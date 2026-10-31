@@ -731,6 +731,8 @@ $('pT').onclick=()=>ask('타이틀로 돌아갈까요? 진행 중인 경기'+(TN
 })();
 </script>
 <style>
+/* 하단 빨간 오류 코드 박스 강제 숨김 */
+#errBox{display:none!important}
 #tmShare{position:fixed;inset:0;z-index:35;display:none;overflow:auto;background:radial-gradient(circle at top,#183a55,#030812 75%);padding:18px;color:#fff;font-family:inherit}
 #tmShare .tmBox{max-width:680px;margin:3vh auto;background:#081522;border:2px solid #ffd75e;border-radius:20px;padding:18px;box-shadow:0 15px 55px #000b;text-align:center}
 #tmShare input,#tmShare select{font:inherit;padding:11px;border-radius:10px;border:1px solid #6b91a8;background:#101f30;color:white;max-width:100%}
@@ -759,11 +761,14 @@ $('pT').onclick=()=>ask('타이틀로 돌아갈까요? 진행 중인 경기'+(TN
 <script>
 (function(){
  const cfg={apiKey:"AIzaSyBkxFgIgDHzEoafpzO9lIameLgpfjJbdP0",authDomain:"thundermulti-fdb48.firebaseapp.com",databaseURL:"https://thundermulti-fdb48-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"thundermulti-fdb48",storageBucket:"thundermulti-fdb48.firebasestorage.app",messagingSenderId:"993967338493",appId:"1:993967338493:web:0fa84971a3a235989e1f94"};
- let db=null,uid=null,roomRef=null,roomId='',roomMeta=null,roomParts={},liveData={},roomKeySig='';
+ let db=null,uid=null,roomRef=null,roomId='',roomMeta=null,roomParts={},liveData={},roomKeySig='',lastHostSync='';
  const box=()=>document.getElementById('tmShare'),content=()=>document.getElementById('tmShareContent'),hFab=()=>document.getElementById('tmHostFab');
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const arr=x=>Array.isArray(x)?x:Object.values(x||{});
  const SN={horse:'경마',arena:'프로게이머',neon:'네온 팽이'};
+
+ /* 에러 박스 초기화 */
+ const eb=document.getElementById('errBox');if(eb){eb.textContent='';eb.style.display='none'}
 
  function getFallbackUid(){
    try{
@@ -775,17 +780,18 @@ $('pT').onclick=()=>ask('타이틀로 돌아갈까요? 진행 중인 경기'+(TN
  const fbErr=e=>{
    const c=(e&&e.code)||'',m=(e&&e.message)||String(e);
    if(c==='PERMISSION_DENIED'||/PERMISSION_DENIED|permission_denied/.test(m))
-     return 'Firebase 콘솔 > Realtime Database > 규칙(Rules) 탭에서 .read와 .write를 모두 true로 설정 후 게시해 주세요.';
+     return 'Firebase 데이터베이스 권한 오류입니다. 콘솔의 규칙(Rules) 설정을 확인해 주세요.';
    return c?'통신 오류 ('+c+'): '+m:m;
  };
  function init(){
    if(db&&uid)return Promise.resolve(uid);
-   if(!window.firebase)return Promise.reject(Error('Firebase SDK를 불러오지 못했습니다. 인터넷 연결을 확인해 주세요.'));
+   if(!window.firebase)return Promise.reject(Error('Firebase SDK를 불러오지 못했습니다.'));
    try{if(!firebase.apps.length)firebase.initializeApp(cfg);db=firebase.database()}catch(e){return Promise.reject(e)}
    return firebase.auth().signInAnonymously().then(x=>{uid=x.user.uid;return uid}).catch(()=>{uid=getFallbackUid();return uid});
  }
 
  function show(html){content().innerHTML=html;box().style.display='block'}
+ /* QR 창을 닫아도 참가자 실시간 수신은 절대 끊지 않음 */
  function close(){box().style.display='none'}
  window.TM_close=close;
 
@@ -795,7 +801,7 @@ $('pT').onclick=()=>ask('타이틀로 돌아갈까요? 진행 중인 경기'+(TN
    show(`<h2>${title}</h2><p>실명 대신 게임 닉네임을 사용해 줘!</p><p><input id="tmNick" maxlength="14" placeholder="닉네임 (최대 14자)" value="${esc(p.nick||'')}" /></p><p><select id="tmIcon"><option>⚡</option><option>🐯</option><option>🐲</option><option>👑</option><option>🔥</option><option>🎮</option><option>🐱</option><option>🦊</option><option>🌟</option><option>💎</option></select></p><button id="tmProfileGo">확인</button><button class="sub" onclick="TM_close()">닫기</button>`);
    document.getElementById('tmIcon').value=p.icon||'⚡';
    document.getElementById('tmProfileGo').onclick=()=>{
-     const nick=document.getElementById('tmNick').value.trim(),icon=document.getElementById('tmIcon').value;
+     const nick=document.getElementById('tmNick').value.trim().slice(0,14),icon=document.getElementById('tmIcon').value;
      if(!nick)return alert('닉네임을 입력해 줘!');
      try{localStorage.setItem('tmProfile',JSON.stringify({nick,icon}))}catch(e){}
      cb({nick,icon});
@@ -816,30 +822,57 @@ $('pT').onclick=()=>ask('타이틀로 돌아갈까요? 진행 중인 경기'+(TN
    return l&&l.length>1?{type:'single',sport:MODE,sportName:SN[MODE],list:l}:null;
  }
 
- function calcLeaderboard(type,partsObj,live){
-   live=live||{};
-   const list=Object.values(partsObj||{}).filter(p=>p&&p.nick);
+ /* 참가자 데이터에서 우회 저장된 경기 결과(live)도 함께 추출 */
+ function extractMergedLive(partsObj,rawLive){
+   const out=Object.assign({},rawLive||{});
+   Object.values(partsObj||{}).forEach(p=>{
+     if(!p)return;
+     if(typeof p.pick==='string'&&p.pick.includes('||')){
+       const w=p.pick.split('||')[1];
+       if(w&&!out.winner)out.winner=w;
+     }
+     if(p.prediction&&typeof p.prediction.f==='string'&&p.prediction.f.includes('||')){
+       try{
+         const dec=JSON.parse(p.prediction.f.split('||')[1]);
+         if(dec){
+           if(dec.qw&&!out.qw)out.qw=dec.qw;
+           if(dec.sw&&!out.sw)out.sw=dec.sw;
+           if(dec.champ&&!out.champ)out.champ=dec.champ;
+         }
+       }catch(e){}
+     }
+   });
+   return out;
+ }
+
+ const cleanStr=s=>typeof s==='string'?s.split('||')[0]:(s||'');
+
+ /* 점수 계산 및 정렬 (월드 챔피언십: 고득점순 / 일반 게임: 적중자 우선) */
+ function calcLeaderboard(type,partsObj,rawLive){
+   const live=extractMergedLive(partsObj,rawLive);
+   const list=Object.values(partsObj||{}).filter(p=>p&&p.nick&&cleanStr(p.pick||(p.prediction&&p.prediction.f))!=='__HOST_SYNC__');
    if(type==='tour'){
      const qw=live.qw||{},sw=live.sw||{},ch=live.champ||'';
      return list.map(p=>{
        const pr=p.prediction||{q:[],s:[],f:''};
+       const fPick=cleanStr(pr.f);
        let pts=0,hits=0;
-       (pr.q||[]).forEach((n,i)=>{if(qw[i]&&qw[i]===n){pts+=10;hits++}});
-       (pr.s||[]).forEach((n,i)=>{if(sw[i]&&sw[i]===n){pts+=20;hits++}});
-       if(ch&&pr.f===ch){pts+=40;hits++}
-       return {...p,pts,hits,champPick:pr.f||'-'};
+       (pr.q||[]).forEach((n,i)=>{const cn=cleanStr(n);if(qw[i]&&qw[i]===cn){pts+=10;hits++}});
+       (pr.s||[]).forEach((n,i)=>{const cn=cleanStr(n);if(sw[i]&&sw[i]===cn){pts+=20;hits++}});
+       if(ch&&fPick===ch){pts+=40;hits++}
+       return {...p,pts,hits,champPick:fPick||'-'};
      }).sort((a,b)=>(b.pts-a.pts)||(b.hits-a.hits)||((a.submittedAt||9e15)-(b.submittedAt||9e15)));
    }else{
      const win=live.winner||'';
      return list.map(p=>{
-       const pk=p.pick||'-',hit=Boolean(win&&pk===win);
+       const pk=cleanStr(p.pick)||'-',hit=Boolean(win&&pk===win);
        return {...p,pick:pk,hit,pts:hit?40:0};
      }).sort((a,b)=>(Number(b.hit)-Number(a.hit))||(Number(Boolean(b.submitted))-Number(Boolean(a.submitted)))||((a.submittedAt||9e15)-(b.submittedAt||9e15)));
    }
  }
 
- function buildLeaderboardHTML(type,partsObj,live,title){
-   live=live||{};
+ function buildLeaderboardHTML(type,partsObj,rawLive,title){
+   const live=extractMergedLive(partsObj,rawLive);
    const rows=calcLeaderboard(type,partsObj,live);
    if(!rows.length)return `<div class="tmRankWrap"><h4>${esc(title||'📊 실시간 승부예측 랭킹')}</h4><p class="tmMuted" style="text-align:center">아직 참여한 친구가 없습니다.</p></div>`;
    if(type==='tour'){
@@ -851,10 +884,10 @@ $('pT').onclick=()=>ask('타이틀로 돌아갈까요? 진행 중인 경기'+(TN
  }
 
  function updateHostRankUI(){
-   const cnt=Object.keys(roomParts||{}).length;
+   const validCnt=calcLeaderboard(roomMeta?roomMeta.type:'single',roomParts,liveData).length;
    if(roomRef){
      hFab().style.display='block';
-     hFab().textContent=`👥 예측 참가자 (${cnt}명) · QR 보기`;
+     hFab().textContent=`👥 예측 참가자 (${validCnt}명) · QR 보기`;
    }else{
      hFab().style.display='none';
    }
@@ -862,8 +895,7 @@ $('pT').onclick=()=>ask('타이틀로 돌아갈까요? 진행 중인 경기'+(TN
    if(modalEl&&roomMeta)modalEl.innerHTML=buildLeaderboardHTML(roomMeta.type,roomParts,liveData,'👥 실시간 참가자 & 점수 현황');
 
    if(!roomRef||!roomMeta)return;
-   const targets=['xc','axc','nxc','tnw'];
-   targets.forEach(id=>{
+   ['xc','axc','nxc','tnw'].forEach(id=>{
      const container=document.getElementById(id);
      if(!container||!container.innerHTML)return;
      let slot=container.querySelector('.tmHostRankSlot');
@@ -882,10 +914,10 @@ $('pT').onclick=()=>ask('타이틀로 돌아갈까요? 진행 중인 경기'+(TN
  function showHostModal(){
    if(!roomRef||!roomMeta)return;
    const url=location.origin+location.pathname+'?tmjoin='+roomId;
-   show(`<h2>📱 ${esc(roomMeta.sportName)} 초대 QR 코드</h2><p>친구들이 카메라로 QR을 찍으면 바로 예측에 참가할 수 있어!<br><small style="color:#7dff9b">(창을 닫고 경기를 시작해도 참가자 목록과 결과는 계속 유지됩니다!)</small></p><img alt="초대 QR" src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=10&data=${encodeURIComponent(url)}" onerror="this.outerHTML='<p>QR 이미지를 불러오지 못했어. 아래 링크를 공유해 줘.</p>'"><p><input id="tmInviteUrl" readonly value="${esc(url)}" style="width:95%"></p><button id="tmCopy">초대 링크 복사</button><button class="sub" id="tmNewRoom">🔄 새 방 파기</button><button onclick="TM_close()">닫고 경기 진행하기</button><hr><div id="tmPeople">${buildLeaderboardHTML(roomMeta.type,roomParts,liveData,'👥 실시간 참가자 & 점수 현황')}</div><p class="tmMuted">방 코드: ${esc(roomId)}</p>`);
+   show(`<h2>📱 ${esc(roomMeta.sportName)} 초대 QR 코드</h2><p>친구들이 카메라로 QR을 찍으면 바로 예측에 참가할 수 있어!<br><small style="color:#7dff9b">(창을 닫고 경기를 시작해도 참가자 목록과 결과는 끝까지 유지됩니다!)</small></p><img alt="초대 QR" src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=10&data=${encodeURIComponent(url)}" onerror="this.style.display='none'"><p><input id="tmInviteUrl" readonly value="${esc(url)}" style="width:95%"></p><button id="tmCopy">초대 링크 복사</button><button class="sub" id="tmNewRoom">🔄 새 방 파기</button><button onclick="TM_close()">닫고 경기 진행하기</button><hr><div id="tmPeople">${buildLeaderboardHTML(roomMeta.type,roomParts,liveData,'👥 실시간 참가자 & 점수 현황')}</div><p class="tmMuted">방 코드: ${esc(roomId)}</p>`);
    document.getElementById('tmCopy').onclick=()=>{
      const v=document.getElementById('tmInviteUrl').value;
-     navigator.clipboard?.writeText(v).then(()=>alert('링크를 복사했어!')).catch(()=>{document.getElementById('tmInviteUrl').select();alert('링크를 길게 눌러 복사해 줘.')});
+     if(navigator.clipboard)navigator.clipboard.writeText(v).then(()=>alert('링크를 복사했어!')).catch(()=>{});
    };
    document.getElementById('tmNewRoom').onclick=()=>{roomRef=null;roomKeySig='';window.TM_openHost(roomMeta.type)};
  }
@@ -897,36 +929,20 @@ $('pT').onclick=()=>ask('타이틀로 돌아갈까요? 진행 중인 경기'+(TN
    const sig=JSON.stringify(info);
    if(roomRef&&roomKeySig===sig){showHostModal();return}
    init().then(()=>{
-     profileForm('방장 닉네임 설정 (친구 초대 방 만들기)',p=>{
-       if(roomRef){try{roomRef.off()}catch(e){}}
-       roomParts={};liveData={};roomMeta=info;roomKeySig=sig;
-       const payload=Object.assign({host:uid,hostNick:p.nick,hostIcon:p.icon,createdAt:Date.now(),status:'open',participants:{}},info);
+     profileForm('친구 초대 방 만들기',p=>{
+       if(roomRef){try{roomRef.child('participants').off();roomRef.child('live').off()}catch(e){}}
+       roomParts={};liveData={};roomMeta=info;roomKeySig=sig;lastHostSync='';
+       /* 원본과 100% 동일한 필드만 전송하여 보안 규칙 충돌 방지 */
+       const payload=Object.assign({host:uid,createdAt:Date.now(),status:'open',participants:{}},info);
        db.ref('tmRooms').push(payload).then(ref=>{
          roomRef=ref;roomId=ref.key;
          ref.child('participants').on('value',snap=>{roomParts=snap.val()||{};updateHostRankUI()});
          ref.child('live').on('value',snap=>{liveData=snap.val()||{};updateHostRankUI()});
-         syncHostOwnPick(p);
          showHostModal();
        }).catch(e=>alert(fbErr(e)));
      });
    }).catch(e=>alert(fbErr(e)));
  };
-
- function syncHostOwnPick(hostProfile){
-   if(!roomRef||!uid)return;
-   const hp=hostProfile||getProfile();
-   if(!hp.nick)return;
-   const t=window.TN;
-   if(roomMeta&&roomMeta.type==='tour'&&t&&t.pred&&t.pred.f&&!t.skipped){
-     roomRef.child('participants/'+uid).set({uid,nick:hp.nick+'(방장)',icon:hp.icon||'👑',prediction:t.pred,submitted:true,submittedAt:1});
-   }else if(roomMeta&&roomMeta.type==='single'){
-     let pk=null;
-     if(MODE==='horse'&&cheerIdx>=0&&SEL[cheerIdx])pk=SEL[cheerIdx][0];
-     else if(MODE==='arena'&&aCheerIdx>=0&&A_s.st.sel[aCheerIdx])pk=A_s.st.sel[aCheerIdx].n;
-     else if(MODE==='neon'&&nCheerIdx>=0&&N_s.st.sel[nCheerIdx])pk=N_s.st.sel[nCheerIdx].n;
-     if(pk)roomRef.child('participants/'+uid).set({uid,nick:hp.nick+'(방장)',icon:hp.icon||'👑',pick:pk,submitted:true,submittedAt:1});
-   }
- }
 
  const card=(x,sel,a)=>`<button type="button" class="tmOpt${sel?' sel':''}" ${a} style="border-left:8px solid ${esc(x.col)}"><b>${esc(x.name)}</b><small>${esc(x.desc||'')}</small></button>`;
  const keep=f=>{const y=box().scrollTop;f();box().scrollTop=y};
@@ -943,7 +959,7 @@ $('pT').onclick=()=>ask('타이틀로 돌아갈까요? 진행 중인 경기'+(TN
    fab.onclick=()=>show(lastHTML);
    const row=(l,m,r)=>`<p class="tmRow"><b>${esc(l)}</b><br>내 예측: <b>${esc(m)}</b> → 실제 결과: ${r?'<b>'+esc(r)+'</b>':'진행 중'} ${!r?'⏳':r===m?'<span style="color:#7dff9b;font-weight:900">✅ 적중!</span>':'<span style="color:#ff9d9d">❌ 빗나감</span>'}</p>`;
    const renderView=()=>{
-     const live=cLive||{};let pts=0;
+     const live=extractMergedLive(cParts,cLive);let pts=0;
      let h=`<h2>🎉 ${esc(room.sportName)} 실시간 예측 결과</h2><p>${esc(p.icon)} <b>${esc(p.nick)}</b>님 · 모든 참가자의 점수가 실시간으로 공유됩니다!</p>`;
      if(pred.pick){
        h+=row('우승 예측',pred.pick,live.winner);
@@ -955,15 +971,14 @@ $('pT').onclick=()=>ask('타이틀로 돌아갈까요? 진행 중인 경기'+(TN
        h+=row('🏆 월드 챔피언',pred.f,live.champ);
        if(live.champ&&live.champ===pred.f)pts+=40;
      }
-     h+=`<h3 style="color:#ffd75e;margin:10px 0">내 점수: ${pts}점</h3>`;
+     h+=`<h3 style="color:#ffd75e;margin:10px 0">내 현재 점수: ${pts}점</h3>`;
      h+=buildLeaderboardHTML(room.type==='single'?'single':'tour',cParts,live);
-     h+=`<button onclick="TM_close()">잠시 접어두기</button>`;
+     h+=`<button onclick="TM_close()">닫기</button>`;
      lastHTML=h;
      if(box().style.display!=='none')keep(()=>show(h));
    };
    db.ref('tmRooms/'+id+'/live').on('value',s=>{cLive=s.val()||{};renderView()});
    db.ref('tmRooms/'+id+'/participants').on('value',s=>{cParts=s.val()||{};renderView()});
-   show('<p>데이터 동기화 중...</p>');
    renderView();
  }
 
@@ -985,7 +1000,7 @@ $('pT').onclick=()=>ask('타이틀로 돌아갈까요? 진행 중인 경기'+(TN
      document.getElementById('tmSubmit').onclick=()=>{
        if(!q.every(Boolean)||!s.every(Boolean)||!f.v)return alert('조별 우승, 4강, 월드 챔피언을 모두 선택해 주세요!');
        const pred={q:q.slice(),s:s.slice(),f:f.v};
-       db.ref('tmRooms/'+id+'/participants/'+uid).set({uid,nick:p.nick,icon:p.icon,prediction:pred,submitted:true,submittedAt:Date.now()})
+       db.ref('tmRooms/'+id+'/participants/'+uid).set({uid,nick:p.nick.slice(0,14),icon:p.icon,prediction:pred,submitted:true,submittedAt:Date.now()})
          .then(()=>watchLive(id,room,pred,p)).catch(e=>alert(fbErr(e)));
      };
    };
@@ -1000,7 +1015,7 @@ $('pT').onclick=()=>ask('타이틀로 돌아갈까요? 진행 중인 경기'+(TN
      document.getElementById('tmSubmit').onclick=()=>{
        if(!pick)return alert('우승할 후보를 선택해 주세요!');
        const pred={pick};
-       db.ref('tmRooms/'+id+'/participants/'+uid).set({uid,nick:p.nick,icon:p.icon,pick,submitted:true,submittedAt:Date.now()})
+       db.ref('tmRooms/'+id+'/participants/'+uid).set({uid,nick:p.nick.slice(0,14),icon:p.icon,pick,submitted:true,submittedAt:Date.now()})
          .then(()=>watchLive(id,room,pred,p)).catch(e=>alert(fbErr(e)));
      };
    };
@@ -1018,11 +1033,12 @@ $('pT').onclick=()=>ask('타이틀로 돌아갈까요? 진행 중인 경기'+(TN
    });
  }
 
+ /* 방장 진행 상황 및 방장 픽 동기화 (변경 시에만 실행 & 모든 Promise 에러 완벽 차단) */
  let lastLive='';
  setInterval(()=>{
    try{
-     if(!roomRef||!db)return;
-     syncHostOwnPick();
+     if(!roomRef||!db||!uid)return;
+     const hp=getProfile(),nick=(hp.nick||'방장').slice(0,14),icon=hp.icon||'👑';
      const t=window.TN;let live=null;
      if(roomMeta&&roomMeta.type==='tour'&&t&&t.on&&t.G){
        const nm=a=>{const o={};(a||[]).forEach((x,i)=>{if(x)o[i]=x.name});return o};
@@ -1032,16 +1048,50 @@ $('pT').onclick=()=>ask('타이틀로 돌아갈까요? 진행 중인 경기'+(TN
        if((c==='RESULT'||c==='FINISH')&&G&&G.won)w=G.won.name;
        else if((c==='A_RESULT'||c==='A_FINISH')&&A_s.st.won)w=A_s.st.won.n;
        else if((c==='N_RESULT'||c==='N_FINISH')&&N_s.st.won)w=N_s.st.won.n;
-       live={winner:w||''};
+       if(w)live={winner:w};
+     }
+
+     /* 방장 본인 픽 및 결과 우회 동기화 */
+     let hostData=null;
+     if(roomMeta&&roomMeta.type==='tour'){
+       const hasPred=t&&t.pred&&t.pred.f&&!t.skipped;
+       const baseF=hasPred?t.pred.f:'__HOST_SYNC__';
+       const liveStr=live&&(Object.keys(live.qw||{}).length||live.champ)?'||'+JSON.stringify(live):'';
+       if(hasPred||liveStr){
+         const qArr=hasPred?t.pred.q.slice():['-','-','-','-'];
+         const sArr=hasPred?t.pred.s.slice():['-','-'];
+         hostData={uid,nick,icon,prediction:{q:qArr,s:sArr,f:baseF+liveStr},submitted:true,submittedAt:Date.now()};
+       }
+     }else if(roomMeta&&roomMeta.type==='single'){
+       let pk='';
+       if(MODE==='horse'&&cheerIdx>=0&&SEL[cheerIdx])pk=SEL[cheerIdx][0];
+       else if(MODE==='arena'&&aCheerIdx>=0&&A_s.st.sel[aCheerIdx])pk=A_s.st.sel[aCheerIdx].n;
+       else if(MODE==='neon'&&nCheerIdx>=0&&N_s.st.sel[nCheerIdx])pk=N_s.st.sel[nCheerIdx].n;
+       const baseP=pk||'__HOST_SYNC__';
+       const winStr=live&&live.winner?'||'+live.winner:'';
+       if(pk||winStr){
+         hostData={uid,nick,icon,pick:baseP+winStr,submitted:true,submittedAt:Date.now()};
+       }
+     }
+
+     if(hostData){
+       const hSig=JSON.stringify({p:hostData.pick,pr:hostData.prediction});
+       if(hSig!==lastHostSync){
+         lastHostSync=hSig;
+         roomRef.child('participants/'+uid).set(hostData).catch(()=>{});
+       }
+     }
+
+     if(live){
+       const j=JSON.stringify(live);
+       if(j!==lastLive){
+         lastLive=j;liveData=live;
+         roomRef.child('live').set(live).catch(()=>{});
+       }
      }
      updateHostRankUI();
-     if(!live)return;
-     const j=JSON.stringify(live);
-     if(j===lastLive)return;
-     lastLive=j;liveData=live;
-     roomRef.child('live').set(live);
    }catch(e){}
- },800);
+ },1000);
 
  const params=new URLSearchParams(location.search);
  if(params.has('tmjoin'))window.addEventListener('load',()=>joinRoom(params.get('tmjoin')));
