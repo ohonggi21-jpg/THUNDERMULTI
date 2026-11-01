@@ -236,6 +236,50 @@ body.TENNIS_PREP #sp,body.TENNIS_MATCH #sp,body.TENNIS_RESULT #sp{z-index:26}
 @media (orientation:landscape) and (max-height:520px){#oX .card,#oAX .card,#oNX .card{max-width:min(92vw,900px);padding:10px}#xc h2,#axc h2,#nxc h2{font-size:clamp(22px,4vw,38px)}#xc h3,#axc h3,#nxc h3{font-size:clamp(20px,3.6vw,34px);margin:5px 0}}
 @media (prefers-reduced-motion:reduce){#oX .card,#oAX .card,#oNX .card,#tnResult .tnWinCard,#tnResult .tnWinIcon,#tnResult #tnWinner,#xc h2,#axc h2,#nxc h2{animation:none!important}#oX .card::after,#oAX .card::after,#oNX .card::after,#tnResult .tnWinCard::after{animation:none!important}}
 
+/* Tennis camera and responsive redesign */
+#tennisApp{padding:clamp(6px,1.15vw,18px);overflow:hidden}
+#tnMatch{height:100%;min-height:0}
+.tnCourtWrap{flex:1 1 auto;min-height:180px;margin:8px 0;background:radial-gradient(ellipse at 50% 75%,#1c5872,#050d19 75%);border:2px solid #4abde0;box-shadow:0 0 0 3px #1ad7ff18,inset 0 0 55px #000b,0 12px 35px #0009}
+#tnCourt{width:100%;height:100%;display:block}
+.tnScoreboard{flex:0 0 auto;background:linear-gradient(100deg,#061b31,#123d5b 48%,#061b31);border-color:#53c8ee;box-shadow:0 0 22px #16b9ed22,0 12px 30px #0007}
+.tnScoreCenter>div{background:linear-gradient(145deg,#123c59,#071a2b)!important;border-color:#3b91b5!important}
+.tnScoreCenter strong{color:#fff;text-shadow:0 0 14px #30dfff88}
+.tnLogPanel{border-color:#3788a9;background:linear-gradient(100deg,#061725,#102e43)}
+#tnEventToast{background:linear-gradient(120deg,#092c4cf2,#087b72f2);box-shadow:0 0 35px #00dfff66,0 10px 35px #0009}
+#tnPrep{height:100%;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.tnPrepGrid{flex:1 1 auto;min-height:0;height:auto}
+@media(orientation:landscape) and (min-width:700px){.tnPrepGrid{grid-template-columns:minmax(270px,.78fr) minmax(0,1.42fr)}.tnOptions,.tnPreviewPanel{overflow-y:auto}}
+@media(orientation:portrait),(max-width:699px){
+ #tennisApp{overflow-y:auto;overflow-x:hidden;padding:8px}
+ #tnPrep{height:auto;min-height:100%;overflow:visible}
+ .tnHeader{align-items:flex-start;padding:4px 2px 12px}
+ .tnPrepGrid{display:flex;flex-direction:column;height:auto;max-height:none;overflow:visible;gap:10px}
+ .tnPanel{overflow:visible;border-radius:15px}
+ .tnOptions label{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);font-size:12px}
+ .tnOptions select{min-height:42px}
+ .tnActionRow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .tnActionRow button{width:100%;min-width:0;min-height:44px;padding:9px 7px}
+ .tnStartRow{position:sticky;bottom:0;padding:8px 0 max(8px,env(safe-area-inset-bottom));background:linear-gradient(transparent,#061321 25%);z-index:3}
+ .tnStartBtn{width:100%;min-height:54px}
+ #tnPreview{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:6px}
+ .tnPlayerCard{padding:9px}.tnPcTop{display:block;font-size:12px}.tnPcTop b{display:block;margin-top:4px}.tnPcStats span{font-size:8px}
+ .tnMatchFooter{flex-direction:column;min-height:0;gap:7px}.tnLogPanel{min-height:43px}
+ .tnControls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+ .tnControls label{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between}
+ .tnControls button{width:100%;min-width:0;padding:8px 4px;font-size:11px}
+ .tnScoreboard{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px}.tnScoreCenter{grid-column:1/-1;grid-row:2}
+ .tnCourtWrap{min-height:clamp(230px,39vh,430px)}
+}
+@media(orientation:landscape) and (max-height:560px){
+ #tennisApp{padding:4px}.tnHeader{padding:0 2px 4px}.tnHeader h2{font-size:24px}.tnHeader p{display:none}
+ .tnPrepGrid{grid-template-columns:minmax(235px,.72fr) minmax(0,1.4fr);height:calc(100% - 48px);gap:8px}
+ .tnPanel{padding:8px}.tnOptions{gap:4px}.tnOptions label{font-size:10px;gap:5px}
+ .tnOptions select{padding:5px 7px;min-height:30px;font-size:10px}
+ .tnActionRow{margin-top:4px;gap:5px}.tnActionRow button{min-height:34px;padding:5px;font-size:10px}
+ .tnStartRow{margin-top:5px}.tnStartBtn{min-height:38px;font-size:14px!important}.tnHint{font-size:8px}
+ .tnScoreboard{padding:4px;gap:5px}.tnCourtWrap{min-height:120px;margin:4px 0}
+ .tnMatchFooter{min-height:40px;gap:5px}.tnLogPanel{padding:3px 7px}.tnControls button{min-height:30px;padding:4px 7px}
+}
 </style></head><body class="TITLE">
 <canvas id="cv"></canvas>
 <div id="hud"><div id="tb"><b id="tm">0.0초</b><b id="ld">-</b><b id="rm">-</b></div><div id="bar"></div><div id="rk"></div></div>
