@@ -718,7 +718,7 @@ Mtm.push(setTimeout(()=>{cd.replaceChildren();cd.style.display='none';if(!TN.mul
 function tennisPanelHud(g){
  const st=TX.st;if(!st)return;const P=st.P,fs=Math.max(18,Math.min(31,W*.023)),lh=fs*1.38,pad=18,bx=16,by=16,bw=W-32,bh=lh*3.55;
  const surf=TN.tennisSurf==='hard'?'하드 코트':TN.tennisSurf==='clay'?'클레이 코트':'잔디 코트';
- const pt=i=>st.pt[i]>3?'AD':['0','15','30','40'][st.pt[i]]||'0';
+ const pt=i=>st.pt[i]>3?'게임':['0','15','30','40'][st.pt[i]]||'0';
  cx.save();
  cx.fillStyle='rgba(3,10,24,.88)';cx.fillRect(bx,by,bw,bh);cx.strokeStyle='#ffd75e';cx.lineWidth=3;cx.strokeRect(bx,by,bw,bh);
  cx.textAlign='left';cx.textBaseline='middle';cx.fillStyle='#ffd75e';cx.font='900 '+fs+'px sans-serif';
