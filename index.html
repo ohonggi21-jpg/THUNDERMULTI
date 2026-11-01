@@ -625,9 +625,9 @@ $('vs').oninput=e=>{vs=e.target.value/100;vol()};
 ['touchstart','pointerdown','mousedown','keydown'].forEach(ev=>document.addEventListener(ev,aud,{passive:true,capture:true}));
 addEventListener('resize',rs);
 addEventListener('orientationchange',()=>{setTimeout(rs,100);setTimeout(rs,350)});
-$('cd').addEventListener('click',e=>{if(S!=='HORSE_CONFIRM')return;const card=e.target.closest('.rc');if(!card)return;const cards=[...$('cd').children],idx=cards.indexOf(card);if(idx<0)return;cheerIdx=idx;cards.forEach((c,i)=>c.classList.toggle('sel',i===idx));sfx('click')});
-$('acd').addEventListener('click',e=>{if(S!=='A_CONFIRM')return;const card=e.target.closest('.rc');if(!card)return;const cards=[...$('acd').children],idx=cards.indexOf(card);if(idx<0)return;aCheerIdx=idx;cards.forEach((c,i)=>c.classList.toggle('sel',i===idx));sfx('click')});
-$('ncd').addEventListener('click',e=>{if(S!=='N_CONFIRM')return;const card=e.target.closest('.rc');if(!card)return;const cards=[...$('ncd').children],idx=cards.indexOf(card);if(idx<0)return;nCheerIdx=idx;cards.forEach((c,i)=>c.classList.toggle('sel',i===idx));sfx('click')});
+$('cd').addEventListener('click',e=>{if(S!=='HORSE_CONFIRM')return;const card=e.target.closest('.rc');if(!card)return;const cards=[...$('cd').children],idx=cards.indexOf(card);if(idx<0)return;cheerIdx=idx;cards.forEach((c,i)=>c.classList.toggle('sel',i===idx));if(window.TM_setHostPick&&SEL[idx])window.TM_setHostPick(SEL[idx][0]);sfx('click')});
+$('acd').addEventListener('click',e=>{if(S!=='A_CONFIRM')return;const card=e.target.closest('.rc');if(!card)return;const cards=[...$('acd').children],idx=cards.indexOf(card);if(idx<0)return;aCheerIdx=idx;cards.forEach((c,i)=>c.classList.toggle('sel',i===idx));if(window.TM_setHostPick&&A_s.st.sel[idx])window.TM_setHostPick(A_s.st.sel[idx].n);sfx('click')});
+$('ncd').addEventListener('click',e=>{if(S!=='N_CONFIRM')return;const card=e.target.closest('.rc');if(!card)return;const cards=[...$('ncd').children],idx=cards.indexOf(card);if(idx<0)return;nCheerIdx=idx;cards.forEach((c,i)=>c.classList.toggle('sel',i===idx));if(window.TM_setHostPick&&N_s.st.sel[idx])window.TM_setHostPick(N_s.st.sel[idx].n);sfx('click')});
 function cheer(){
   aud(); if(performance.now()-lastCheer<650)return; lastCheer=performance.now();
   if(S==='A_BATTLE'||S==='A_FINISH'){A_s.cheer();return}
@@ -860,6 +860,7 @@ $('pT').onclick=()=>ask('타이틀로 돌아갈까요? 진행 중인 경기'+(TN
   document.getElementById('tmCopy').onclick=()=>{const v=document.getElementById('tmInviteUrl').value;navigator.clipboard?.writeText(v).then(()=>alert('링크를 복사했어!')).catch(()=>{document.getElementById('tmInviteUrl').select();alert('링크를 길게 눌러 복사해 줘.')})};
   paintPeople()}
  function hostJoin(extra){if(!db||!roomRef||!uid)return Promise.resolve();const p=getProfile();return roomRef.child('participants/'+uid).set(Object.assign({uid,nick:String(p.nick||'방장')+'(방장)',icon:String(p.icon||'👑'),submitted:true,submittedAt:Date.now()},extra))}
+ window.TM_setHostPick=name=>{if(!hostInfo||!roomRef||hostInfo.type!=='single'||!name)return;const valid=arr(hostInfo.list).some(x=>x.name===name);if(!valid)return;hostJoin({pick:name}).catch(e=>console.warn('방장 예측 저장 실패',e))};
  function syncHostPred(){try{const t=window.TN;if(!roomRef||!isTour()||!t.locked||t.skipped)return;const P=t.pred;if(!P||!P.f||!P.q.every(Boolean)||!P.s.every(Boolean))return;const key=JSON.stringify(P);if(key===hostPredKey)return;hostPredKey=key;hostJoin({prediction:{q:P.q.slice(),s:P.s.slice(),f:P.f}})}catch(e){}}
  window.TM_hostPick=()=>{if(!hostInfo)return;const L=arr(hostInfo.list);let pick=null;const draw=()=>{keep(()=>show(`<h2>🙋 방장 예측 (선택)</h2><p>${esc(hostInfo.sportName)} 우승 후보를 골라봐! 안 해도 괜찮아요.</p>${L.map((x,i)=>card(x,pick===x.name,`data-i="${i}"`)).join('')}<p><button id="tmHP">예측 저장</button><button id="tmHB">뒤로</button></p>`));
  document.querySelectorAll('#tmShare .tmOpt').forEach(b=>b.onclick=()=>{pick=L[+b.dataset.i].name;draw()});document.getElementById('tmHB').onclick=showInvite;
