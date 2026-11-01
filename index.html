@@ -733,7 +733,7 @@ function tennisPanelHud(g){
  cx.fillStyle=TX.multiEv&&TX.evT>0?(TX.multiEv.good?'#9dffb4':'#ffb2b2'):'#fff';cx.font='800 '+Math.round(fs*.82)+'px sans-serif';cx.fillText(ev,bx+pad,ey+eh/2,bw-pad*2);
  cx.restore();
 }
-function stat(g){const m=MM[g];if(TN.sp==='tennis'){tennisLd(g);const z=TX.st;return `${Math.floor(TX.time)}초 · ${z.rw[0]}:${z.rw[1]} · ${z.P[z.srv].name} 서브`}if(TN.sp=='horse'){const o=ranked(),L=o[0];return`${G.t.toFixed(0)}초 · 1위 ${L.name} ${Math.min(100,L.pos/10|0)}%`}
+function stat(g){const m=MM[g];if(TN.sp==='tennis'){const z=TX.st;return `${Math.floor(TX.time)}초 · ${z.rw[0]}:${z.rw[1]} · ${z.P[z.srv].name} 서브`}if(TN.sp=='horse'){const o=ranked(),L=o[0];return`${G.t.toFixed(0)}초 · 1위 ${L.name} ${Math.min(100,L.pos/10|0)}%`}
 const e=E(),st=e.st,L=TN.sp=='arena'?st.fighters:st.tops,A=L.filter(f=>f.alive).sort((a,b)=>(TN.sp=='arena'?b.hp-a.hp:b.rpm-a.rpm)),k=L.reduce((a,f)=>Math.max(a,f.kills),0);
 return`${st.t.toFixed(0)}초 · 생존 ${A.length}/${L.length}`+(A[0]?` · ${A[0].n} ${TN.sp=='arena'?'HP '+(A[0].hp|0):'RPM '+(A[0].rpm|0)}`:'')+` · 최다처치 ${k}`}
 TN.mf=dt=>{const t=TN,M=MM,H=t.sp=='horse';if(t.run){const cd=$('mcd');if(cd.style.display!=='none'){cd.replaceChildren();cd.style.display='none'}}
@@ -741,7 +741,7 @@ if(t.run)M.forEach((m,g)=>{if(m.fd>1.6)return;if(t.sp==='tennis'){tennisLd(g);S=
 if(m.won&&m.fd<0)m.fd=0;if(m.fd>=0)m.fd+=dt;sv(g)});
 exc+=(.5-exc)*dt*2;if(AC)cg.gain.value=mut?0:exc*vs*.35;if(flash>0)flash=Math.max(0,flash-dt*1.6);shk*=.9;
 cx.fillStyle='#000';cx.fillRect(0,0,W,CH);const z=t.zoom,R4=[];let k=0;for(let g=0;g<4;g++){R4[g]=z<0?[(g%2)*W/2,(g>>1)*CH/2,W/2,CH/2,.5]:g==z?[0,0,W,CH,1]:[8,8+(k++)*(CH*.245+8),W*.26,CH*.235,.26]}
-(z<0?[0,1,2,3]:[z,...[0,1,2,3].filter(g=>g!=z)]).forEach(g=>{const[x,y,w,h,sc]=R4[g],m=M[g],q=$('mq'+g);cx.save();cx.beginPath();cx.rect(x,y,w,h);cx.clip();cx.translate(x,y);cx.scale(sc,sc);if(t.sp==='tennis'){tennisLd(g);S='T_MATCH';TX._multi.draw(dt)}else{ld(g)}/* 각 경기 장면을 그릴 때만 밝기를 보정하고, 테두리·라벨은 원래 색으로 유지 */if(t.sp==='tennis'){/* tennis draw was rendered above */}else if(H){S=m.fd>=0?'FINISH':'RACING';scene(m.fd>1.6||!t.run?0:dt)}else E().render();/* 모바일 성능을 위해 Canvas filter 대신 단일 반투명 레이어로 밝기 보정 */cx.fillStyle='rgba(255,255,255,0.26)';cx.fillRect(0,0,W,CH);if(t.sp==='tennis')tennisPanelHud(g);
+(z<0?[0,1,2,3]:[z,...[0,1,2,3].filter(g=>g!=z)]).forEach(g=>{const[x,y,w,h,sc]=R4[g],m=M[g],q=$('mq'+g);cx.save();cx.beginPath();cx.rect(x,y,w,h);cx.clip();cx.translate(x,y);cx.scale(sc,sc);if(t.sp==='tennis'){tennisLd(g);S='T_MATCH';TX._multi.draw(dt);tennisSv(g)}else{ld(g)}/* 각 경기 장면을 그릴 때만 밝기를 보정하고, 테두리·라벨은 원래 색으로 유지 */if(t.sp==='tennis'){/* tennis draw was rendered above */}else if(H){S=m.fd>=0?'FINISH':'RACING';scene(m.fd>1.6||!t.run?0:dt)}else E().render();/* 모바일 성능을 위해 Canvas filter 대신 단일 반투명 레이어로 밝기 보정 */cx.fillStyle='rgba(255,255,255,0.26)';cx.fillRect(0,0,W,CH);if(t.sp==='tennis')tennisPanelHud(g);
 const tx=stat(g);cx.restore();cx.strokeStyle=m.fd>=0?'#ffd75e':'#fff6';cx.lineWidth=m.fd>=0?3:1;cx.strokeRect(x,y,w,h);
 const key=[x,y,w,h].join();if(q._k!=key){q._k=key;q.style.cssText=`left:${x}px;top:${y}px;width:${w}px;height:${h}px`;q.classList.toggle('sm',sc<.4);q.classList.toggle('mn',g==z)}
 q.firstChild.textContent=`${'ABCD'[g]}${TN.sp=='horse'?'팀':'조'}`+(sc<.4?'':' · '+(m.fd>=0?'경기 종료':tx));q.classList.toggle('dn',m.fd>=0);q.lastChild.textContent=m.fd>=0?(sc<.4?'🏆':`경기 종료 🏁\n4강 진출! 🏆 ${m.wn||''}`):''});
