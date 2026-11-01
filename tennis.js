@@ -166,7 +166,7 @@ function updateUI(){
  $('tnLeftName').textContent=s.sides[0].members.map(p=>p.flag+' '+p.name).join(' / ');$('tnRightName').textContent=s.sides[1].members.map(p=>p.flag+' '+p.name).join(' / ');
  $('tnLeftRank').textContent='OVR '+s.sides[0].rating+' · '+s.sides[0].styles;$('tnRightRank').textContent='OVR '+s.sides[1].rating+' · '+s.sides[1].styles;
  $('tnSetScore').textContent=s.sets[0]+' : '+s.sets[1];$('tnGameScore').textContent=s.games[0]+' : '+s.games[1]+(s.tiebreak?' · 타이브레이크':'');$('tnPointScore').innerHTML=scorePoint(s);
- $('tnServer').textContent=s.server===0?'●':'';$('tnServer2').textContent=s.server===1?'●';$('tnStaminaA').style.width=s.stamina[0]+'%';$('tnStaminaB').style.width=s.stamina[1]+'%';
+ $('tnServer').textContent=s.server===0?'●':'';$('tnServer2').textContent=s.server===1?'●':'';$('tnStaminaA').style.width=s.stamina[0]+'%';$('tnStaminaB').style.width=s.stamina[1]+'%';
  $('tnAceA').textContent='ACE '+s.aces[0];$('tnAceB').textContent='ACE '+s.aces[1];$('tnSetHistory').textContent=s.history.map((h,i)=>(i+1)+'세트 '+h.a+':'+h.b+(h.tb?' (TB '+h.tb+')':'')).join('   ')||'첫 세트';
  $('tnRoundLabel').textContent=tournament?tournament.roundLabel+' · '+(tournament.index+1)+'/'+tournament.pairs.length:'프로 매치';
 }
