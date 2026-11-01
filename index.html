@@ -997,7 +997,7 @@ TX._multi={
 };
 /* ---------- 매치 준비 ---------- */
 function newMatch(){const sex=R()<.5?'M':'F',pool=PL.filter(b=>b[4]===sex).sort(()=>R()-.5).slice(0,2),su=['hard','clay','grass'][R()*3|0];TX.sex=sex;TX.surf=su;TX.pl=pool.map(mkP);TX.prob=oddsP(TX.pl[0],TX.pl[1],su);TX.odds=TX.prob.map(p=>cl(.94/p,1.05,9.9));TX.st=mk(TX.pl[0],TX.pl[1],su);resetView()}
-function resetView(){TX.anim=null;TX.gap=0;TX.time=0;TX.win=null;TX.saved=0;TX.pu=[0,0];TX.z=1;TX.cf=[];TX.pop=null;TX.fin=0;TX.evT=0;TX.last=null;TX.hl=[0,0]}
+function resetView(){TX.anim=null;TX.gap=0;TX.time=0;TX.win=null;TX.saved=0;TX.pu=[0,0];TX.py=TX.st?(TX.st.side===0?[.97,.03]:[.03,.97]):[.97,.03];TX.z=1;TX.cf=[];TX.pop=null;TX.fin=0;TX.evT=0;TX.last=null;TX.hl=[0,0]}
 TX.qr=()=>TX.pl.map((p,i)=>({name:p.name,col:i?C1:C0,desc:FL[p.cc]+' 세계 '+p.rank+'위 · '+STL[p.sty]+' · 배당 '+TX.odds[i].toFixed(2)+'배'}));
 const ov=h=>{$('oTX').innerHTML=h;$('oTX').scrollTop=0};
 const bar=(l,v)=>`<div class="sbar"><span>${l}</span><i><u style="width:${v}%"></u></i><b>${v}</b></div>`;
@@ -1017,23 +1017,28 @@ $('txh').firstElementChild.innerHTML=row(0)+row(1)+`<div class="ts">${SUN[st.sur
 function showEv(ev){const P=TX.st.P,w=ev.who===2?'양 선수':P[ev.who].name,e=$('txe');e.innerHTML=`⚡ <b>${ev.name}</b> · ${w} — ${ev.desc}`;e.style.opacity=1;e.style.borderColor=ev.good?'#7dff9b':'#ff9d9d';TX.multiEv={text:`⚡ ${ev.name} · ${w} — ${ev.desc}`,good:!!ev.good};TX.evT=2.6;sfx(ev.good?'up':'down')}
 function build(info){const st=TX.st,nr=st.side?1:0,vB=i=>i===nr?.97:.03,s=info.s,sh=[];let t=0;
 if(info.type=='df'){for(let q=0;q<2;q++){sh.push({h:s,a:{u:TX.pu[s],v:vB(s)},b:{u:q?-1.25:1.25,v:s===nr?.22:.78},t0:t,t1:t+.28,arc:30,out:1,type:info.type});t+=.3}return{sh,dur:t+.22,info,t:0,q:-1}}
-const want=info.type=='err'?1-info.w:info.w;let cnt=Math.max(1,info.n);while(((s+cnt-1)%2)!==want)cnt++;let pu=0;
-for(let q=0;q<cnt;q++){const h=(s+q)%2,last=q===cnt-1,out=last&&info.type=='err',a={u:q?pu:TX.pu[h],v:vB(h)},b=q===0?{u:(R()<.5?-1:1)*rr(.3,.6),v:h===nr?.34:.66}:{u:(R()<.5?-1:1)*rr(.1,.75),v:h===nr?.1:.9};
-if(out){b.u=R()<.5?-1.22:1.22;if(R()<.4){b.u=rr(-.4,.4);b.v=h===nr?.56:.44}}const shotDur=q?.27:.34;sh.push({h,a,b,t0:t,t1:t+shotDur,arc:q?26:34,out,type:info.type});t+=shotDur;pu=b.u}
+const want=info.type=='err'?1-info.w:info.w;let cnt=Math.max(1,info.n);while(((s+cnt-1)%2)!==want)cnt++;let pu=0,pv0=0;
+for(let q=0;q<cnt;q++){const h=(s+q)%2,last=q===cnt-1,out=last&&info.type=='err',a={u:q?pu:TX.pu[h],v:q?pv0:vB(h)},b=q===0?{u:(R()<.5?-1:1)*rr(.3,.6),v:h===nr?.34:.66}:{u:(R()<.5?-1:1)*rr(.1,.75),v:h===nr?.1:.9};
+if(out){b.u=R()<.5?-1.22:1.22;if(R()<.4){b.u=rr(-.4,.4);b.v=h===nr?.56:.44}}const shotDur=q?.27:.34;sh.push({h,a,b,t0:t,t1:t+shotDur,arc:q?26:34,out,type:info.type});t+=shotDur;pu=b.u;pv0=b.v}
 return{sh,dur:t+.22,info,t:0,q:-1}}
 function movePlayers(dt){
  const st=TX.st;if(!st)return;
- const a=TX.anim,follow=1-Math.exp(-dt*10),recover=1-Math.exp(-dt*4);
- if(!a){TX.pu[0]+=(0-TX.pu[0])*recover;TX.pu[1]+=(0-TX.pu[1])*recover;return}
+ const a=TX.anim,follow=1-Math.exp(-dt*12),recover=1-Math.exp(-dt*4),near=st.side?1:0,baseY=i=>i===near?.97:.03;
+ if(!TX.py)TX.py=st.side===0?[.97,.03]:[.03,.97];
+ if(!a){for(let i=0;i<2;i++){TX.pu[i]+=(0-TX.pu[i])*recover;TX.py[i]+=(baseY(i)-TX.py[i])*recover}return}
  let q=a.sh.findIndex(sh=>a.t>=sh.t0&&a.t<sh.t1);
- if(q<0){TX.pu[0]+=(0-TX.pu[0])*recover;TX.pu[1]+=(0-TX.pu[1])*recover;return}
+ if(q<0){for(let i=0;i<2;i++){TX.pu[i]+=(0-TX.pu[i])*recover;TX.py[i]+=(baseY(i)-TX.py[i])*recover}return}
  const sh=a.sh[q],f=cl((a.t-sh.t0)/(sh.t1-sh.t0),0,1),ease=x=>x*x*(3-2*x);
  const hitter=sh.h,receiver=1-hitter;
  const hitterGoal=cl(sh.a.u*(1-.28*ease(f)),-.92,.92);
+ const hitterYGoal=cl(sh.a.v+(baseY(hitter)-sh.a.v)*.16*ease(f),.02,.98);
  const arrival=ease(cl((f-.05)/.82,0,1));
  const receiverGoal=cl(sh.b.u*arrival,-.96,.96);
+ const receiverYGoal=cl(baseY(receiver)+(sh.b.v-baseY(receiver))*arrival,.02,.98);
  TX.pu[hitter]+=(hitterGoal-TX.pu[hitter])*follow;
+ TX.py[hitter]+=(hitterYGoal-TX.py[hitter])*follow;
  TX.pu[receiver]+=(receiverGoal-TX.pu[receiver])*follow;
+ TX.py[receiver]+=(receiverYGoal-TX.py[receiver])*follow;
 }
 function tick(d,rd){const st=TX.st;TX.time+=rd;if(TX.evT>0){TX.evT-=d;if(TX.evT<=0)$('txe').style.opacity=0}
 if(TX.gap>0){TX.gap-=d;return}
@@ -1061,7 +1066,7 @@ cx.fillStyle='#0a1222';cx.fillRect(-20,-20,W+40,CH+40);const rows=4;for(let r=0;
 cx.fillStyle=OC[st.surf];cx.fillRect(-20,CH*.26,W+40,CH);cx.fillStyle=CC[st.surf];cx.beginPath();cx.moveTo(X(-1.18,-.08),Y(-.08));cx.lineTo(X(1.18,-.08),Y(-.08));cx.lineTo(X(1.18,1.08),Y(1.08));cx.lineTo(X(-1.18,1.08),Y(1.08));cx.fill();
 if(st.surf=='grass'){cx.fillStyle='#ffffff14';for(let k=0;k<8;k+=2){cx.beginPath();cx.moveTo(X(-1.18,k/8),Y(k/8));cx.lineTo(X(1.18,k/8),Y(k/8));cx.lineTo(X(1.18,(k+1)/8),Y((k+1)/8));cx.lineTo(X(-1.18,(k+1)/8),Y((k+1)/8));cx.fill()}}
 cx.strokeStyle='#fff';cx.lineWidth=2;const L=(a,b,c,d)=>{cx.beginPath();cx.moveTo(X(a,b),Y(b));cx.lineTo(X(c,d),Y(d));cx.stroke()};L(-1,0,1,0);L(-1,1,1,1);L(-1,0,-1,1);L(1,0,1,1);L(-.8,0,-.8,1);L(.8,0,.8,1);L(-.8,.28,.8,.28);L(-.8,.72,.8,.72);L(0,.28,0,.72);
-const pv=i=>i===nr?.97:.03,per=(i)=>{const v=pv(i),a=TX.anim,sw=a&&a.q>=0&&a.sh[a.q]&&a.sh[a.q].h===i?Math.max(0,1-(a.t-a.sh[a.q].t0)/.12):0,fin=S==='T_FINISH'||S==='T_RESULT',cheer=fin&&st.win===i;if(fin&&st.win!==i){}
+const pv=i=>TX.py&&Number.isFinite(TX.py[i])?TX.py[i]:(i===nr?.97:.03),per=(i)=>{const v=pv(i),a=TX.anim,sw=a&&a.q>=0&&a.sh[a.q]&&a.sh[a.q].h===i?Math.max(0,1-(a.t-a.sh[a.q].t0)/.12):0,fin=S==='T_FINISH'||S==='T_RESULT',cheer=fin&&st.win===i;if(fin&&st.win!==i){}
  const x=X(TX.pu[i],v),y=Y(v);person(x,y,SC(v)*1.15,i?C1:C0,sw,cheer,i===nr?1:-1)};
 const nv=Y(.5);cx.fillStyle='#e8eef5aa';cx.fillRect(X(-1.1,.5),nv-26*SC(.5),X(1.1,.5)-X(-1.1,.5),26*SC(.5));cx.fillStyle='#fff';cx.fillRect(X(-1.1,.5),nv-27*SC(.5),X(1.1,.5)-X(-1.1,.5),3);
 const a=TX.anim;let bx=null;
