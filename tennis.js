@@ -77,16 +77,17 @@ function makeTeams(cfg){
 }
 function roundName(n){return n===2?'결승':n===4?'4강':n+'강'}
 function showEl(el){el.hidden=false}function hideEl(el){el.hidden=true}
-function sideCard(x){
+function estimatedOdds(x,op){const p=1/(1+Math.exp(((op&&op.rating||x.rating)-x.rating)/12));return Math.max(1.08,.9/p).toFixed(2)+'배'}
+function sideCard(x,op){
  const top=x.members.map(p=>p.flag+' '+p.name).join(' / '),details=x.members.map(p=>p.nation+' · '+p.age+'세 · 세계 '+p.rank+'위').join('<br>');
- return '<div class="tnPlayerCard" style="--team:'+x.color+'"><div class="tnPcTop"><span>'+top+'</span><b>OVR '+x.rating+'</b></div><div class="tnPcMeta">'+details+'</div><div class="tnPcStyle">'+esc(x.styles)+' · 주력 '+esc(x.bestCourt)+'</div><div class="tnPcStats">'+['serve','fh','bh','volley','speed','stamina','focus','mental','experience'].map((k,i)=>'<span>'+['서브','포핸드','백핸드','발리','스피드','체력','집중','멘탈','경험'][i]+' '+Math.round(x.stats[k])+'</span>').join('')+'</div></div>';
+ return '<div class="tnPlayerCard" style="--team:'+x.color+'"><div class="tnPcTop"><span>'+top+'</span><b>OVR '+x.rating+'</b></div><div class="tnPcMeta">'+details+'</div><div class="tnOdds">예상 우승 배당 <b>'+estimatedOdds(x,op)+'</b></div><div class="tnPcStyle">'+esc(x.styles)+' · 주력 '+esc(x.bestCourt)+'</div><div class="tnPcStats">'+['serve','fh','bh','volley','speed','stamina','focus','mental','experience'].map((k,i)=>'<span>'+['서브','포핸드','백핸드','발리','스피드','체력','집중','멘탈','경험'][i]+' '+Math.round(x.stats[k])+'</span>').join('')+'</div></div>';
 }
 function prepare(){
  active=false;MODE='tennis';S='TENNIS_PREP';document.body.className='TENNIS_PREP';$('oT').style.display='none';$('tennisApp').style.display='block';showEl($('tnPrep'));hideEl($('tnMatch'));hideEl($('tnResult'));preparedSettings=setting();preparedSides=makeTeams(preparedSettings);state={sides:preparedSettings.draw?[tournament.pairs[0][0],tournament.pairs[0][1]]:preparedSides,settings:preparedSettings};renderPreview();$('tnRoundLabel').textContent=tournament?tournament.roundLabel+' 토너먼트':'친선 경기';
 }
 function renderPreview(){
  const sides=state.sides||preparedSides;
- $('tnPreview').innerHTML=sides.slice(0,2).map(x=>sideCard(x)).join('<div class="tnVs">VS</div>');
+ $('tnPreview').innerHTML=sides.slice(0,2).map((x,i)=>sideCard(x,sides[1-i])).join('<div class="tnVs">VS</div>');
  if(tournament){$('tnBracketInfo').textContent=tournament.size+'팀 대진표 생성 완료 · '+tournament.roundLabel+' 첫 경기부터 진행';$('tnBracketInfo').style.display='block'}else{$('tnBracketInfo').style.display='none'}
 }
 function buildState(sides,cfg){
@@ -170,8 +171,25 @@ function updateUI(){
  $('tnAceA').textContent='ACE '+s.aces[0];$('tnAceB').textContent='ACE '+s.aces[1];$('tnSetHistory').textContent=s.history.map((h,i)=>(i+1)+'세트 '+h.a+':'+h.b+(h.tb?' (TB '+h.tb+')':'')).join('   ')||'첫 세트';
  $('tnRoundLabel').textContent=tournament?tournament.roundLabel+' · '+(tournament.index+1)+'/'+tournament.pairs.length:'프로 매치';
 }
+
+function readHall(){try{return JSON.parse(localStorage.getItem('tmTennisHall')||'{"matches":0,"players":{},"longestRally":0,"bestStreak":0,"events":0}')}catch(e){return{matches:0,players:{},longestRally:0,bestStreak:0,events:0}}}
+function saveHall(s,k){
+ const h=readHall();h.matches=(h.matches||0)+1;h.longestRally=Math.max(h.longestRally||0,s.longestRally||0);h.events=(h.events||0)+(s.eventsUsed||0);
+ s.sides.forEach((team,i)=>team.members.forEach(p=>{
+  const z=h.players[p.name]||{played:0,wins:0,aces:0,bestRank:p.rank,style:p.style};
+  z.played++;if(i===k)z.wins++;z.aces+=(s.aces[i]||0)/team.members.length;z.bestRank=Math.min(z.bestRank||p.rank,p.rank);z.style=p.style;h.players[p.name]=z;
+ }));
+ try{localStorage.setItem('tmTennisHall',JSON.stringify(h))}catch(e){}
+}
+function renderHall(){
+ const h=readHall(),rows=Object.entries(h.players).map(([name,v])=>({name,...v})).sort((a,b)=>b.wins-a.wins||b.played-a.played);
+ const best=rows.filter(x=>x.played>=2).sort((a,b)=>(b.wins/b.played)-(a.wins/a.played))[0],ace=rows.slice().sort((a,b)=>b.aces-a.aces)[0],win=rows[0];
+ $('tnHallDisplay').innerHTML='<div class="tnHallTitle">🏅 TENNIS HALL OF FAME <button id="tnHallClose" class="tnSmallBtn">닫기</button></div><div class="tnHallStats"><span>누적 경기 <b>'+h.matches+'</b></span><span>최장 랠리 <b>'+h.longestRally+'구</b></span><span>발생 이벤트 <b>'+h.events+'</b></span></div><div class="tnHallGrid"><div><small>최다 우승 선수</small><b>'+(win?esc(win.name)+' · '+win.wins+'승':'아직 기록 없음')+'</b></div><div><small>최고 승률 (2경기 이상)</small><b>'+(best?esc(best.name)+' · '+Math.round(best.wins/best.played*100)+'%':'아직 기록 없음')+'</b></div><div><small>최다 에이스</small><b>'+(ace?esc(ace.name)+' · '+Math.floor(ace.aces)+'개':'아직 기록 없음')+'</b></div></div><div class="tnHallList">'+rows.slice(0,12).map((x,i)=>'<div><b>'+(i+1)+'. '+esc(x.name)+'</b><span>'+x.wins+'승 / '+x.played+'경기 · '+Math.floor(x.aces)+' ACE</span></div>').join('')+'</div>';
+ $('tnHallDisplay').style.display='block';$('tnHallClose').onclick=()=>$('tnHallDisplay').style.display='none';
+}
+
 function completeMatch(s,k){
- s.finished=true;s.winnerIndex=k;s.winner=s.sides[k].label;s.setScore=s.sets[0]+'-'+s.sets[1];s.score=s.setScore;s.phase='finished';active=false;MODE='tennis';S='TENNIS_RESULT';document.body.className='TENNIS_RESULT';
+ s.finished=true;saveHall(s,k);s.winnerIndex=k;s.winner=s.sides[k].label;s.setScore=s.sets[0]+'-'+s.sets[1];s.score=s.setScore;s.phase='finished';active=false;MODE='tennis';S='TENNIS_RESULT';document.body.className='TENNIS_RESULT';
  $('tnWinner').textContent=s.sides[k].label;$('tnWinnerMeta').textContent=s.sides[k].members.map(p=>p.flag+' '+p.nation+' · 세계 '+p.rank+'위').join('  /  ');$('tnFinalScore').textContent=s.sets[0]+' : '+s.sets[1];
  $('tnResultTitle').textContent=tournament?'🏆 '+tournament.roundLabel+' 경기 우승!':'🏆 MATCH WINNER';$('tnResultDesc').textContent=s.sides[k].label+' 승리 · 에이스 '+s.aces[k]+'개 · 최장 랠리 '+s.longestRally+'구';
  $('tnNextMatch').style.display=tournament?'inline-flex':'none';$('tnAgain').textContent=tournament?'새 대회 만들기':'다시 경기하기';showEl($('tnResult'));try{sfx('fin');setTimeout(()=>sfx('fan'),450)}catch(e){}render();updateUI();
@@ -225,7 +243,7 @@ function init(){
  $('tnQr').addEventListener('click',()=>{if(typeof window.TM_openHost==='function')window.TM_openHost('single');else alert('예측 시스템을 준비하는 중이에요. 잠시 후 다시 눌러 주세요.')});
  $('tnBack').addEventListener('click',back);$('tnHome').addEventListener('click',back);$('tnExit').addEventListener('click',back);$('tnAgain').addEventListener('click',again);$('tnNextMatch').addEventListener('click',nextMatch);
  $('tnSpeed').addEventListener('change',e=>speed(e.target.value));$('tnNextPoint').addEventListener('click',nextPoint);$('tnPause').addEventListener('click',()=>$('pz').click());
- $('tnFormat').addEventListener('change',generate);$('tnDrawSize').addEventListener('change',generate);window.addEventListener('resize',render);
+ $('tnFormat').addEventListener('change',generate);$('tnDrawSize').addEventListener('change',generate);['tnSets','tnGames','tnCourtType','tnRule'].forEach(id=>$(id).addEventListener('change',()=>{preparedSettings=setting();if(state){state.settings=preparedSettings;state.court=preparedSettings.court;state.gamesToWin=preparedSettings.games;state.setsNeeded=preparedSettings.sets===1?1:2}}));$('tnHall').addEventListener('click',renderHall);window.addEventListener('resize',render);
 }
 window.TennisGame={open:open,hide:hide,back:back,start:start,restart:()=>{if(active){const sides=state.sides,cfg=state.settings;state=buildState(sides,cfg);active=true;MODE='tennis';S='TENNIS_MATCH';document.body.className='TENNIS_MATCH';showEl($('tnMatch'));hideEl($('tnResult'));updateUI()}else start()},advance:nextMatch,update:update,render:render,score:()=>state?state.score:'',get settings(){return state&&state.settings},get tournament(){return tournament},get state(){return state}};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
