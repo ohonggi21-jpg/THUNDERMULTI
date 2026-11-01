@@ -118,6 +118,94 @@ h1{font:900 clamp(38px,10vw,110px)/.95 Impact,"Arial Black",sans-serif;letter-sp
 .mq.dn em{display:block;animation:tnp .6s both}.mq.sm em{font-size:9px;padding:2px 4px}.mq.dn.sm em{white-space:nowrap}
 #mcd{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;font:900 clamp(60px,16vw,180px) Impact,sans-serif;color:#fff;text-shadow:0 0 30px #ffd75e,0 6px 0 #7a1020}#mcd span{display:inline-block;animation:tnp .55s both}#mcd span.last{animation:tnLast .56s forwards}@keyframes tnLast{0%{transform:scale(.3);opacity:0}22%{transform:scale(1.08);opacity:1}72%{transform:scale(1);opacity:1}100%{transform:scale(1.45);opacity:0}}
 #oC{z-index:30;background:#000c}
+
+/* ===== Tennis mode: independent arena UI ===== */
+.mode-btn.tennis{border-color:#7dffce;background:linear-gradient(145deg,#062d2a,#07152a)}.mode-btn.tennis .mt{color:#7dffce}
+#tennisApp{position:fixed;inset:0;z-index:18;display:none;background:radial-gradient(ellipse at 50% 0%,#173958 0%,#071321 55%,#030914 100%);color:#f7fbff;padding:clamp(10px,1.5vw,24px);font-family:inherit}
+body.TENNIS_PREP #cv,body.TENNIS_MATCH #cv,body.TENNIS_RESULT #cv{display:none}
+body.TENNIS_MATCH #pz{display:flex;z-index:27}body.TENNIS_MATCH #oP{z-index:26}
+body.TENNIS_PREP #sb,body.TENNIS_MATCH #sb,body.TENNIS_RESULT #sb{z-index:25}
+body.TENNIS_PREP #sp,body.TENNIS_MATCH #sp,body.TENNIS_RESULT #sp{z-index:26}
+#tennisApp .tnPane{width:100%;height:100%;max-width:1800px;margin:auto;min-height:0}
+#tennisApp [hidden]{display:none!important}
+.tnHeader{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:3px 4px 14px}
+.tnHeader h2{font:900 clamp(27px,4vw,54px)/1 Impact,"Arial Black",sans-serif;color:#8effd4;letter-spacing:.03em;text-shadow:0 5px 24px #00a98255}
+.tnHeader h2 span{font:800 clamp(12px,1.6vw,20px)/1.2 system-ui;color:#d8eaff;letter-spacing:0;margin-left:10px}
+.tnHeader p{color:#9fb9d1;font-size:clamp(11px,1.1vw,15px);margin-top:8px}
+.tnEyebrow{color:#73a9c7;font-size:10px;font-weight:900;letter-spacing:.2em;margin-bottom:7px}
+.tnSmallBtn,.tnGoldBtn,.tnGhostBtn{border:1px solid #62849d;border-radius:12px;padding:12px 18px;color:#fff;background:#13283c;font:800 clamp(12px,1.2vw,16px) system-ui;cursor:pointer;min-height:44px}
+.tnGoldBtn{background:linear-gradient(135deg,#ffe28a,#b98127);border:1px solid #fff1bd;color:#24190b;box-shadow:0 5px 18px #d59c3b44}
+.tnGhostBtn{background:#10253a;border-color:#4d7895}
+.tnPrepGrid{display:grid;grid-template-columns:minmax(250px,.72fr) minmax(0,1.5fr);gap:clamp(10px,1.4vw,22px);height:calc(100% - 105px);min-height:0}
+.tnPanel{background:linear-gradient(145deg,#10243aee,#091727ee);border:1px solid #355a77;border-radius:20px;padding:clamp(12px,1.5vw,24px);box-shadow:0 16px 50px #0005;min-height:0;overflow:auto}
+.tnPanel h3{font-size:clamp(18px,1.8vw,25px);color:#f3d68b;margin-bottom:14px}
+.tnOptions{display:flex;flex-direction:column;gap:10px}
+.tnOptions label{display:grid;grid-template-columns:1fr minmax(130px,1.1fr);align-items:center;gap:10px;color:#bfd0e0;font-size:clamp(11px,1vw,14px);font-weight:700}
+.tnOptions select,.tnControls select{width:100%;min-width:0;border:1px solid #466783;border-radius:9px;padding:9px 10px;background:#071726;color:#fff;font:700 13px system-ui}
+.tnActionRow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center;margin-top:12px}.tnActionRow button{flex:1 1 130px}
+.tnHint{color:#89a4bc;font-size:11px;line-height:1.55;margin-top:6px}
+.tnPanelHead{display:flex;align-items:center;justify-content:space-between;gap:8px}.tnPanelHead span{font-size:11px;color:#819db6}
+#tnPreview{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:12px;margin-top:10px}
+.tnPlayerCard{--team:#55b7ff;border:1px solid color-mix(in srgb,var(--team),transparent 35%);border-top:4px solid var(--team);border-radius:14px;background:#071827;padding:clamp(10px,1.2vw,17px);min-width:0}
+.tnPcTop{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;font-weight:900;font-size:clamp(12px,1.3vw,17px);color:#fff}
+.tnPcTop b{white-space:nowrap;color:var(--team);font-size:11px}
+.tnPcMeta,.tnPcStyle{font-size:clamp(9px,.95vw,12px);line-height:1.5;color:#9fb5c9;margin-top:7px}.tnPcStyle{color:#e7d59b}
+.tnPcStats{display:flex;gap:5px;flex-wrap:wrap;margin-top:9px}.tnPcStats span{background:#173149;border-radius:6px;padding:4px 6px;font-size:9px;color:#cde0ef}
+.tnVs{font:900 clamp(18px,2.5vw,32px) Impact,sans-serif;color:#f6ce70}
+.tnBracketInfo{margin-top:12px;padding:10px;border:1px solid #7dffce55;border-radius:10px;background:#06332c55;color:#9dffdc;text-align:center;font-weight:800;font-size:clamp(11px,1.1vw,14px)}
+.tnStartRow{margin-top:20px}.tnStartBtn{font-size:clamp(16px,1.8vw,23px)!important;min-height:58px}
+.tnScoreboard{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.95fr) minmax(0,1fr);align-items:center;gap:14px;background:linear-gradient(100deg,#0c2135,#102e44,#0c2135);border:1px solid #466d88;border-radius:16px;padding:clamp(9px,1.1vw,16px);box-shadow:0 12px 30px #0005}
+.tnScoreSide{position:relative;min-width:0;padding:4px 10px 4px 20px;display:flex;flex-direction:column;gap:4px;text-align:left}.tnScoreSide.right{text-align:right;padding:4px 20px 4px 10px}
+.tnScoreSide b{font-size:clamp(13px,1.6vw,22px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tnScoreSide small{font-size:clamp(9px,.9vw,12px);color:#a6c0d3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tnServeMark{position:absolute;left:0;top:4px;color:#ffe37e;font-size:13px}.tnScoreSide.right .tnServeMark{left:auto;right:0}
+.tnStamina{height:6px;background:#020b12;border-radius:6px;overflow:hidden;margin-top:3px}.tnStamina i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#5dedae,#ffe27b);transition:width .25s}
+.tnScoreCenter{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;text-align:center}.tnScoreCenter>div:not(.tnHistory){background:#061422;border:1px solid #33536c;border-radius:10px;padding:7px 4px}
+.tnScoreCenter small{display:block;font-size:9px;letter-spacing:.15em;color:#82a9c1;font-weight:900}.tnScoreCenter strong{display:block;font:900 clamp(17px,2.3vw,32px) Impact,sans-serif;color:#fff;margin-top:3px}
+.tnHistory{grid-column:1/-1;font-size:10px;color:#aac1d3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tnCourtWrap{position:relative;min-height:0;flex:1;border-radius:18px;overflow:hidden;margin:10px 0;background:#081321;border:1px solid #355a78;box-shadow:inset 0 0 35px #0008}
+#tnMatch{display:flex;flex-direction:column}#tnCourt{display:block;width:100%;height:100%}
+.tnCourtLabel{position:absolute;right:14px;top:10px;color:#ffffff8a;font-size:10px;letter-spacing:.18em;font-weight:900;pointer-events:none}
+#tnEventToast{position:absolute;left:50%;top:12%;transform:translate(-50%,-10px) scale(.92);opacity:0;pointer-events:none;min-width:min(80%,360px);text-align:center;padding:12px 20px;background:linear-gradient(135deg,#071a2aee,#0b5549ee);border:2px solid #ffe28a;border-radius:14px;box-shadow:0 10px 40px #0009;color:#ffe69b;transition:opacity .2s,transform .2s}
+#tnEventToast.on{opacity:1;transform:translate(-50%,0) scale(1)}#tnEventToast b{display:block;font-size:clamp(15px,2vw,24px)}#tnEventToast small{display:block;margin-top:4px;color:#e7f5fa;font-size:clamp(10px,1vw,13px)}
+.tnMatchFooter{display:flex;gap:14px;align-items:stretch;min-height:82px}
+.tnLogPanel{flex:1;min-width:0;border:1px solid #35536d;border-radius:12px;padding:8px 12px;background:#081726;overflow:hidden}
+.tnLogPanel>b{font-size:9px;letter-spacing:.18em;color:#80a8c2}.tnLogPanel div{font-size:clamp(10px,1vw,13px);line-height:1.5;color:#d8e7f1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tnControls{display:flex;gap:7px;align-items:center;justify-content:flex-end;flex-wrap:wrap}.tnControls label{font-size:10px;color:#a9c2d4;min-width:72px}.tnControls button{min-height:42px;padding:9px 13px;font-size:12px}
+.tnResult{position:absolute;inset:0;z-index:22;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#0a2438ef,#020711f5);padding:18px;overflow:auto}
+.tnWinCard{position:relative;max-width:850px;width:100%;padding:clamp(24px,4vw,55px);border:2px solid #ffe28a;border-radius:26px;text-align:center;background:linear-gradient(155deg,#17364b,#091626);box-shadow:0 0 0 8px #ffe28a12,0 25px 90px #000c;animation:tnWinIn .65s cubic-bezier(.18,.85,.25,1.2) both}
+@keyframes tnWinIn{from{opacity:0;transform:translateY(35px) scale(.82)}to{opacity:1;transform:translateY(0) scale(1)}}
+.tnWinIcon{font-size:clamp(50px,8vw,100px);filter:drop-shadow(0 0 25px #ffe28a);animation:tnTrophy 1.3s ease-in-out infinite alternate}
+@keyframes tnTrophy{to{transform:translateY(-9px) rotate(4deg)}}
+.tnWinCard h2{font-size:clamp(22px,3vw,38px);color:#ffe28a;margin:10px 0}.tnWinCard h1{font:900 clamp(25px,5vw,58px)/1 Impact,sans-serif;color:#fff;background:none;filter:none;overflow-wrap:anywhere}
+.tnWinCard p{color:#b8cddd;font-size:clamp(11px,1.2vw,16px);margin:8px 0}.tnFinalScore{font:900 clamp(36px,5vw,60px) Impact,sans-serif;color:#7dffce;margin:15px 0;text-shadow:0 0 28px #2ce9bb55}
+@media (orientation:landscape) and (min-aspect-ratio:1.25){
+ .TITLE #oT>.wrap{max-width:1700px;width:96vw;gap:clamp(10px,2vh,22px)}
+ .TITLE #oT .menu{max-width:1500px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(10px,1vw,18px)}
+ .TITLE #oT .mode-btn{max-width:none;min-width:0;min-height:clamp(100px,14vh,170px);display:flex;flex-direction:column;justify-content:center}
+ .TITLE #oT .mode-btn .mi{font-size:clamp(34px,5vh,58px)}.TITLE #oT .mode-btn .md{font-size:clamp(11px,1.5vh,15px)}
+ .tnHeader{padding-bottom:8px}.tnPrepGrid{height:calc(100% - 88px)}.tnPlayerCard{padding:12px}.tnPcStats span{font-size:10px}
+}
+@media (max-width:900px){
+ #tennisApp{padding:9px}.tnPrepGrid{grid-template-columns:1fr;height:auto;max-height:calc(100% - 78px);overflow:auto}.tnPanel{padding:12px}
+ .tnScoreboard{grid-template-columns:1fr 1fr;gap:8px}.tnScoreCenter{grid-column:1/-1;grid-row:2}.tnScoreSide b{font-size:12px}
+ .tnMatchFooter{flex-direction:column}.tnControls{justify-content:center}.tnPlayerCard{padding:9px}.tnPcStats span{font-size:8px}
+}
+@media (max-width:560px){
+ .tnHeader h2{font-size:27px}.tnHeader h2 span{display:block;margin:6px 0 0}#tnPreview{grid-template-columns:1fr}.tnVs{text-align:center}
+ .tnScoreboard{padding:7px}.tnControls button{flex:1}.tnOptions label{grid-template-columns:.8fr 1.2fr}.tnActionRow button{flex:1 1 100%}
+}
+@media (orientation:landscape) and (max-height:560px){
+ #tennisApp{padding:6px}.tnHeader{padding-bottom:5px}.tnHeader h2{font-size:26px}.tnHeader p{display:none}
+ .tnPrepGrid{height:calc(100% - 58px)}.tnPanel{padding:8px 11px}.tnOptions{gap:5px}.tnOptions label{font-size:10px}.tnOptions select{padding:6px;font-size:11px}
+ .tnPanel h3{font-size:15px;margin-bottom:7px}.tnHint{font-size:9px}.tnScoreboard{padding:6px}.tnScoreSide small{font-size:8px}
+ .tnMatchFooter{min-height:54px}.tnLogPanel{padding:4px 8px}.tnControls button{min-height:32px;padding:6px 9px}.tnCourtWrap{margin:5px 0}.tnWinCard{padding:18px}
+}
+.RESULT #xc,.A_RESULT #axc,.N_RESULT #nxc{animation:tmChampionReveal .75s cubic-bezier(.15,.85,.2,1.2) both;border-color:#ffe28a;box-shadow:0 0 0 3px #ffe28a22,0 18px 55px #0009}
+.RESULT #xc h2,.A_RESULT #axc h2,.N_RESULT #nxc h2{animation:tmChampionGlow 1.6s ease-in-out infinite alternate}
+@keyframes tmChampionReveal{from{opacity:0;transform:translateY(26px) scale(.92)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes tmChampionGlow{to{filter:drop-shadow(0 0 16px #ffe28a);transform:scale(1.035)}}
+
 </style></head><body class="TITLE">
 <canvas id="cv"></canvas>
 <div id="hud"><div id="tb"><b id="tm">0.0초</b><b id="ld">-</b><b id="rm">-</b></div><div id="bar"></div><div id="rk"></div></div>
@@ -136,6 +224,7 @@ h1{font:900 clamp(38px,10vw,110px)/.95 Impact,"Arial Black",sans-serif;letter-sp
 <button class="mode-btn arena" id="bA" type="button"><div class="mi">⚔️</div><div class="mt">프로게이머</div><div class="md">30가지 이벤트! 5인 배틀로얄!</div></button>
 <button class="mode-btn neon" id="bN" type="button"><div class="mi">🌀</div><div class="mt">네온 팽이</div><div class="md">30가지 이벤트! 링아웃 배틀!</div></button>
 <button class="mode-btn wc" id="bW" type="button"><div class="mi">🏆</div><div class="mt">월드 챔피언십</div><div class="md">세 가지 종목 중 하나를 선택하고 세계 챔피언에 도전하세요!</div></button>
+<button class="mode-btn tennis" id="bTennis" type="button"><div class="mi">🎾</div><div class="mt">테니스 경기</div><div class="md">40개 이벤트! 빠른 프로 경기 시뮬레이션!</div></button>
 <button class="mode-btn random" id="bR" type="button"><div class="mi">🎲</div><div class="mt">랜덤 모드!</div><div class="md">세 게임 중 하나를 무작위로!</div></button>
 </div></div></div>
 <div class="ov" id="oR"><div class="wrap"><div id="rt">출전마 추첨 중...</div><div class="cards" id="cd"></div><button class="btn" id="bC" type="button">확인하고 경주 준비!</button><button class="btn s QRB" type="button" onclick="TM_openHost('single')">📱 친구 예측 QR</button><div class="tmFriends"></div></div></div>
@@ -153,6 +242,37 @@ h1{font:900 clamp(38px,10vw,110px)/.95 Impact,"Arial Black",sans-serif;letter-sp
 <div id="mv"><div class="mq" id="mq0"><span></span><em></em></div><div class="mq" id="mq1"><span></span><em></em></div><div class="mq" id="mq2"><span></span><em></em></div><div class="mq" id="mq3"><span></span><em></em></div><div id="mcd"></div></div>
 <div class="ov" id="oC"><div class="wrap"><div class="card"><p id="cmsg" style="font-size:18px;margin-bottom:12px"></p><div style="display:flex;gap:10px;justify-content:center"><button class="btn" id="cy" type="button">확인</button><button class="btn s" id="cn" type="button">취소</button></div></div></div></div>
 <div class="ov" id="oTN"><div class="wrap" id="tnw"></div></div>
+<div id="tennisApp">
+ <section id="tnPrep" class="tnPane">
+  <header class="tnHeader"><div><div class="tnEyebrow">THUNDER MULTI ARENA · NEW SPORT</div><h2>🎾 TENNIS <span id="tnRoundLabel">친선 경기</span></h2><p>선수 추첨부터 결승 세리머니까지, 빠르게 즐기는 테니스 시뮬레이션</p></div><button id="tnBack" class="tnSmallBtn">← 타이틀</button></header>
+  <div class="tnPrepGrid">
+   <section class="tnPanel tnOptions">
+    <h3>경기 설정</h3>
+    <label>경기 형식<select id="tnFormat"><option value="ms">남자 단식</option><option value="ws">여자 단식</option><option value="md">남자 복식</option><option value="wd">여자 복식</option><option value="xd">혼합 복식</option></select></label>
+    <label>경기 길이<select id="tnSets"><option value="1">1세트 경기 · 약 40~60초</option><option value="3" selected>3세트 경기 · 약 2~3분</option></select></label>
+    <label>세트 승리 조건<select id="tnGames"><option value="1">1게임 선취</option><option value="3" selected>3게임 선취</option></select></label>
+    <label>코트 종류<select id="tnCourtType"><option value="hard">하드 코트</option><option value="clay">클레이 코트</option><option value="grass">잔디 코트</option></select></label>
+    <label>점수 규칙<select id="tnRule"><option value="adv">듀스 · 어드밴티지</option><option value="noad">노애드(No-Ad)</option></select></label>
+    <label>대회 규모<select id="tnDrawSize"><option value="0">친선 경기 · 2팀</option><option value="8">8강 토너먼트</option><option value="16">16강 토너먼트</option><option value="32">32강 토너먼트</option><option value="64">64강 토너먼트</option></select></label>
+    <div class="tnActionRow"><button id="tnDraw" class="tnGoldBtn">🎲 선수 다시 추첨</button><button id="tnQr" class="tnGhostBtn">📱 친구 예측 QR</button></div>
+    <p class="tnHint">경기는 자동으로 진행돼. 선수의 능력치·주력 코트·플레이 스타일과 40개 랜덤 이벤트가 실제 득점 확률에 반영돼.</p>
+   </section>
+   <section class="tnPanel tnPreviewPanel"><div class="tnPanelHead"><h3>출전 선수 & 대진</h3><span>선수별 능력치 랜덤 생성</span></div><div id="tnPreview"></div><div id="tnBracketInfo" class="tnBracketInfo"></div><div class="tnActionRow tnStartRow"><button id="tnStart" class="tnGoldBtn tnStartBtn">🏁 경기 시작!</button></div><div class="tmFriends"></div></section>
+  </div>
+ </section>
+ <section id="tnMatch" class="tnPane" hidden>
+  <header class="tnScoreboard">
+   <div class="tnScoreSide"><div class="tnServeMark" id="tnServer">●</div><b id="tnLeftName">선수 A</b><small id="tnLeftRank"></small><div class="tnStamina"><i id="tnStaminaA"></i></div><small id="tnAceA">ACE 0</small></div>
+   <div class="tnScoreCenter"><div><small>SETS</small><strong id="tnSetScore">0 : 0</strong></div><div><small>GAMES</small><strong id="tnGameScore">0 : 0</strong></div><div><small>POINTS</small><strong id="tnPointScore">0 - 0</strong></div><div class="tnHistory" id="tnSetHistory">첫 세트</div></div>
+   <div class="tnScoreSide right"><div class="tnServeMark" id="tnServer2">●</div><b id="tnRightName">선수 B</b><small id="tnRightRank"></small><div class="tnStamina"><i id="tnStaminaB"></i></div><small id="tnAceB">ACE 0</small></div>
+  </header>
+  <div class="tnCourtWrap"><canvas id="tnCourt"></canvas><div id="tnEventToast"></div><div class="tnCourtLabel" id="tnCourtLabel">PRO COURT</div></div>
+  <footer class="tnMatchFooter"><div class="tnLogPanel"><b>LIVE MATCH LOG</b><div id="tnLog"></div></div><div class="tnControls"><label>속도<select id="tnSpeed"><option value="1">1배속</option><option value="1.5">1.5배속</option><option value="2">2배속</option></select></label><button id="tnNextPoint" class="tnGhostBtn">다음 포인트 ⏭</button><button id="tnPause" class="tnGhostBtn">⏸ 일시정지</button><button id="tnExit" class="tnSmallBtn">타이틀</button></div></footer>
+ </section>
+ <section id="tnResult" class="tnResult" hidden>
+  <div class="tnWinCard"><div class="tnWinIcon">🏆</div><div class="tnEyebrow">MATCH POINT · FINAL RESULT</div><h2 id="tnResultTitle">🏆 MATCH WINNER</h2><h1 id="tnWinner">WINNER</h1><p id="tnWinnerMeta"></p><div class="tnFinalScore" id="tnFinalScore">2 : 0</div><p id="tnResultDesc"></p><div class="tnActionRow"><button id="tnNextMatch" class="tnGoldBtn" style="display:none">다음 경기 진행 →</button><button id="tnAgain" class="tnGoldBtn">다시 경기하기</button><button id="tnHome" class="tnGhostBtn">타이틀로</button></div></div>
+ </section>
+</div>
 
 <!-- Firebase Realtime Database: cross-device tournament predictions -->
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
@@ -199,7 +319,7 @@ function newRace(){HS=SEL.map(mk);G={t:0,last:{},retired:0,log:[],evn:0,evT:.8,e
 function sim(dt){G.t+=dt;G.hf-=dt;if(G.hf<=0&&S=='RACING'){G.hf=.22;sfx('hoof')}HS.forEach(h=>{if(h.bd&&(h.bd.t-=dt)<=0)h.bd=null;h.cd-=dt;if(h.out){h.ph+=dt;return}h.fx=h.fx.filter(e=>{if(e.d>0){e.d-=dt;if(e.d<=0&&e.onStart){try{e.onStart(h)}catch(x){}}return 1}e.t-=dt;return e.t>0});h.stop-=dt;const p=h.pos/1000;let tg;if(h.fin)tg=16;else if(h.stop>0)tg=0;else{const m=Math.max(-.88,Math.min(1.1,fxm(h))),tr=1+(h.tr=='s'?(p<.3?.09:p>.7?-.05:0):h.tr=='l'?(p<.4?-.06:p>.7?.09:0):0)+.04*Math.sin(G.t*1.3+h.seed),cu=G.t>22?(G.t-22)*.07:0;tg=Math.max(h.base*.1,h.base*tr*(1+m+cu))}h.v+=(tg-h.v)*Math.min(1,dt*5);h.pos=Math.min(h.pos+h.v*dt,1055);h.ph+=dt*(8+h.v*.18);if(S=='RACING'&&R()<dt*h.v*.25&&PT.length<170)PT.push({x:X(h.pos)-30*hs,y:ty0+lh*(h.i+.84),vx:-rr(60,160),vy:-rr(20,80),l:.6,m:.6,c:R()<.5?'#8fc65a':'#c9a66b',s:3,g:200})});if(S=='RACING'){G.evT-=dt;if(G.evT<=0){G.evT=rr(.6,1.2);tryEvent()}G.idle-=dt;if(G.idle<=0&&!cmq.length){G.idle=rr(2.6,3.6);idle()}const o=live();if(o.length>1){const L=o[0],old=HS[G.lead];if(G.lead>=0&&L.i!=G.lead&&G.t>1.2&&G.t-G.lt>2&&old&&!old.out&&!old.fin){G.lt=G.ot=G.t;say(`선두 교체! ${L.name}!`,2);G.lead=L.i}else if(o.length==Object.keys(G.rk).length&&G.t-G.ot>1.6)o.forEach((h,n)=>{if(n>0&&G.rk[h.i]>n){const y=o.find(z=>z!=h&&G.rk[z.i]==n);if(y){G.ot=G.t;say(`${h.name}, ${y.name} 제치고 ${n+1}위!`,1)}}});G.rk={};o.forEach((h,n)=>G.rk[h.i]=n);const p=L.pos/1000;if(p>.8&&!G.f.a){G.f.a=1;setM('f',176);say("결승선이 얼마 남지 않았습니다!",2)}if(p>.93&&!G.f.b){G.f.b=1;say("결승선 바로 앞!",2)}}if(o.length>0&&(G.lead<0||!HS[G.lead]||HS[G.lead].out||HS[G.lead].fin))G.lead=o[0].i;HS.forEach(h=>{if(h.out&&!h.ot){h.ot=1;G.outT=G.t}})}const cr=HS.filter(h=>!h.fin&&!h.out&&h.pos>=1000);cr.forEach(h=>{h.fin=1;h.ft=G.t-(h.pos-1000)/Math.max(h.v,1);h.fx=[]});cr.sort((a,b)=>a.ft-b.ft).forEach(h=>{G.fin.push(h);if(!G.won)win(h)})}
 function win(h){G.won=h;go('FINISH');G.ts=.5;G.finT=0;sfx('fin');after(500,()=>sfx('fan'));say(`결승선! ${h.name} 우승!`,3);flash=1;shk=8;for(let i=0;i<110;i++)PT.push({x:rr(0,W),y:rr(-40,ty0),vx:rr(-60,60),vy:rr(20,140),l:3,m:3,c:['#ffd75e','#e63946','#fff','#4f8bff','#3ddc84'][i%5],s:5,g:60});after(1500,()=>G.ts=1)}
 const after=(ms,f)=>{const k=tok;T.push(setTimeout(()=>{if(k==tok)f()},ms))};
-function go(s){if(TN&&TN.on&&TN.cap&&TN.cap(s))return;S=s;tok++;T.forEach(clearTimeout);T=[];document.body.className=s;
+function go(s){if(s==='TITLE'&&window.TennisGame)window.TennisGame.hide();if(TN&&TN.on&&TN.cap&&TN.cap(s))return;S=s;tok++;T.forEach(clearTimeout);T=[];document.body.className=s;
 const OVS={oT:['TITLE'],oR:['ROULETTE','HORSE_CONFIRM'],oAR:['A_ROULETTE','A_CONFIRM'],oNR:['N_ROULETTE','N_CONFIRM'],oD:['READY'],oAD:['A_READY'],oND:['N_READY'],oX:['RESULT'],oAX:['A_RESULT'],oNX:['N_RESULT']};
 Object.keys(OVS).forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none'});
 Object.keys(OVS).forEach(id=>{if(OVS[id].includes(s)){const el=document.getElementById(id);if(el)el.style.display='block'}});
@@ -565,10 +685,11 @@ const N_s = (() => {
 function startRandom(){
   isRandom = true;
   aud();sfx('click');
-  const r=Math.floor(R()*4);
+  const r=Math.floor(R()*5);
   if(r===0){ startR(); }
   else if(r===1){ A_s.startRoulette(); }
   else if(r===2){ N_s.startRoulette(); }
+  else if(r===3){ window.TennisGame.open(); }
   else { TN.rnd(); }
 }
 
@@ -576,6 +697,7 @@ function startRandom(){
 let last=performance.now(),lastCheer=0;
 function loop(n){if(paused){last=n;requestAnimationFrame(loop);return}
   const dt=Math.min(.05,(n-last)/1e3); last=n; tt+=dt;
+  if(MODE==='tennis'&&window.TennisGame){TennisGame.update(dt);TennisGame.render();requestAnimationFrame(loop);return}
   if(TN&&TN.multi){TN.mf(dt);requestAnimationFrame(loop);return}
   if(MODE==='arena'){
     if(S==='A_BATTLE'){A_s.update(dt);A_s.render();A_s.hud()}
@@ -723,13 +845,15 @@ $('mv').addEventListener('click',e=>{const q=e.target.closest('.mq');if(!q||!TN.
 $('tnw').addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b||b.disabled)return;aud();if(b.dataset.a.length>2)sfx('click');const f=A[b.dataset.a];if(f)f(b.dataset.v)});
 $('bW').onclick=()=>{if(S!=='TITLE')return;aud();sfx('click');A.menu()};
 /* 일시정지 */
-const BT=['RACING','FINISH','A_BATTLE','A_FINISH','N_BATTLE','N_FINISH'],hideP=()=>{$('oP').style.display='none'};
+const BT=['RACING','FINISH','A_BATTLE','A_FINISH','N_BATTLE','N_FINISH','TENNIS_MATCH'],hideP=()=>{$('oP').style.display='none'};
 $('pz').onclick=()=>{if(paused||!BT.includes(S))return;paused=1;$('oP').style.display='block';aud();sfx('lock');if(AC&&AC.state==='running')AC.suspend().catch(()=>{})};
 $('pR').onclick=()=>{paused=0;hideP();aud();if(AC&&AC.state==='suspended')AC.resume().catch(()=>{});sfx('click');last=performance.now()};
-$('pRe').onclick=()=>{aud();if(AC&&AC.state==='suspended')AC.resume().catch(()=>{});sfx('click');hideP();paused=0;if(TN.on&&TN.sp)launch();else if(MODE=='horse'){G=null;HS=[];startReady()}else if(MODE=='arena')A_s.startReady();else if(MODE=='neon')N_s.startReady();last=performance.now()};
+$('pRe').onclick=()=>{aud();if(AC&&AC.state==='suspended')AC.resume().catch(()=>{});sfx('click');hideP();paused=0;if(TN.on&&TN.sp)launch();else if(MODE=='horse'){G=null;HS=[];startReady()}else if(MODE=='arena')A_s.startReady();else if(MODE=='neon')N_s.startReady();else if(MODE=='tennis'&&window.TennisGame)TennisGame.restart();last=performance.now()};
 $('pT').onclick=()=>ask('타이틀로 돌아갈까요? 진행 중인 경기'+(TN.on?'와 토너먼트':'')+'가 중단됩니다.',()=>{aud();sfx('click');hideP();paused=0;if(AC&&AC.state==='suspended')AC.resume().catch(()=>{});home();last=performance.now()});
 })();
 </script>
+<script src="./tennis.js"></script>
+
 <style>
 #tmShare{position:fixed;inset:0;z-index:30;display:none;overflow:auto;background:radial-gradient(circle at top,#183a55,#030812 75%);padding:18px;color:#fff;font-family:inherit}
 #tmShare .tmBox{max-width:680px;margin:4vh auto;background:#081522;border:2px solid #ffd75e;border-radius:20px;padding:18px;box-shadow:0 15px 55px #000b;text-align:center}
@@ -768,10 +892,10 @@ $('pT').onclick=()=>ask('타이틀로 돌아갈까요? 진행 중인 경기'+(TN
  function profileForm(title,cb){const p=getProfile();show(`<h2>${title}</h2><p>실명 대신 게임 닉네임을 사용해 줘!</p><p><input id="tmNick" maxlength="14" placeholder="닉네임 (최대 14자)" value="${esc(p.nick||'')}" /></p><p><select id="tmIcon"><option>⚡</option><option>🐯</option><option>🐲</option><option>👑</option><option>🔥</option><option>🎮</option><option>🐱</option><option>🦊</option><option>🌟</option><option>💎</option></select></p><button id="tmProfileGo">확인</button><button onclick="TM_close()">닫기</button>`);document.getElementById('tmIcon').value=p.icon||'⚡';document.getElementById('tmProfileGo').onclick=()=>{const nick=document.getElementById('tmNick').value.trim(),icon=document.getElementById('tmIcon').value;if(!nick)return alert('닉네임을 입력해 줘!');localStorage.setItem('tmProfile',JSON.stringify({nick,icon}));cb({nick,icon})}}
  window.TM_close=close;
  const dsc=x=>String(x.sp=='horse'?x.e[2]:x.sp=='arena'?(x.e.w||'')+' · '+(x.e.ab||''):(x.e.ab||''));
- const SN={horse:'경마',arena:'프로게이머',neon:'네온 팽이'};
+ const SN={horse:'경마',arena:'프로게이머',neon:'네온 팽이',tennis:'테니스'};
  function roomInfo(kind){const t=window.TN;if(kind!=='single'&&t&&t.sp&&t.G)return{type:'tour',sport:t.sp,sportName:SN[t.sp],groups:t.G.map(g=>g.map(x=>({name:x.name,col:x.col,desc:dsc(x)})))};
- let l=null;try{if(MODE==='horse')l=(SEL||[]).map(e=>({name:e[0],col:e[1],desc:String(e[2]||'')}));else if(MODE==='arena')l=A_s.st.sel.map(c=>({name:c.n,col:c.c,desc:(c.w||'')+' · '+(c.ab||'')}));else if(MODE==='neon')l=N_s.st.sel.map(c=>({name:c.n,col:c.c,desc:String(c.ab||'')}))}catch(e){}
- return l&&l.length>1?{type:'single',sport:MODE,sportName:SN[MODE],list:l}:null}
+ let l=null;try{if(MODE==='horse')l=(SEL||[]).map(e=>({name:e[0],col:e[1],desc:String(e[2]||'')}));else if(MODE==='arena')l=A_s.st.sel.map(c=>({name:c.n,col:c.c,desc:(c.w||'')+' · '+(c.ab||'')}));else if(MODE==='neon')l=N_s.st.sel.map(c=>({name:c.n,col:c.c,desc:String(c.ab||'')}));else if(MODE==='tennis'&&window.TennisGame&&window.TennisGame.state)l=(window.TennisGame.state.sides||[]).map(x=>({name:x.label,col:x.color,desc:x.styles||''}))}catch(e){}
+ return l&&l.length>1?{type:'single',sport:MODE,sportName:SN[MODE],list:l,sets:MODE==='tennis'&&window.TennisGame&&window.TennisGame.settings?window.TennisGame.settings.sets:3}:null}
  const ls=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k)||'';localStorage.setItem(k,v)}catch(e){return ''}};
  function hostedHelp(){const dv=ls('tmHosted')||'';show(`<h2>🌐 온라인 주소가 필요해요</h2><p>파일로 직접 연 게임(file://)은 친구 폰이 접속할 수 없어서 QR 초대가 작동하지 않아요.<br>배포한 <b>https 주소</b>(예: GitHub Pages)로 열면 QR을 만들 수 있어요.</p><p><input id="tmHostedUrl" placeholder="https://아이디.github.io/저장소/" value="${esc(dv)}" style="width:95%"></p><p id="tmHostedMsg" style="color:#ff9d9d;min-height:1.3em"></p><a id="tmHostedGo" class="tmBtn" target="_blank" rel="noopener">🌐 온라인 버전 열기</a><button id="tmHostedCp">주소 복사</button><button id="tmHostedQr">이 주소 QR 보기</button><button onclick="TM_close()">닫기</button><div id="tmHostedOut"></div><p class="tmMuted">온라인 버전에서 같은 경기를 시작하면 📱 QR 버튼이 정상 작동해요. 주소는 한 번만 입력하면 저장돼요.</p>`);
  const inp=document.getElementById('tmHostedUrl'),go=document.getElementById('tmHostedGo'),msg=document.getElementById('tmHostedMsg');
@@ -782,11 +906,11 @@ $('pT').onclick=()=>ask('타이틀로 돌아갈까요? 진행 중인 경기'+(TN
  document.getElementById('tmHostedQr').onclick=()=>{const u=get();if(u)document.getElementById('tmHostedOut').innerHTML=`<p>폰으로 찍으면 온라인 버전이 열려요</p><img alt="사이트 QR" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=10&data=${encodeURIComponent(u)}" onerror="this.outerHTML='<p>QR 이미지를 불러오지 못했어. 주소를 직접 열어 줘.</p>'">`}}
  window.TM_openHost=kind=>{if(!/^https?:$/.test(location.protocol))return hostedHelp();
  const info=roomInfo(kind);if(!info)return alert('출전마/선수 추첨이 끝난 화면(또는 월드 챔피언십 예측 화면)에서 눌러 주세요.');
- init().then(()=>{profileForm('친구 초대 방 만들기',p=>{const payload=Object.assign({host:uid,createdAt:Date.now(),status:'open',participants:{}},info);db.ref('tmRooms').push(payload).then(ref=>{roomRef=ref;const url=location.origin+location.pathname+'?tmjoin='+ref.key;
+ init().then(()=>{profileForm('친구 초대 방 만들기',p=>{const payload=Object.assign({host:uid,createdAt:Date.now(),status:'open',participants:{}},info);const path=info.sport==='tennis'?'tmTennisRooms':'tmRooms';db.ref(path).push(payload).then(ref=>{roomRef=ref;const roomKey=(path==='tmTennisRooms'?'tennis_':'')+ref.key;const url=location.origin+location.pathname+'?tmjoin='+roomKey;
  show(`<h2>📱 ${esc(info.sportName)} 초대 QR 코드</h2><p>친구들이 카메라로 QR을 찍으면 참가할 수 있어!</p><img alt="초대 QR" src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=10&data=${encodeURIComponent(url)}" onerror="this.outerHTML='<p>QR 이미지를 불러오지 못했어. 아래 링크를 공유해 줘.</p>'"><p><input id="tmInviteUrl" readonly value="${esc(url)}" style="width:95%"></p><button id="tmCopy">초대 링크 복사</button><button onclick="TM_close()">닫기</button><hr><h3>참가자 현황</h3><div id="tmPeople">참가자를 기다리는 중...</div><p class="tmMuted">방 코드: ${esc(ref.key)}</p>`);
  document.getElementById('tmCopy').onclick=()=>{const v=document.getElementById('tmInviteUrl').value;navigator.clipboard?.writeText(v).then(()=>alert('링크를 복사했어!')).catch(()=>{document.getElementById('tmInviteUrl').select();alert('링크를 길게 눌러 복사해 줘.')})};
- hostAttach(ref)}).catch(e=>alert(fbErr(e)))})}).catch(e=>alert(fbErr(e)))};
- function joinRoom(id){init().then(()=>db.ref('tmRooms/'+id).once('value')).then(s=>{if(!s.exists())throw Error('초대 방을 찾을 수 없어. 링크를 다시 확인해 줘.');const room=s.val();if(!room||(!room.groups&&!room.list))throw Error('초대 방 정보가 올바르지 않아. 방장이 QR을 다시 만들어 줘.');if(room.closed)throw Error('이 예측방은 이미 종료됐어요. 방장에게 새 QR을 받아 줘!');bootInfo('<h2>📱 친구 예측 모드</h2><p>예측을 제출하면 아래 📊 버튼으로 점수와 랭킹을 볼 수 있어요.</p>');profileForm('THUNDER MULTI 예측 참가',p=>(room.type==='single'||(!room.groups&&room.list))?renderSingle(id,room,p):renderPred(id,room,p))}).catch(e=>{bootInfo('<h2>접속할 수 없어</h2><p>'+esc(fbErr(e))+'</p>');show(`<h2>접속할 수 없어</h2><p>${esc(fbErr(e))}</p><button onclick="TM_close()">닫기</button>`)})}
+ hostAttach(ref,path)}).catch(e=>alert(fbErr(e)))})}).catch(e=>alert(fbErr(e)))};
+ function joinRoom(id){const path=String(id).startsWith('tennis_')?'tmTennisRooms':'tmRooms',rid=String(id).replace(/^tennis_/, '');init().then(()=>db.ref(path+'/'+rid).once('value')).then(s=>{if(!s.exists())throw Error('초대 방을 찾을 수 없어. 링크를 다시 확인해 줘.');const room=s.val();if(!room||(!room.groups&&!room.list))throw Error('초대 방 정보가 올바르지 않아. 방장이 QR을 다시 만들어 줘.');if(room.closed)throw Error('이 예측방은 이미 종료됐어요. 방장에게 새 QR을 받아 줘!');bootInfo('<h2>📱 친구 예측 모드</h2><p>예측을 제출하면 아래 📊 버튼으로 점수와 랭킹을 볼 수 있어요.</p>');profileForm('THUNDER MULTI 예측 참가',p=>(room.type==='single'||(!room.groups&&room.list))?renderSingle(id,room,p):renderPred(id,room,p))}).catch(e=>{bootInfo('<h2>접속할 수 없어</h2><p>'+esc(fbErr(e))+'</p>');show(`<h2>접속할 수 없어</h2><p>${esc(fbErr(e))}</p><button onclick="TM_close()">닫기</button>`)})}
  const card=(x,sel,a)=>`<button type="button" class="tmOpt${sel?' sel':''}" ${a} style="border-left:8px solid ${esc(x.col)}"><b>${esc(x.name)}</b><small>${esc(x.desc||'')}</small></button>`;
  const keep=f=>{const y=box().scrollTop;f();box().scrollTop=y};
  let ended=false,liveOff=()=>{};
@@ -799,10 +923,10 @@ $('pT').onclick=()=>ask('타이틀로 돌아갈까요? 진행 중인 경기'+(TN
  const row=(l,m,r)=>`<p class="tmRow"><b>${esc(l)}</b><br>내 예측 <b>${esc(m)}</b> → 실제 ${r?'<b>'+esc(r)+'</b>':'?'} ${!r?'⏳':r===m?'✅ 적중':'❌ 빗나감'}</p>`;
  const view=r=>{if(ended)return;r=r||{};const live=r.live||{},rows=arr(r.board),done=!!r.done,sc=scoreOf(pred.pick!=null?{pick:pred.pick}:{prediction:pred},live);
  let h=`<h2>${done?'🏆 최종 결과':'🎉 예측 제출 완료!'}</h2><p>${esc(p.icon)} ${esc(p.nick)}님 · 방장이 경기를 진행하면 점수가 실시간으로 떠요.</p>`;
- if(pred.pick!=null)h+=row('우승',pred.pick,live.winner);else{const qw=live.qw||{},sw=live.sw||{};pred.q.forEach((n,i)=>{h+=row(`${'ABCD'[i]}${unit} 우승`,n,qw[i])});pred.s.forEach((n,i)=>{h+=row(`4강 ${i+1}경기 승자`,n,sw[i])});h+=row('🏆 월드 챔피언',pred.f,live.champ)}
+ if(room.sport==='tennis'&&pred.tennis){h+=row('경기 승자',pred.tennis.winner,live.winner);h+=row('세트 스코어',pred.tennis.sets,live.score)}else if(pred.pick!=null)h+=row('우승',pred.pick,live.winner);else{const qw=live.qw||{},sw=live.sw||{};pred.q.forEach((n,i)=>{h+=row(`${'ABCD'[i]}${unit} 우승`,n,qw[i])});pred.s.forEach((n,i)=>{h+=row(`4강 ${i+1}경기 승자`,n,sw[i])});h+=row('🏆 월드 챔피언',pred.f,live.champ)}
  h+=`<h3>내 점수 ${sc.pts}점</h3><h3>🏅 ${done?'최종 랭킹':'모두의 점수'}</h3>${boardHtml(rows,uid,done)}${r.closed?'<p class="tmMuted">방장이 경기를 마쳤어요. 1분 뒤 자동으로 종료돼요.</p>':''}${done?'<button onclick="TM_end()">✅ 종료하기</button>':''}<button onclick="TM_close()">닫기</button>`;
  last=h;if(box().style.display!=='none')keep(()=>show(h));if((done||r.closed)&&!shown){shown=true;show(h)}if(r.closed&&!cdT){cdT=setTimeout(endProgram,60000)}};
- view(null);const cb=x=>view(x.val()),rf=db.ref('tmRooms/'+id);rf.on('value',cb);liveOff=()=>rf.off('value',cb)}
+ view(null);const cb=x=>view(x.val()),path=room.sport==='tennis'?'tmTennisRooms':'tmRooms',rid=String(id).replace(/^tennis_/,''),rf=db.ref(path+'/'+rid);rf.on('value',cb);liveOff=()=>rf.off('value',cb)}
  function renderPred(id,room,p){const q=[null,null,null,null],s=[null,null],f={v:null},G=arr(room.groups).map(arr),unit=room.sport==='horse'?'팀':'조';
  const by=n=>{for(const g of G)for(const x of g)if(x.name===n)return x;return{name:n,col:'#888',desc:''}};
  const draw=()=>{let h=`<h2>🏆 ${esc(room.sportName)} 월드 챔피언십 예측</h2><p>${esc(p.icon)} ${esc(p.nick)}님, 조별 우승 → 4강 → 결승 순서로 골라봐!</p>`;
@@ -813,22 +937,22 @@ $('pT').onclick=()=>ask('타이틀로 돌아갈까요? 진행 중인 경기'+(TN
  document.querySelectorAll('#tmShare .tmOpt').forEach(b=>b.onclick=()=>{const k=b.dataset.k,n=b.dataset.n;if(k[0]==='q'){q[+k[1]]=n;s.fill(null);f.v=null}else if(k[0]==='s'){s[+k[1]]=n;f.v=null}else f.v=n;draw()});
  document.getElementById('tmSubmit').onclick=()=>{if(!q.every(Boolean)||!s.every(Boolean)||!f.v)return show(box().firstChild?content().innerHTML.replace(/<p class="tmErr">.*?<\/p>/,'')+'<p class="tmErr" style="color:#ff9d9d">모든 단계(조별 우승·4강·월드 챔피언)를 선택해 줘!</p>':'');
  const pred={q:q.slice(),s:s.slice(),f:f.v};db.ref('tmRooms/'+id+'/participants/'+uid).set({uid,nick:p.nick,icon:p.icon,prediction:pred,submitted:true,submittedAt:Date.now()}).then(()=>watchLive(id,room,pred,p)).catch(e=>show(`<h2>제출 실패</h2><p>${esc(fbErr(e))}</p><button onclick="TM_close()">닫기</button>`))}};draw()}
- function renderSingle(id,room,p){let pick=null;const L=arr(room.list);const draw=()=>{keep(()=>show(`<h2>${esc(room.sportName)} 우승 예측</h2><p>${esc(p.icon)} ${esc(p.nick)}님, 누가 1등일까?</p>${L.map((x,i)=>card(x,pick===x.name,`data-i="${i}"`)).join('')}<p><button id="tmSubmit">예측 제출</button><button onclick="TM_close()">닫기</button></p><p class="tmMuted">제출하면 경기 결과가 끝나는 순간 여기에 정답이 떠!</p>`));
+ function renderTennisSingle(id,room,p){let winner=null,sets=room.sets===1?'1-0':'2-0';const L=arr(room.list);const draw=()=>{keep(()=>show('<h2>🎾 테니스 승부 예측</h2><p>'+esc(p.icon)+' '+esc(p.nick)+'님, 승자와 최종 세트 스코어를 골라 봐!</p>'+L.map((x,i)=>card(x,winner===x.name,'data-i="'+i+'"')).join('')+'<p><b>최종 세트 스코어</b><br><select id="tmTennisSets" style="padding:10px;border-radius:9px;background:#10243a;color:white;border:1px solid #6b91a8">'+(room.sets===1?'<option>1-0</option><option>0-1</option>':'<option>2-0</option><option>2-1</option><option>1-2</option><option>0-2</option>')+'</select></p><p><button id="tmSubmit">예측 제출</button><button onclick="TM_close()">닫기</button></p><p class="tmMuted">승자 40점 · 세트 스코어 20점. 경기 결과가 끝나면 적중 결과가 반영돼.</p>'));document.getElementById('tmTennisSets').value=sets;document.querySelectorAll('#tmShare .tmOpt').forEach(b=>b.onclick=()=>{winner=L[+b.dataset.i].name;draw()});document.getElementById('tmTennisSets').onchange=e=>{sets=e.target.value};document.getElementById('tmSubmit').onclick=()=>{if(!winner)return;const pred={tennis:{winner:winner,sets:sets}};db.ref('tmRooms/'+id.replace(/^tennis_/, '')).remove;const path=room.sport==='tennis'?'tmTennisRooms':'tmRooms',rid=String(id).replace(/^tennis_/, '');db.ref(path+'/'+rid+'/participants/'+uid).set({uid:uid,nick:p.nick,icon:p.icon,prediction:pred,submitted:true,submittedAt:Date.now()}).then(()=>watchLive(id,room,pred,p)).catch(e=>show('<h2>제출 실패</h2><p>'+esc(fbErr(e))+'</p><button onclick="TM_close()">닫기</button>'))}};draw()}function renderSingle(id,room,p){if(room.sport==='tennis')return renderTennisSingle(id,room,p);let pick=null;const L=arr(room.list);const draw=()=>{keep(()=>show(`<h2>${esc(room.sportName)} 우승 예측</h2><p>${esc(p.icon)} ${esc(p.nick)}님, 누가 1등일까?</p>${L.map((x,i)=>card(x,pick===x.name,`data-i="${i}"`)).join('')}<p><button id="tmSubmit">예측 제출</button><button onclick="TM_close()">닫기</button></p><p class="tmMuted">제출하면 경기 결과가 끝나는 순간 여기에 정답이 떠!</p>`));
  document.querySelectorAll('#tmShare .tmOpt').forEach(b=>b.onclick=()=>{pick=L[+b.dataset.i].name;draw()});
  document.getElementById('tmSubmit').onclick=()=>{if(!pick)return;const pred={pick};db.ref('tmRooms/'+id+'/participants/'+uid).set({uid,nick:p.nick,icon:p.icon,pick,submitted:true,submittedAt:Date.now()}).then(()=>watchLive(id,room,pred,p)).catch(e=>show(`<h2>제출 실패</h2><p>${esc(fbErr(e))}</p><button onclick="TM_close()">닫기</button>`))}};draw()}
  /* ===== 방장: 친구 목록 유지 · 점수 계산 · 랭킹 공유 ===== */
  const FAB='position:fixed;left:8px;bottom:8px;z-index:9999;padding:8px 12px;border-radius:12px;border:2px solid #ffd75e;background:#8d1a2c;color:#fff;font-weight:800;font-size:13px';
  const isTour=()=>!!(window.TN&&window.TN.on&&window.TN.G);
  function scoreOf(pt,live){live=live||{};let pts=0,hit=0,tot=0;
- if(pt.pick!=null){tot=1;if(live.winner&&live.winner===pt.pick){pts=40;hit=1}}
+ if(pt.prediction&&pt.prediction.tennis){const tp=pt.prediction.tennis;tot=2;if(live.winner&&live.winner===tp.winner){pts+=40;hit++}if(live.score&&live.score===tp.sets){pts+=20;hit++}}else if(pt.pick!=null){tot=1;if(live.winner&&live.winner===pt.pick){pts=40;hit=1}}
  else if(pt.prediction){const P=pt.prediction,qw=live.qw||{},sw=live.sw||{};tot=7;arr(P.q).forEach((n,i)=>{if(qw[i]&&qw[i]===n){pts+=10;hit++}});arr(P.s).forEach((n,i)=>{if(sw[i]&&sw[i]===n){pts+=20;hit++}});if(live.champ&&live.champ===P.f){pts+=40;hit++}}
  return{pts,hit,tot}}
  function curLive(){const t=window.TN,c=document.body.className;
  if(isTour()){const nm=a=>{const o={};(a||[]).forEach((x,i)=>{if(x)o[i]=x.name});return o};return{stage:t.stage||'',qw:nm(t.qw),sw:nm(t.sw),champ:t.champ?t.champ.name:''}}
- let w='';if((c==='FINISH'||c==='RESULT')&&G&&G.won)w=G.won.name;else if((c==='A_FINISH'||c==='A_RESULT')&&A_s.st.won)w=A_s.st.won.n;else if((c==='N_FINISH'||c==='N_RESULT')&&N_s.st.won)w=N_s.st.won.n;
+ let w='';if(c==='TENNIS_RESULT'&&window.TennisGame&&window.TennisGame.state&&window.TennisGame.state.winner)return{winner:window.TennisGame.state.winner,score:window.TennisGame.state.setScore};if((c==='FINISH'||c==='RESULT')&&G&&G.won)w=G.won.name;else if((c==='A_FINISH'||c==='A_RESULT')&&A_s.st.won)w=A_s.st.won.n;else if((c==='N_FINISH'||c==='N_RESULT')&&N_s.st.won)w=N_s.st.won.n;
  return w?{winner:w}:null}
  function isDone(){const c=document.body.className;if(isTour())return c==='TN'&&document.getElementById('tnw').textContent.includes('최종 순위');return /(^|_)RESULT$/.test(c)&&!!curLive()}
- function board(live){return Object.keys(PARTS).map(k=>{const v=PARTS[k]||{};if(!v.submitted)return null;const sc=scoreOf(v,live);return{uid:k,nick:String(v.nick||'참가자'),icon:String(v.icon||'🎮'),pts:sc.pts,hit:sc.hit,tot:sc.tot,pick:String(v.pick||(v.prediction&&v.prediction.f)||''),t:v.submittedAt||0}}).filter(Boolean).sort((a,b)=>b.pts-a.pts||b.hit-a.hit||a.t-b.t)}
+ function board(live){return Object.keys(PARTS).map(k=>{const v=PARTS[k]||{};if(!v.submitted)return null;const sc=scoreOf(v,live);return{uid:k,nick:String(v.nick||'참가자'),icon:String(v.icon||'🎮'),pts:sc.pts,hit:sc.hit,tot:sc.tot,pick:String(v.pick||(v.prediction&&(v.prediction.f||(v.prediction.tennis&&v.prediction.tennis.winner))||'')),t:v.submittedAt||0}}).filter(Boolean).sort((a,b)=>b.pts-a.pts||b.hit-a.hit||a.t-b.t)}
  function boardHtml(rows,me,done){const M=['🥇','🥈','🥉'];if(!rows.length)return'<p>아직 예측을 제출한 친구가 없어.</p>';return rows.map((r,i)=>`<p class="tmRow" style="${r.uid===me?'background:#3a2a05;border-radius:8px;padding:4px':''}">${M[i]||(i+1)+'위'} ${esc(r.icon)} <b>${esc(r.nick)}</b> · <b>${r.pts}점</b>${r.tot===1?(r.pts?' ✅ 정답':done?' ❌ 오답':''):' ('+r.hit+'/'+r.tot+')'}<br><small class="tmMuted">예측: ${esc(r.pick||'-')}</small></p>`).join('')}
  function showBoard(){panel='board';const rows=board(curLive()),done=isDone();show(`<h2>${done?'🏆 최종 랭킹':'📊 실시간 점수'}</h2>${boardHtml(rows,uid,done)}<p class="tmMuted">${isTour()?'조별 우승 10점 · 4강 20점 · 월드 챔피언 40점 (점수순)':'정답 40점 · 맞춘 사람이 위로!'}</p>${done?'<button onclick="TM_endRoom()">✅ 방 종료</button>':''}<button onclick="TM_close()">닫기</button>`)}
  function paintPeople(){const ps=Object.values(PARTS);document.querySelectorAll('.tmFriends').forEach(d=>{d.innerHTML=roomRef?(ps.length?'<i>👥 예측 친구</i>'+ps.map(v=>`<span class="${v.submitted?'ok':''}">${esc(v.icon||'🎮')} ${esc(v.nick||'참가자')} ${v.submitted?'✔':'…'}</span>`).join(''):'<i>아직 참가한 친구가 없어 · QR로 초대해 봐!</i>'):''});const el=document.getElementById('tmPeople');if(!el)return;el.innerHTML=Object.values(PARTS).map(v=>`<p>${esc(v.icon||'🎮')} <b>${esc(v.nick||'참가자')}</b> · ${v.submitted?'예측 제출 완료'+((v.pick||(v.prediction&&v.prediction.f))?' → '+esc(v.pick||v.prediction.f):''):'예측 작성 중'}</p>`).join('')||'아직 참가자가 없어.'}
@@ -837,11 +961,11 @@ $('pT').onclick=()=>ask('타이틀로 돌아갈까요? 진행 중인 경기'+(TN
  let partsRef=null,partsCb=null,wasDone=false;
  function closeRoom(){if(!roomRef)return;try{roomRef.update({closed:true,done:true});if(partsRef)partsRef.off('value',partsCb)}catch(e){}roomRef=null;PARTS={};panel=null;lastSync='';doneShown=false;wasDone=false;try{localStorage.removeItem('tmHostRoom')}catch(e){}const f=document.getElementById('tmHostFab');if(f)f.remove();paintPeople()}
  window.TM_endRoom=()=>{closeRoom();close()};
- function hostAttach(ref){roomRef=ref;PARTS={};lastSync='';wasDone=false;try{localStorage.setItem('tmHostRoom',ref.key)}catch(e){}
+ function hostAttach(ref,path){path=path||'tmRooms';roomRef=ref;PARTS={};lastSync='';wasDone=false;try{localStorage.setItem('tmHostRoom',(path==='tmTennisRooms'?'tennis_':'')+ref.key)}catch(e){}
  let f=document.getElementById('tmHostFab');if(!f){f=document.createElement('button');f.id='tmHostFab';f.textContent='📊 친구 점수';f.style.cssText=FAB;document.body.appendChild(f)}f.onclick=showBoard;
  partsRef=ref.child('participants');partsCb=snap=>{const o={};snap.forEach(x=>{o[x.key]=x.val()||{}});PARTS=o;paintPeople();sync()};partsRef.on('value',partsCb)}
  window.TM_paint=paintPeople;setInterval(sync,1500);
- window.addEventListener('load',()=>{if(new URLSearchParams(location.search).has('tmjoin')||!/^https?:$/.test(location.protocol))return;let id='';try{id=localStorage.getItem('tmHostRoom')||''}catch(e){}if(!id)return;init().then(()=>db.ref('tmRooms/'+id).once('value')).then(x=>{const r=x.val();if(r&&r.host===uid&&Date.now()-(r.createdAt||0)<432e5)hostAttach(db.ref('tmRooms/'+id))}).catch(()=>{})});
+ window.addEventListener('load',()=>{if(new URLSearchParams(location.search).has('tmjoin')||!/^https?:$/.test(location.protocol))return;let id='';try{id=localStorage.getItem('tmHostRoom')||''}catch(e){}if(!id)return;const path=id.startsWith('tennis_')?'tmTennisRooms':'tmRooms',rid=id.replace(/^tennis_/, '');init().then(()=>db.ref(path+'/'+rid).once('value')).then(x=>{const r=x.val();if(r&&r.host===uid&&Date.now()-(r.createdAt||0)<432e5)hostAttach(db.ref(path+'/'+rid),path)}).catch(()=>{})});
  const params=new URLSearchParams(location.search);if(params.has('tmjoin')){(document.readyState==='loading'?document.addEventListener('DOMContentLoaded',()=>joinRoom(params.get('tmjoin'))):joinRoom(params.get('tmjoin')))}
 })();
 </script>
