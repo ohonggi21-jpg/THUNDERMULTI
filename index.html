@@ -338,6 +338,87 @@ kbd{display:inline-block;padding:1px 6px;border:1px solid #8ab6d9;border-radius:
  .ov>.wrap{gap:3px}
 }
 
+
+/* ===== 전체 화면 스크롤 제거: 가로·세로 공통 ===== */
+html,body{width:100%;height:100%;height:100dvh;overflow:hidden!important;overscroll-behavior:none}
+body{position:fixed;inset:0}
+.ov{inset:0;width:100%;height:100%;height:100dvh;overflow:hidden!important;overscroll-behavior:none!important;touch-action:pan-x pan-y}
+.ov>.wrap{width:100%;height:100%;height:100dvh;min-height:0!important;max-height:100%;overflow:hidden!important;justify-content:center;gap:clamp(3px,1vh,9px);padding:max(5px,env(safe-area-inset-top)) max(6px,env(safe-area-inset-right)) max(5px,env(safe-area-inset-bottom)) max(6px,env(safe-area-inset-left))}
+.ov .card{min-height:0;max-height:100%;overflow:hidden!important}
+#oX .card,#oAX .card,#oNX .card,#oP .card,#oC .card{max-height:100%;overflow:hidden!important}
+#errBox{overflow:hidden!important;max-height:18vh}
+#sp{max-height:calc(100dvh - 54px);overflow:hidden}
+#oT>.wrap{justify-content:space-evenly}
+#oT .menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;max-width:none;gap:clamp(4px,1vw,9px)}
+#oT .mode-btn{width:100%;min-width:0;max-width:none;min-height:clamp(76px,13vh,126px);padding:clamp(5px,1vh,10px);display:flex;flex-direction:column;justify-content:center;align-items:center}
+#oT .mode-btn.random{grid-column:1/-1;grid-row:auto;width:100%;max-width:none!important;justify-self:stretch}
+#oT .mode-btn .mi{font-size:clamp(22px,5vh,42px);margin-bottom:2px}
+#oT .mode-btn .mt{font-size:clamp(11px,2.2vh,18px)}
+#oT .mode-btn .md{font-size:clamp(8px,1.45vh,11px);line-height:1.15}
+#oT h1{font-size:clamp(28px,7vh,62px)}
+#oT .kr{font-size:clamp(14px,3vh,26px)}
+#oT .tag{font-size:clamp(9px,1.6vh,13px);min-height:0}
+#oT #bHelp{min-height:30px;padding:4px 12px;font-size:clamp(10px,1.6vh,13px)}
+#oR>.wrap,#oAR>.wrap,#oNR>.wrap{justify-content:space-evenly}
+#oR .cards,#oAR .cards,#oNR .cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:clamp(3px,.8vw,8px);width:100%;max-width:none}
+#oR .rc,#oAR .rc,#oNR .rc{min-width:0;min-height:0;padding:clamp(3px,.8vh,7px) 2px;display:flex;flex-direction:column;justify-content:center;align-items:center}
+#oR .rc i,#oAR .rc i,#oNR .rc i{width:clamp(22px,5vh,38px);height:clamp(22px,5vh,38px);font-size:clamp(10px,2vh,16px)}
+#oR .rc .nm,#oAR .rc .nm,#oNR .rc .nm{font-size:clamp(8px,1.5vh,12px);overflow-wrap:anywhere}
+#oR .rc small,#oAR .rc small,#oNR .rc small{font-size:clamp(7px,1.15vh,9px);line-height:1.1}
+#rt,#art,#nrt{font-size:clamp(15px,3vh,26px)}
+#cnt,#acnt,#ncnt{font-size:clamp(42px,14vh,120px)}
+#oTN>.wrap{justify-content:space-evenly;gap:clamp(3px,.7vh,7px);padding:5px}
+#oTN .gr{width:100%;max-width:none;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(3px,.7vw,7px);min-height:0}
+#oTN .gc{min-width:0;min-height:0;padding:clamp(3px,.7vh,7px);overflow:hidden}
+#oTN .pc{min-height:0;margin:2px 0;padding:3px 4px;font-size:clamp(8px,1.3vh,11px)}
+#oTN .tnh{font-size:clamp(18px,4vh,36px)}
+#oTN .tnh.fin{font-size:clamp(22px,5vh,44px)}
+#oHelp .guide-wrap{justify-content:space-evenly!important;gap:clamp(2px,.5vh,5px)!important;padding:5px!important}
+#oHelp .guide-head{width:100%;max-width:none;padding:2px 4px}
+#oHelp .guide-kicker{font-size:8px}
+#oHelp .guide-head h2{font-size:clamp(16px,3vh,26px);margin:2px 0}
+#oHelp .guide-head>p{font-size:9px}
+#oHelp .guide-content{width:100%;max-width:none;min-height:0;flex:1;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:4px;overflow:hidden}
+#oHelp .guide-content section{min-width:0;min-height:0;padding:5px;border-radius:8px;overflow:hidden}
+#oHelp .guide-no{font-size:7px}
+#oHelp .guide-content h3{font-size:clamp(10px,1.7vh,14px);margin:2px 0 4px}
+#oHelp .guide-content p,#oHelp .guide-card p,#oHelp .guide-controls p{font-size:clamp(7px,1.15vh,9px);line-height:1.25}
+#oHelp .guide-content h4{font-size:9px;margin-bottom:2px}
+#oHelp .guide-cards,#oHelp .guide-controls,#oHelp .guide-tips{grid-template-columns:repeat(2,minmax(0,1fr));gap:3px}
+#oHelp .guide-card{gap:3px;padding:3px;border-radius:5px}
+#oHelp .guide-icon{font-size:13px;min-width:14px}
+#oHelp .guide-card small{font-size:7px;margin-top:2px;line-height:1.1}
+#oHelp .guide-mini{gap:2px;margin-top:3px;padding:4px;font-size:7px}
+#oHelp .guide-controls>div,#oHelp .guide-tips li{padding:4px}
+#oHelp .guide-controls b,#oHelp .guide-tips b{font-size:8px;margin-bottom:1px}
+#oHelp .guide-note{font-size:7px!important;margin-top:3px!important;padding:4px}
+#oHelp .guide-bracket{gap:2px;margin:3px 0;padding:3px}
+#oHelp .guide-round{gap:2px}
+#oHelp .guide-round b,#oHelp .guide-round span{font-size:7px;padding:3px 1px}
+#oHelp .guide-arrow{font-size:10px}
+#oHelp .guide-tournament{grid-template-columns:repeat(4,minmax(0,1fr));gap:2px}
+#oHelp .guide-tournament>div{padding:3px}
+#oHelp .guide-tournament b,#oHelp .guide-tournament p{font-size:7px}
+#oHelp .guide-footer{width:100%;max-width:none;padding:0;gap:4px}
+#oHelp .guide-footer p{font-size:8px}
+#oHelp .guide-footer .btn{min-height:25px;padding:3px 9px;font-size:9px}
+@media (orientation:landscape){
+ #oT .menu{grid-template-columns:repeat(3,minmax(0,1fr))}
+ #oT .mode-btn.random{grid-column:2}
+ #oHelp .guide-content{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-height:420px){
+ #oT .mode-btn{min-height:58px;padding:3px}
+ #oT .mode-btn .mi{font-size:22px}
+ #oT .mode-btn .md{display:none}
+ #oT h1{font-size:26px}
+ #oT .kr{font-size:13px}
+ #oT .tag{display:none}
+ #oT #bHelp{min-height:24px;font-size:9px}
+ #oHelp .guide-head>p{display:none}
+ #oHelp .guide-content p,#oHelp .guide-card p,#oHelp .guide-controls p{font-size:7px}
+}
+
 </style></head><body class="TITLE">
 <canvas id="cv"></canvas>
 <div id="hud"><div id="tb"><b id="tm">0.0초</b><b id="ld">-</b><b id="rm">-</b></div><div id="bar"></div><div id="rk"></div></div>
