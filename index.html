@@ -1235,15 +1235,16 @@ function showHall(){
  const d=hallData(),r=rec(),g=r.g||{};
  const overall=[];
  names.forEach(([key,label])=>Object.entries(d[key]||{}).forEach(([name,v])=>overall.push({name,game:label,...v})));
- overall.sort((a,b)=>b.best-a.best||b.points-a.points);
+ overall.sort((a,b)=>b.best-a.best||b.points-a.points||b.wins-a.wins);
  const gameHtml=names.map(([key,label])=>{
   const rows=hallRows(key);
   return `<div class="gc wide"><h4>${label} · 최고 점수 TOP 10</h4>${rows.length?`<ol class="rl">${rows.map((p,i)=>`<li><b>${i+1}위 ${p.name}</b><small>최고 ${p.best.toLocaleString()}점 · 누적 ${p.points.toLocaleString()}점 · ${p.wins}승 / ${p.games}경기</small></li>`).join('')}</ol>`:'<p class="sm">아직 기록이 없어요. 이 종목을 플레이해 보세요!</p>'}</div>`;
  }).join('');
- const top=overall.slice(0,10);
+ const top=overall.slice(0,10),star=top[0];
  go('T_RESULT');
- ov(`<div class="tnh">🏆 명예의 전당</div><div class="tag">이 브라우저에 저장된 네 종목 누적 기록 · 기기 간 자동 공유는 되지 않아요.</div>
- <div class="gc wide"><h4>👑 전체 게임 최고 점수 TOP 10</h4>${top.length?`<ol class="rl">${top.map((p,i)=>`<li><b>${i+1}위 ${p.name}</b><small>${p.game} · 최고 ${p.best.toLocaleString()}점 · 누적 ${p.points.toLocaleString()}점</small></li>`).join('')}</ol>`:'<p class="sm">아직 기록이 없어요. 게임을 플레이하면 여기에 등록됩니다!</p>'}</div>
+ ov(`<div class="tnh">🏆 명예의 전당</div><div class="tag">경마 · 프로게이머 경기 · 네온 팽이 · 테니스 기록 · 이 브라우저에 저장돼요.</div>
+ ${star?`<div class="gc wide" style="border:2px solid #ffd75e;background:linear-gradient(135deg,#3b2b08,#101b18);padding:14px"><h4>👑 역대 최고 득점 플레이어</h4><h3 style="color:#ffd75e">${star.name}</h3><b>${star.best.toLocaleString()}점</b><p class="sm">${star.game} · 누적 ${star.points.toLocaleString()}점 · ${star.wins}승 / ${star.games}경기</p></div>`:''}
+ <div class="gc wide"><h4>🌟 전체 게임 최고 점수 TOP 10</h4>${top.length?`<ol class="rl">${top.map((p,i)=>`<li><b>${i+1}위 ${p.name}</b><small>${p.game} · 최고 ${p.best.toLocaleString()}점 · 누적 ${p.points.toLocaleString()}점</small></li>`).join('')}</ol>`:'<p class="sm">아직 기록이 없어요. 게임을 플레이하면 여기에 등록됩니다!</p>'}</div>
  <div class="gr">${gameHtml}</div>
  <div class="gc wide"><h4>🎾 테니스 추가 기록</h4><div class="gr"><div class="gc"><small>예측 승자 적중</small><b>${g.predHit||0} / ${g.predTotal||0}</b></div><div class="gc"><small>정확한 세트 스코어</small><b>${g.predExact||0}회</b></div><div class="gc"><small>최다 에이스</small><b>${g.aces||0}개</b></div><div class="gc"><small>최장 랠리</small><b>${g.rally||0}구</b></div><div class="gc"><small>최단 경기</small><b>${g.fast&&g.fast!==999?g.fast+'초':'기록 없음'}</b></div></div></div>
  <button class="btn" type="button" data-tx="home">닫기</button>`);
@@ -1291,6 +1292,8 @@ const nw=R0[P[w].name]=R0[P[w].name]||{w:0,l:0,s:0,b:0},nl=R0[P[l].name]=R0[P[l]
 if(!TX.saved){TX.saved=1;nw.w++;nw.s++;nw.b=Math.max(nw.b,nw.s);nl.l++;nl.s=0}
 const pred=TX.prediction||{},actualScore=`${st.rw[w]}-${st.rw[l]}`,predHit=pred.locked&&pred.winner===w,predExact=predHit&&pred.score===actualScore;R0.g.predTotal=(R0.g.predTotal||0)+(pred.locked&&pred.winner!=null?1:0);R0.g.predHit=(R0.g.predHit||0)+(predHit?1:0);R0.g.predExact=(R0.g.predExact||0)+(predExact?1:0);
 const nb=[];if(S0.ace[0]+S0.ace[1]>0&&Math.max(...S0.ace)>R0.g.aces){R0.g.aces=Math.max(...S0.ace);nb.push('최다 에이스 '+R0.g.aces+'개')}if(S0.rally>R0.g.rally){R0.g.rally=S0.rally;nb.push('최장 랠리 '+S0.rally+'구')}if(t<R0.g.fast){R0.g.fast=t;nb.push('최단 경기 '+t+'초')}saveRec(R0);
+const tennisPoints=i=>Math.round((S0.pts[i]||0)*10+(S0.ace[i]||0)*80+(S0.win[i]||0)*30+(i===w?500:0));
+hallRecord('tennis',P.map((p,i)=>({name:p.name,place:i===w?1:2,win:i===w,points:tennisPoints(i)})));
 go('T_RESULT');MODE='tennis';setM('',0);
 ov(`<div class="card"><h2>🏆 우승!</h2><h3 style="color:${w?C1:C0}">${FL[P[w].cc]} ${P[w].name}</h3><p>${st.rw[w]}:${st.rw[l]}로 승리했습니다!${upset?' <b style="color:#ffd75e">🔥 대이변! (배당 '+TX.odds[w].toFixed(2)+'배)</b>':''}</p>
 <ol class="rl" style="list-style:none">${st.rounds.map((r,i)=>`<li style="--c:${r.w?C1:C0}"><b>${i+1}판</b> ${r.g[0]} : ${r.g[1]} <small>${P[r.w].name} 승</small></li>`).join('')}</ol>
