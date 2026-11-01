@@ -43,11 +43,11 @@ const EVENT=[
  {n:'의료 타임아웃',d:'선수가 치료를 받고 체력을 회복한다.',w:2,c:s=>true,e:(s,k)=>{s.stamina[k]=Math.min(100,s.stamina[k]+22);mod(s,k,'all',-3,2)}},
  {n:'기적의 랠리',d:'엄청나게 긴 랠리! 양쪽 체력이 크게 소모된다.',w:2,c:s=>true,e:(s,k)=>{s.stamina[0]=Math.max(5,s.stamina[0]-12);s.stamina[1]=Math.max(5,s.stamina[1]-12);mod(s,k,'rally',20,2);s.forceLongRally=1}},
  {n:'챔피언 포인트',d:'경기를 결정할 수 있는 순간! 중요한 포인트의 집중력이 상승한다.',w:2,c:s=>true,e:(s,k)=>mod(s,matchPoint(s)>=0?matchPoint(s):trailing(s),'clutch',19,2)},
- {n:'슈퍼 타이브레이크',d:'세트가 팽팽하다! 7점 선취 타이브레이크가 시작된다.',w:1,c:s=>s.gamesToWin>1&&s.games[0]===s.games[1]&&s.games[0]>=s.gamesToWin-1,e:s=>{s.forceTB=true}},
+ {n:'슈퍼 타이브레이크',d:'팽팽한 승부! 타이브레이크에서 집중력이 폭발한다.',w:1,c:s=>s.tiebreak,e:(s,k)=>mod(s,k,'clutch',16,2)},
  {n:'관중석의 스타 등장',d:'스타의 등장으로 경기장 분위기가 달아오른다.',w:1,c:s=>true,e:(s,k)=>mod(s,k,'focus',12,3)},
  {n:'역대급 대역전',d:'열세에 놓인 선수가 기적의 기회를 얻는다.',w:1,c:s=>true,e:s=>{const k=trailing(s);mod(s,k,'all',22,5);mod(s,k,'clutch',12,3)}}
 ];
-let state=null,tournament=null,active=false,preparedSides=[],preparedSettings=null;
+let state=null,tournament=null,active=false,preparedSides=[],preparedSettings=null,usedPlayerNames=new Map();
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function setting(){return{format:$('tnFormat').value,sets:+$('tnSets').value,games:+$('tnGames').value,court:$('tnCourtType').value,noAd:$('tnRule').value==='noad',draw:+$('tnDrawSize').value||0}}
 function randomPerson(gender){
@@ -55,7 +55,7 @@ function randomPerson(gender){
  const stats={serve:randStat(),fh:randStat(),bh:randStat(),volley:randStat(),speed:randStat(),stamina:randStat(),focus:randStat(),mental:randStat(),experience:clamp(100-rank*.35+Math.floor(R()*18),40,99)};
  const bestCourt=pick(['hard','clay','grass']),style=pick(STYLES);
  const styleBonus=style==='강력한 서브 중심'?{serve:8}:style==='공격형 베이스라이너'?{fh:7,bh:4}:style==='수비형 베이스라이너'?{speed:7,stamina:5}:style==='서브 앤 발리'?{serve:5,volley:8}:style==='랠리 특화형'?{fh:4,bh:7,stamina:4}:style==='카운터펀처'?{speed:5,focus:5}:{fh:3,bh:3,volley:3};
- return{name:base[0],flag:base[1],nation:base[2],age:age,rank:rank,stats:stats,bestCourt:bestCourt,style:style,bonus:styleBonus};
+ const seq=(usedPlayerNames.get(base[0])||0)+1;usedPlayerNames.set(base[0],seq);return{name:seq===1?base[0]:base[0]+' '+seq,flag:base[1],nation:base[2],age:age,rank:rank,stats:stats,bestCourt:bestCourt,style:style,bonus:styleBonus};
 }
 function randStat(){return 58+Math.floor(Math.pow(R(),.65)*39)}
 function teamFor(format,idx){
@@ -67,6 +67,7 @@ function teamFor(format,idx){
  return{label:title,color:c,members:members,rating:rating,stats:Object.fromEntries(['serve','fh','bh','volley','speed','stamina','focus','mental','experience'].map(k=>[k,avg(k)])),bestCourt:members.map(p=>p.bestCourt).join(' / '),styles:members.map(p=>p.style).join(' · ')};
 }
 function makeTeams(cfg){
+ usedPlayerNames=new Map();
  const count=cfg.draw||2,sides=[];tournament=null;
  for(let i=0;i<count;i++)sides.push(teamFor(cfg.format,i));
  if(count===2)return sides;
@@ -123,7 +124,7 @@ function pointWinner(s){
  const aceChance=clamp(.025+(serve-70)*.003+getMod(s,server,'serve')*.002,.01,.28);
  if(R()<aceChance)return{side:server,ace:true};return{side:R()<p?0:1,ace:false};
 }
-function pointRest(s){if(s.gamesToWin===1)return s.settings.sets===1?7:8.6;return s.settings.sets===1?1.25:2.05}
+function pointRest(s){if(s.gamesToWin===1)return s.settings.sets===1?9:8.8;return s.settings.sets===1?2.3:3.2}
 function beginPoint(){
  const s=state;if(!s||s.finished)return;s.pointNo++;
  const ev=pickEvent(s);if(ev)showEvent(ev.n,ev.d);
@@ -143,9 +144,12 @@ function awardPoint(s,k){
 function winGame(s,k){
  s.games[k]++;s.points=[0,0];s.server=1-s.server;
  if((s.games[0]+s.games[1])%2===0){s.swapped=!s.swapped;log('코트 체인지!')}
- const o=1-k;if(s.games[k]>=s.gamesToWin&&s.games[k]>s.games[o]){closeSet(s,k,false);return}
- if(s.gamesToWin>1&&s.games[0]===s.gamesToWin-1&&s.games[1]===s.gamesToWin-1){s.tiebreak=true;s.tbPoints=[0,0];log('타이브레이크 시작! 7점 선취, 2점 차 승리')}
- if(s.forceTB){s.forceTB=false;s.tiebreak=true;s.tbPoints=[0,0];log('슈퍼 타이브레이크 돌입!')}updateUI();
+ // 3게임 압축 세트에서는 2:2 동점 시 타이브레이크로 세트를 결정한다.
+ if(s.gamesToWin>1&&s.games[0]===s.gamesToWin-1&&s.games[1]===s.gamesToWin-1){
+  s.tiebreak=true;s.tbPoints=[0,0];log('타이브레이크 시작! 7점 선취, 2점 차 승리');updateUI();return;
+ }
+ if(s.games[k]>=s.gamesToWin&&s.games[k]>s.games[1-k]){closeSet(s,k,false);return}
+ updateUI();
 }
 function closeSet(s,k,tb){
  const record={a:s.games[0],b:s.games[1],tb:tb?(s.tbPoints[0]+'-'+s.tbPoints[1]):''};s.history.push(record);s.sets[k]++;s.games=[0,0];s.points=[0,0];s.tbPoints=[0,0];s.tiebreak=false;s.server=1-k;s.swapped=!s.swapped;log((s.history.length)+'세트 종료! '+s.sides[k].label+' 승리');
@@ -181,7 +185,7 @@ function nextMatch(){
 }
 function startTournamentMatch(){const sides=tournament.pairs[tournament.index],cfg=setting();state=buildState(sides,cfg);active=true;MODE='tennis';S='TENNIS_MATCH';document.body.className='TENNIS_MATCH';hideEl($('tnResult'));showEl($('tnMatch'));updateUI();log(tournament.roundLabel+' '+(tournament.index+1)+'번째 경기 · '+sides[0].label+' vs '+sides[1].label);try{sfx('big')}catch(e){}}
 function update(dt){
- if(!active||!state||paused)return;const s=state;dt*=s.speed||1;
+ if(!active||!state||paused)return;const s=state;dt*=s.speed||1;s.elapsed=(s.elapsed||0)+dt;
  if(s.phase==='countdown'){s.count-=dt;if(s.count<=0){s.phase='idle';s.nextIn=.65;log('경기 시작!')}return}
  if(s.rally){s.rally.elapsed+=dt;if(s.rally.elapsed>=s.rally.duration)finishPoint();return}
  if(s.phase==='idle'){s.nextIn-=dt;if(s.nextIn<=0)beginPoint()}
