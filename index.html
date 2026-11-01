@@ -673,9 +673,9 @@ A.skip=()=>{const t=TN;t.pred={q:[null,null,null,null],s:[null,null],f:null};t.l
 TN.mt=()=>{const t=TN;if(t.stage=='Q')return{list:t.G[t.i],title:`예선 ${'ABCD'[t.i]}${unit()}`};if(t.stage=='S')return{list:[t.qw[t.i*2],t.qw[t.i*2+1]],title:`4강 ${t.i+1}경기`};return{list:t.sw,title:'결승'}};
 const pl=()=>{const t=TN,p=t.pred,m=(n,ok)=>`<span class="${ok==null?'':ok?'ok':'no'}">${n||'-'}</span>`;return`<div class="pl">${t.skipped?'⏭️ 승부예측 건너뜀':'🔒 내 예측 · 예선 '+[0,1,2,3].map(i=>m(p.q[i],t.qw[i]?t.qw[i].name==p.q[i]:null)).join(' / ')+' · 4강 '+[0,1].map(i=>m(p.s[i],t.sw[i]?t.sw[i].name==p.s[i]:null)).join(' / ')+' · 우승 '+m(p.f,t.champ?t.champ.name==p.f:null)}</div>`};
 const br=()=>{const t=TN,n=p=>p?p.name:'?';return`<div class="br"><div>예선 ${[0,1,2,3].map(i=>`<span class="${t.qw[i]?'w':''}">${'ABCD'[i]}:${n(t.qw[i])}</span>`).join(' ')}</div><div>4강 ${[0,1].map(i=>`<span class="${t.sw[i]?'w':''}">${n(t.sw[i])}</span>`).join(' ')}</div><div>결승 <span class="${t.champ?'w':''}">${n(t.champ)}</span></div></div>`};
-A.intro=()=>{if(TN.stage=='Q')return scr(`<div class="tnh">📺 예선 동시 중계</div>${br()}<div class="tag">4${unit()} 동시 시작 · 각 ${unit()}의 우승자 1명만 4강 진출</div><div class="gr">${TN.G.map((l,g)=>`<div class="gc"><h4>${'ABCD'[g]}${unit()}</h4>${l.map(p=>`<div class="pc" style="--c:${p.col}"><i></i><b>${p.name}</b></div>`).join('')}</div>`).join('')}</div>${pl()}<button class="btn" type="button" data-a="go">📺 4경기 동시 시작!</button><button class="btn s" type="button" data-a="title">타이틀로</button>`);const t=TN,m=t.mt(),f=t.stage=='F';scr(`<div class="tnh ${f?'fin':''}">${f?'🏆 결승전 🏆':m.title}</div>${br()}<div class="tag">${t.sp=='horse'?(m.list.length===2?'두 마리 맞대결':`${m.list.length}마리 출전`):`선수 소개 · ${m.list.length}명 출전`}</div><ul class="rl">${m.list.map(p=>`<li style="--c:${p.col}"><b>${p.name}</b><small>${ds(p)}</small></li>`).join('')}</ul>${pl()}<button class="btn" type="button" data-a="go">🏁 경기 시작!</button><button class="btn s" type="button" data-a="title">타이틀로</button>`)};
+A.intro=()=>{if(TN.sp==='tennis'&&TN.stage==='S'){const t=TN,duel=i=>[t.qw[i*2],t.qw[i*2+1]].map(p=>chip(p,'adv','disabled')).join('<em>VS</em>');return scr(`<div class="tnh">⚔️ 테니스 4강 동시 중계</div>${br()}<div class="tag">1경기와 2경기를 동시에 진행합니다 · 두 경기 승자가 결승 진출</div><div class="gr"><div class="gc"><h4>4강 1경기</h4><div class="vs">${duel(0)}</div></div><div class="gc"><h4>4강 2경기</h4><div class="vs">${duel(1)}</div></div></div>${pl()}<button class="btn" type="button" data-a="go">📺 4강 두 경기 동시 시작!</button><button class="btn s" type="button" data-a="title">타이틀로</button>`)}if(TN.stage=='Q')return scr(`<div class="tnh">📺 예선 동시 중계</div>${br()}<div class="tag">4${unit()} 동시 시작 · 각 ${unit()}의 우승자 1명만 4강 진출</div><div class="gr">${TN.G.map((l,g)=>`<div class="gc"><h4>${'ABCD'[g]}${unit()}</h4>${l.map(p=>`<div class="pc" style="--c:${p.col}"><i></i><b>${p.name}</b></div>`).join('')}</div>`).join('')}</div>${pl()}<button class="btn" type="button" data-a="go">📺 4경기 동시 시작!</button><button class="btn s" type="button" data-a="title">타이틀로</button>`);const t=TN,m=t.mt(),f=t.stage=='F';scr(`<div class="tnh ${f?'fin':''}">${f?'🏆 결승전 🏆':m.title}</div>${br()}<div class="tag">${t.sp=='horse'?(m.list.length===2?'두 마리 맞대결':`${m.list.length}마리 출전`):`선수 소개 · ${m.list.length}명 출전`}</div><ul class="rl">${m.list.map(p=>`<li style="--c:${p.col}"><b>${p.name}</b><small>${ds(p)}</small></li>`).join('')}</ul>${pl()}<button class="btn" type="button" data-a="go">🏁 경기 시작!</button><button class="btn s" type="button" data-a="title">타이틀로</button>`)};
 function launch(){const t=TN,m=t.mt();paused=0;$('oP').style.display='none';
-if(t.sp==='tennis'){if(t.stage==='Q'){t.tennisSurf=['hard','clay','grass'][R()*3|0];TX.on=0;return startMulti()}const surf=['hard','clay','grass'][R()*3|0],z=TX._t.mk(m.list[0].e,m.list[1].e,surf);let n=0;while(!z.done&&n++<500)TX._t.step(z);const w=z.win,l=1-w;t.tennisRows=[{name:z.P[w].name,m:200,tx:`${surf} 코트 · ${z.rw[w]}:${z.rw[l]} 승리`},{name:z.P[l].name,m:100,tx:`${surf} 코트 · ${z.rw[w]}:${z.rw[l]} 패배`}];t.tennisSurf=surf;rec1();return res()}
+if(t.sp==='tennis'){t.tennisSurf=['hard','clay','grass'][R()*3|0];TX.on=0;const groups=t.stage==='Q'?t.G:t.stage==='S'?[[t.qw[0],t.qw[1]],[t.qw[2],t.qw[3]]]:[t.sw.slice()];return startMulti(groups)}
 if(t.stage=='Q')return startMulti();
 if(t.sp=='horse'){SEL=m.list.map(p=>[...p.e,['최상','양호','양호','보통','보통'][R()*5|0]]);cheerIdx=-1;G=null;HS=[];startReady()}
 else if(t.sp=='arena'){A_s.st.sel=m.list.map(p=>p.e);A_s.startReady()}else{N_s.st.sel=m.list.map(p=>p.e);N_s.startReady()}}
@@ -709,10 +709,10 @@ function tennisLd(g){TX._multi.load(MM[g].tx)}
 function tennisSv(g){MM[g].tx=TX._multi.save()}
 function ld(g){const m=MM[g];if(TN.sp=='horse'){HS=m.HS;G=m.G;PT=m.PT;cmq=m.cmq;cmT=m.cmT;shown=m.shown;scroll=m.scroll}else{const e=E();Object.assign(e.st,m.st);Object.assign(e.cam,m.cam);e.setP(m.pT)}}
 function sv(g){const m=MM[g];if(TN.sp=='horse'){m.HS=HS;m.G=G;m.PT=PT;m.cmq=cmq;m.cmT=cmT;m.shown=shown;m.scroll=scroll}else{const e=E();m.st={...e.st};m.cam={...e.cam};m.pT=e.getP()}}
-function startMulti(){const t=TN;stopM();paused=0;MM=[];
-for(let g=0;g<4;g++){const l=t.G[g];if(t.sp==='tennis'){MM.push({tx:TX._multi.prepare(l[0],l[1],t.tennisSurf),fd:-1,wn:''})}else if(t.sp=='horse'){SEL=l.map(p=>[...p.e,['최상','양호','양호','보통','보통'][R()*5|0]]);G=null;HS=[];startReady();MM.push({HS,G,PT,cmq,cmT,shown,scroll:0,fd:-1})}
+function startMulti(groupOverride){const t=TN,groups=groupOverride||t.G;stopM();paused=0;MM=[];
+for(let g=0;g<groups.length;g++){const l=groups[g];if(t.sp==='tennis'){MM.push({tx:TX._multi.prepare(l[0],l[1],t.tennisSurf),fd:-1,wn:''})}else if(t.sp=='horse'){SEL=l.map(p=>[...p.e,['최상','양호','양호','보통','보통'][R()*5|0]]);G=null;HS=[];startReady();MM.push({HS,G,PT,cmq,cmT,shown,scroll:0,fd:-1})}
 else{const e=E();e.st.sel=l.map(p=>p.e);e.startReady();MM.push({st:{...e.st},cam:{...e.cam},pT:e.getP(),fd:-1})}}
-tok++;T.forEach(clearTimeout);T=[];t.M=MM;t.multi=1;t.run=0;t.zoom=-1;t.allT=0;S=t.sp=='horse'?'RACING':t.sp=='arena'?'A_BATTLE':t.sp==='tennis'?'T_MATCH':'N_BATTLE';document.body.className='TN_M';$('mv').style.display='block';setM('d',126,.3);
+tok++;T.forEach(clearTimeout);T=[];t.M=MM;t.multi=1;t.run=0;t.zoom=-1;t.allT=0;t.matchCount=MM.length;t.multiStage=t.stage;S=t.sp=='horse'?'RACING':t.sp=='arena'?'A_BATTLE':t.sp==='tennis'?'T_MATCH':'N_BATTLE';document.body.className='TN_M';$('mv').style.display='block';setM('d',126,.3);
 const cd=$('mcd');cd.style.display='flex';cd.replaceChildren();const seq=[['READY...',900],['3',560],['2',560],['1',560]];let at=0;seq.forEach(([x,d],i)=>{Mtm.push(setTimeout(()=>{if(!TN.multi)return;cd.style.display='flex';const sp=document.createElement('span');sp.textContent=x;if(x==='1'){sp.className='last';/* animationend 이벤트에 의존하지 않고 별도 타이머로 반드시 제거 */Mtm.push(setTimeout(()=>{cd.replaceChildren();cd.style.display='none'},520))}cd.replaceChildren(sp);sfx(i?'beep':'lock')},at));at+=d});
 Mtm.push(setTimeout(()=>{cd.replaceChildren();cd.style.display='none';if(!TN.multi)return;t.run=1;setM('g',160);$('go').classList.remove('on');void $('go').offsetWidth;$('go').classList.add('on');sfx('gun');shk=10},at+80))}
 function tennisPanelHud(g){
@@ -740,14 +740,26 @@ TN.mf=dt=>{const t=TN,M=MM,H=t.sp=='horse';if(t.run){const cd=$('mcd');if(cd.sty
 if(t.run)M.forEach((m,g)=>{if(m.fd>1.6)return;if(t.sp==='tennis'){tennisLd(g);S='T_MATCH';if(m.fd<0)TX._multi.step(dt);if(TX._multi.done()&&m.fd<0){const z=TX._multi.result();m.won=z.winner;m.wn=z.winner.name;m.result=z;m.fd=0}if(m.fd>=0)m.fd+=dt;tennisSv(g);return}ld(g);let d=dt;if(H){S=m.fd>=0?'FINISH':'RACING';if(g)G.hf=9;d=dt*G.ts;sim(d);m.scroll=scroll+Math.max(...HS.map(h=>h.v))*d*W/1000*.9;m.won=G.won;m.wn=G.won&&G.won.name}else{d=m.fd>=0?dt*.5:dt;E().update(d);m.won=E().st.won;m.wn=m.won&&m.won.n}
 if(m.won&&m.fd<0)m.fd=0;if(m.fd>=0)m.fd+=dt;sv(g)});
 exc+=(.5-exc)*dt*2;if(AC)cg.gain.value=mut?0:exc*vs*.35;if(flash>0)flash=Math.max(0,flash-dt*1.6);shk*=.9;
-cx.fillStyle='#000';cx.fillRect(0,0,W,CH);const z=t.zoom,R4=[];let k=0;for(let g=0;g<4;g++){R4[g]=z<0?[(g%2)*W/2,(g>>1)*CH/2,W/2,CH/2,.5]:g==z?[0,0,W,CH,1]:[8,8+(k++)*(CH*.245+8),W*.26,CH*.235,.26]}
-(z<0?[0,1,2,3]:[z,...[0,1,2,3].filter(g=>g!=z)]).forEach(g=>{const[x,y,w,h,sc]=R4[g],m=M[g],q=$('mq'+g);cx.save();cx.beginPath();cx.rect(x,y,w,h);cx.clip();cx.translate(x,y);cx.scale(sc,sc);if(t.sp==='tennis'){tennisLd(g);S='T_MATCH';TX._multi.draw(dt);tennisSv(g)}else{ld(g)}/* 각 경기 장면을 그릴 때만 밝기를 보정하고, 테두리·라벨은 원래 색으로 유지 */if(t.sp==='tennis'){/* tennis draw was rendered above */}else if(H){S=m.fd>=0?'FINISH':'RACING';scene(m.fd>1.6||!t.run?0:dt)}else E().render();/* 모바일 성능을 위해 Canvas filter 대신 단일 반투명 레이어로 밝기 보정 */cx.fillStyle='rgba(255,255,255,0.26)';cx.fillRect(0,0,W,CH);if(t.sp==='tennis')tennisPanelHud(g);
+cx.fillStyle='#000';cx.fillRect(0,0,W,CH);const count=M.length,z=t.zoom,R4=[];let k=0;for(let g=0;g<count;g++){if(z<0){R4[g]=count===4?[(g%2)*W/2,(g>>1)*CH/2,W/2,CH/2,.5,.5]:count===2?[g*W/2,0,W/2,CH,.5,1]:[0,0,W,CH,1,1]}else R4[g]=g===z?[0,0,W,CH,1,1]:[8,8+(k++)*(CH*.245+8),W*.26,CH*.235,.26,.235]}for(let g=0;g<4;g++)$('mq'+g).style.display=g<count?'':'none';
+(z<0?Array.from({length:count},(_,i)=>i):[z,...Array.from({length:count},(_,i)=>i).filter(g=>g!==z)]).forEach(g=>{const[x,y,w,h,sx,sy]=R4[g],sc=Math.min(sx,sy),m=M[g],q=$('mq'+g);cx.save();cx.beginPath();cx.rect(x,y,w,h);cx.clip();cx.translate(x,y);cx.scale(sx,sy);if(t.sp==='tennis'){tennisLd(g);S='T_MATCH';TX._multi.draw(dt);tennisSv(g)}else{ld(g)}/* 각 경기 장면을 그릴 때만 밝기를 보정하고, 테두리·라벨은 원래 색으로 유지 */if(t.sp==='tennis'){/* tennis draw was rendered above */}else if(H){S=m.fd>=0?'FINISH':'RACING';scene(m.fd>1.6||!t.run?0:dt)}else E().render();/* 모바일 성능을 위해 Canvas filter 대신 단일 반투명 레이어로 밝기 보정 */cx.fillStyle='rgba(255,255,255,0.26)';cx.fillRect(0,0,W,CH);if(t.sp==='tennis')tennisPanelHud(g);
 const tx=stat(g);cx.restore();cx.strokeStyle=m.fd>=0?'#ffd75e':'#fff6';cx.lineWidth=m.fd>=0?3:1;cx.strokeRect(x,y,w,h);
 const key=[x,y,w,h].join();if(q._k!=key){q._k=key;q.style.cssText=`left:${x}px;top:${y}px;width:${w}px;height:${h}px`;q.classList.toggle('sm',sc<.4);q.classList.toggle('mn',g==z)}
-q.firstChild.textContent=`${'ABCD'[g]}${TN.sp=='horse'?'팀':'조'}`+(sc<.4?'':' · '+(m.fd>=0?'경기 종료':tx));q.classList.toggle('dn',m.fd>=0);q.lastChild.textContent=m.fd>=0?(sc<.4?'🏆':`경기 종료 🏁\n4강 진출! 🏆 ${m.wn||''}`):''});
-if(H)S='RACING';if(t.run&&M.every(m=>m.fd>=0)){t.allT+=dt;if(t.allT>3){t.run=0;finishM()}}}
+const panelName=TN.sp==='tennis'?(t.multiStage==='Q'?`${'ABCD'[g]}조`:t.multiStage==='S'?`4강 ${g+1}경기`:'결승'):(`${'ABCD'[g]}${TN.sp=='horse'?'팀':'조'}`);q.firstChild.textContent=panelName+(sc<.4?'':' · '+(m.fd>=0?'경기 종료':tx));q.classList.toggle('dn',m.fd>=0);q.lastChild.textContent=m.fd>=0?(sc<.4?'🏆':`경기 종료 🏁\n4강 진출! 🏆 ${m.wn||''}`):''});
+if(H)S='RACING';if(t.run&&M.every(m=>m.fd>=0)){t.allT+=dt;if(t.allT>3){t.run=0;if(t.sp==='tennis')finishTennisMulti();else finishM()}}}
+function finishTennisMulti(){
+ const t=TN,stage=t.stage;
+ for(let g=0;g<MM.length;g++){
+  const z=MM[g].result;t.i=g;
+  t.tennisRows=[{name:z.winner.name,m:200,tx:`${t.tennisSurf} 코트 · ${z.score} 승리 · ${z.time}초`},{name:z.loser.name,m:100,tx:`${t.tennisSurf} 코트 · ${z.score} 패배 · ${z.time}초`}];
+  rec1();
+ }
+ stopM();
+ if(stage==='Q'){t.stage='S';t.i=0;adv('예선 종료!','8강 예선 4경기 완료 · 4명의 승자가 4강에 진출',t.qw,'⚔️ 4강 두 경기 시작')}
+ else if(stage==='S'){t.stage='F';t.i=0;adv('4강 종료!','두 준결승 경기 완료 · 승자들이 결승에 진출',t.sw,'🏆 결승전 시작')}
+ else{t.i=0;res()}
+}
 function finishM(){const t=TN;for(let g=0;g<4;g++){if(t.sp==='tennis'){const m=MM[g],z=m.result;t.i=g;t.tennisRows=[{name:z.winner.name,m:200,tx:`${t.tennisSurf} 코트 · ${z.score} 승리`},{name:z.loser.name,m:100,tx:`${t.tennisSurf} 코트 · ${z.score} 패배`}];rec1()}else{ld(g);t.i=g;rec1()}}t.stage='S';t.i=0;adv('예선 종료!','4강 진출자 발표 · 각 '+unit()+' 우승자',t.qw,'⚔️ 4강 시작')}
-$('mv').addEventListener('click',e=>{const q=e.target.closest('.mq');if(!q||!TN.multi)return;const g=+q.id.slice(2);TN.zoom=TN.zoom==g?-1:g;sfx('click')});
+$('mv').addEventListener('click',e=>{const q=e.target.closest('.mq');if(!q||!TN.multi||TN.matchCount===1)return;const g=+q.id.slice(2);TN.zoom=TN.zoom==g?-1:g;sfx('click')});
 $('tnw').addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b||b.disabled)return;aud();if(b.dataset.a.length>2)sfx('click');const f=A[b.dataset.a];if(f)f(b.dataset.v)});
 $('bW').onclick=()=>{if(S!=='TITLE')return;aud();sfx('click');A.menu()};
 /* 일시정지 */
@@ -976,7 +988,7 @@ TX._multi={
  prepare:(a,b,surf)=>{TX.on=0;TX.surf=surf;TX.multiEv=null;TX.pl=[{...a.e,cc:a.raw?a.raw[3]:0},{...b.e,cc:b.raw?b.raw[3]:0}];TX.prob=oddsP(TX.pl[0],TX.pl[1],surf);TX.odds=TX.prob.map(p=>cl(.94/p,1.05,9.9));TX.st=mk(TX.pl[0],TX.pl[1],surf);resetView();TX.cf=[];return TX._multi.save()},
  save:()=>{const o={};for(const k of Object.keys(TX)){if(k==='_t'||k==='_multi'||typeof TX[k]==='function')continue;try{o[k]=structuredClone(TX[k])}catch(e){o[k]=TX[k]}}return o},
  load:o=>{for(const k of Object.keys(o))TX[k]=structuredClone(o[k]);TX.on=0;S='T_MATCH'},
- step:(dt)=>{TX.t0+=dt;tick(dt*TX.spd,dt);if(flash>0)flash=Math.max(0,flash-dt*1.6);shk*=.9},
+ step:(dt)=>{TX.t0+=dt;tick(dt*TX.spd,dt);movePlayers(dt*TX.spd);if(flash>0)flash=Math.max(0,flash-dt*1.6);shk*=.9},
  draw:dt=>draw(dt),
  done:()=>!!(TX.st&&TX.st.done),
  result:()=>{const st=TX.st,w=st.win,l=1-w;return{winner:st.P[w],loser:st.P[l],score:st.rw[w]+':'+st.rw[l],time:TX.time}}
@@ -1002,11 +1014,25 @@ function hud(){const st=TX.st,P=st.P,row=i=>`<div class="tr"><b>${FL[P[i].cc]} $
 $('txh').firstElementChild.innerHTML=row(0)+row(1)+`<div class="ts">${SUN[st.surf]} · ${st.rounds.length+1}판 · 3판 2선승제 · 체력바 표시${st.pt[0]==3&&st.pt[1]==3?' · 노애드 결승 포인트':''}</div>`}
 function showEv(ev){const P=TX.st.P,w=ev.who===2?'양 선수':P[ev.who].name,e=$('txe');e.innerHTML=`⚡ <b>${ev.name}</b> · ${w} — ${ev.desc}`;e.style.opacity=1;e.style.borderColor=ev.good?'#7dff9b':'#ff9d9d';TX.multiEv={text:`⚡ ${ev.name} · ${w} — ${ev.desc}`,good:!!ev.good};TX.evT=2.6;sfx(ev.good?'up':'down')}
 function build(info){const st=TX.st,nr=st.side?1:0,vB=i=>i===nr?.97:.03,s=info.s,sh=[];let t=0;
-if(info.type=='df'){for(let q=0;q<2;q++){sh.push({h:s,a:{u:.2,v:vB(s)},b:{u:q?-1.25:1.25,v:s===nr?.22:.78},t0:t,t1:t+.18,arc:30,out:1});t+=.2}return{sh,dur:t+.2,info,t:0,q:-1}}
+if(info.type=='df'){for(let q=0;q<2;q++){sh.push({h:s,a:{u:TX.pu[s],v:vB(s)},b:{u:q?-1.25:1.25,v:s===nr?.22:.78},t0:t,t1:t+.28,arc:30,out:1,type:info.type});t+=.3}return{sh,dur:t+.22,info,t:0,q:-1}}
 const want=info.type=='err'?1-info.w:info.w;let cnt=Math.max(1,info.n);while(((s+cnt-1)%2)!==want)cnt++;let pu=0;
 for(let q=0;q<cnt;q++){const h=(s+q)%2,last=q===cnt-1,out=last&&info.type=='err',a={u:q?pu:TX.pu[h],v:vB(h)},b=q===0?{u:(R()<.5?-1:1)*rr(.3,.6),v:h===nr?.34:.66}:{u:(R()<.5?-1:1)*rr(.1,.75),v:h===nr?.1:.9};
-if(out){b.u=R()<.5?-1.22:1.22;if(R()<.4){b.u=rr(-.4,.4);b.v=h===nr?.56:.44}}sh.push({h,a,b,t0:t,t1:t+(q?.12:.18),arc:q?26:34,out});t+=q?.12:.18;pu=b.u}
+if(out){b.u=R()<.5?-1.22:1.22;if(R()<.4){b.u=rr(-.4,.4);b.v=h===nr?.56:.44}}const shotDur=q?.27:.34;sh.push({h,a,b,t0:t,t1:t+shotDur,arc:q?26:34,out,type:info.type});t+=shotDur;pu=b.u}
 return{sh,dur:t+.22,info,t:0,q:-1}}
+function movePlayers(dt){
+ const st=TX.st;if(!st)return;
+ const a=TX.anim,follow=1-Math.exp(-dt*10),recover=1-Math.exp(-dt*4);
+ if(!a){TX.pu[0]+=(0-TX.pu[0])*recover;TX.pu[1]+=(0-TX.pu[1])*recover;return}
+ let q=a.sh.findIndex(sh=>a.t>=sh.t0&&a.t<sh.t1);
+ if(q<0){TX.pu[0]+=(0-TX.pu[0])*recover;TX.pu[1]+=(0-TX.pu[1])*recover;return}
+ const sh=a.sh[q],f=cl((a.t-sh.t0)/(sh.t1-sh.t0),0,1),ease=x=>x*x*(3-2*x);
+ const hitter=sh.h,receiver=1-hitter;
+ const hitterGoal=cl(sh.a.u*(1-.28*ease(f)),-.92,.92);
+ const arrival=ease(cl((f-.05)/.82,0,1));
+ const receiverGoal=cl(sh.b.u*arrival,-.96,.96);
+ TX.pu[hitter]+=(hitterGoal-TX.pu[hitter])*follow;
+ TX.pu[receiver]+=(receiverGoal-TX.pu[receiver])*follow;
+}
 function tick(d,rd){const st=TX.st;TX.time+=rd;if(TX.evT>0){TX.evT-=d;if(TX.evT<=0)$('txe').style.opacity=0}
 if(TX.gap>0){TX.gap-=d;return}
 if(!TX.anim){const info=step(st);TX.last=info;TX.anim=build(info);if(info.ev)showEv(info.ev);if(info.mp)say('🔥 매치 포인트!');return}
@@ -1040,9 +1066,8 @@ const a=TX.anim;let bx=null;
 if(a){let q=a.sh.findIndex(s=>a.t>=s.t0&&a.t<s.t1);if(q<0&&a.t>=a.sh[a.sh.length-1].t1)q=a.sh.length-1;
  if(q!==a.q&&q>=0){a.q=q;tone(650+rr(0,250),.05,'square',.07);if(q)noise(.03,.1,900)}else if(q<0){a.q=-1}
  if(q>=0){const sh=a.sh[q],f=cl((a.t-sh.t0)/(sh.t1-sh.t0),0,1),u=sh.a.u+(sh.b.u-sh.a.u)*f,v=sh.a.v+(sh.b.v-sh.a.v)*f;bx={x:X(u,v),y:Y(v),h:Math.sin(Math.PI*f)*sh.arc*SC(v)*2,r:4.5*SC(v)*1.6};
- const tu=cl(sh.b.u,-1.05,1.05),nearRate=1-Math.exp(-dt*15),farRate=1-Math.exp(-dt*12),receiverTarget=sh.type==='ace'?cl(sh.b.u*.72,-1.05,1.05):tu;
- TX.pu[sh.h]+=(sh.a.u-TX.pu[sh.h])*nearRate;TX.pu[1-sh.h]+=(receiverTarget-TX.pu[1-sh.h])*farRate}}
-else{const settle=1-Math.exp(-dt*5);TX.pu[0]+=(0-TX.pu[0])*settle;TX.pu[1]+=(0-TX.pu[1])*settle;const sv=pv(st.srv);bx={x:X(TX.pu[st.srv]+.12,sv),y:Y(sv),h:30*SC(sv),r:4*SC(sv)*1.6}}
+}}
+else{const sv=pv(st.srv);bx={x:X(TX.pu[st.srv]+.12,sv),y:Y(sv),h:30*SC(sv),r:4*SC(sv)*1.6}}
 if(bx&&S!=='T_RESULT'&&!(S==='T_FINISH')){cx.fillStyle='#0005';cx.beginPath();cx.ellipse(bx.x,bx.y,bx.r*1.4,bx.r*.6,0,0,7);cx.fill();cx.fillStyle='#e6ff4a';cx.beginPath();cx.arc(bx.x,bx.y-bx.h,bx.r,0,7);cx.fill()}
 per(1-nr);per(nr);
 if(S==='T_FINISH'||S==='T_RESULT'){const w=st.win,tx=W/2,ty=CH*.52;cx.fillStyle='#ffd75e';cx.beginPath();cx.moveTo(tx-26,ty-60);cx.lineTo(tx+26,ty-60);cx.quadraticCurveTo(tx+26,ty-20,tx,ty-12);cx.quadraticCurveTo(tx-26,ty-20,tx-26,ty-60);cx.fill();cx.fillRect(tx-5,ty-14,10,18);cx.fillRect(tx-20,ty+4,40,8)}
@@ -1054,7 +1079,7 @@ cx.fillStyle=col;cx.fillRect(-11,-58,22,34);cx.fillStyle='#f1c9a0';cx.beginPath(
 const a=cheer?-2.2:-.5+sw*1.7,ex=10+Math.cos(a)*22,ey=-54+Math.sin(a)*22;cx.strokeStyle='#f1c9a0';cx.lineWidth=5;cx.beginPath();cx.moveTo(10,-54);cx.lineTo(ex,ey);cx.stroke();cx.strokeStyle='#ddd';cx.lineWidth=3;cx.beginPath();cx.moveTo(ex,ey);cx.lineTo(ex+Math.cos(a)*14,ey+Math.sin(a)*14);cx.stroke();
 cx.strokeStyle='#fff';cx.beginPath();cx.ellipse(ex+Math.cos(a)*26,ey+Math.sin(a)*26,8,11,a,0,7);cx.stroke();cx.restore()}
 TX.t0=0;
-TX.frame=dt=>{TX.t0+=dt;const sp=TX.spd;if(S==='T_MATCH')tick(dt*sp,dt);else if(S==='T_FINISH'){TX.fin-=dt;if(TX.fin<=0)result()}
+TX.frame=dt=>{TX.t0+=dt;const sp=TX.spd;if(S==='T_MATCH'){tick(dt*sp,dt);movePlayers(dt*sp)}else if(S==='T_FINISH'){TX.fin-=dt;if(TX.fin<=0)result()}
 if(flash>0)flash=Math.max(0,flash-dt*1.6);shk*=.9;exc+=((S==='T_MATCH'?.5:S==='T_FINISH'?.9:.15)-exc)*dt*2;if(AC)cg.gain.value=mut?0:exc*vs*.35;draw(dt)};
 /* ---------- 입력 ---------- */
 $('oTX').addEventListener('click',e=>{const b=e.target.closest('[data-tx]');if(!b)return;aud();sfx('click');const a=b.dataset.tx;if(a=='go'&&S==='T_CONFIRM')ready();else if(a=='re'&&S==='T_CONFIRM')start();else if(a=='next'&&S==='T_RESULT')start();else if(a=='home')go('TITLE')});
