@@ -249,6 +249,14 @@ kbd{display:inline-block;padding:1px 6px;border:1px solid #8ab6d9;border-radius:
 /* 친구 점수 버튼은 일시정지 버튼 바로 위에, 서로 겹치지 않게 배치 */
 #tmHostFab{bottom:calc(154px + env(safe-area-inset-bottom))!important}
 @media(max-height:500px){#tmHostFab{bottom:calc(102px + env(safe-area-inset-bottom))!important}}
+
+/* 최종 위치 보정: 가로 메뉴 마지막 줄에 월드 챔피언십 + 랜덤 모드 */
+@media (orientation:landscape){
+ .menu{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-auto-flow:row}
+ .mode-btn.random{grid-column:auto!important;grid-row:auto!important;justify-self:stretch!important;width:auto!important;max-width:none!important;flex-basis:auto!important}
+}
+/* 친구 점수 버튼은 상단 왼쪽으로 이동해 일시정지·해설과 완전히 분리 */
+#tmHostFab{top:calc(62px + env(safe-area-inset-top))!important;bottom:auto!important;left:max(8px,env(safe-area-inset-left))!important;right:auto!important}
 </style></head><body class="TITLE">
 <canvas id="cv"></canvas>
 <div id="hud"><div id="tb"><b id="tm">0.0초</b><b id="ld">-</b><b id="rm">-</b></div><div id="bar"></div><div id="rk"></div></div>
