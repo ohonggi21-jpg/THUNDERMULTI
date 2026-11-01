@@ -254,7 +254,7 @@ kbd{display:inline-block;padding:1px 6px;border:1px solid #8ab6d9;border-radius:
 <div id="go">GO!!</div>
 <button id="cb" type="button" aria-label="응원">📣</button>
 <button id="sb" type="button" aria-label="사운드">♪</button>
-<div id="sp"><label><input type="checkbox" id="mu"> 전체 음소거</label><label>배경음악<br><input type="range" id="vm" min="0" max="100" value="60"></label><label>효과음<br><input type="range" id="vs" min="0" max="100" value="80"></label><hr style="border:0;border-top:1px solid #ffd75e55;width:100%"><label><input type="checkbox" id="voiceOn" checked> 🎙️ 2인 음성 중계</label><label>중계 음량<br><input type="range" id="voiceVol" min="0" max="100" value="82"></label><label>말하기 속도<br><input type="range" id="voiceRate" min="80" max="120" value="100"></label><button type="button" class="voice-test" id="voiceTest">▶ 중계 테스트</button><div class="voice-note">남성 한국어 음성을 우선 선택합니다. 기기에 남성 음성이 없으면 가장 낮은 톤의 한국어 음성으로 대체됩니다.</div></div>
+<div id="sp"><label><input type="checkbox" id="mu"> 전체 음소거</label><label>배경음악<br><input type="range" id="vm" min="0" max="100" value="60"></label><label>효과음<br><input type="range" id="vs" min="0" max="100" value="80"></label><hr style="border:0;border-top:1px solid #ffd75e55;width:100%"><label><input type="checkbox" id="voiceOn" checked> 🎙️ 2인 음성 중계</label><label>중계 음량<br><input type="range" id="voiceVol" min="0" max="100" value="82"></label><label>말하기 속도<br><input type="range" id="voiceRate" min="80" max="120" value="100"></label><button type="button" class="voice-test" id="voiceTest">▶ 중계 테스트</button><label><input type="checkbox" id="aiCommentary"> 🤖 LLM 실시간 AI 해설 사용</label><label>AI 서버 주소 (API 키를 HTML에 입력하지 마세요)<br><input id="aiEndpoint" type="url" placeholder="https://your-server.example/api/commentary" style="width:100%;box-sizing:border-box;padding:8px;border-radius:8px;border:1px solid #8b7b54;background:#101827;color:#fff"></label><div id="aiStatus" class="voice-note">이벤트를 JSON으로 수집합니다. AI 해설은 보안 프록시 서버 주소가 필요합니다.</div><div class="voice-note">남성 한국어 음성을 우선 선택합니다. AI API가 연결되지 않으면 게임 내 기본 해설로 자동 전환합니다.</div></div>
 <div class="ov" id="oT"><div class="wrap"><h1>THUNDER</h1><div class="kr">MULTI ARENA</div><div class="tag" id="tg"></div><div class="menu">
 <button class="mode-btn horse" id="bS" type="button"><div class="mi">🏇</div><div class="mt">경마 경기</div><div class="md">40가지 이벤트! 결승선 질주!</div></button>
 <button class="mode-btn arena" id="bA" type="button"><div class="mi">⚔️</div><div class="mt">프로게이머</div><div class="md">30가지 이벤트! 5인 배틀로얄!</div></button>
@@ -1271,105 +1271,141 @@ $('bT').onclick=()=>{if(S!=='TITLE')return;sfx('click');start()};
 })();
 
 
-/* ===== THUNDER MULTI · 남성 캐스터 & 해설위원 중계 ===== */
+/* ===== THUNDER MULTI · 이벤트 기반 AI 해설 + 2인 음성 중계 ===== */
 (function(){
-  const synth=window.speechSynthesis;
-  const enabled=$('voiceOn'),volume=$('voiceVol'),rate=$('voiceRate');
-  if(!enabled||!volume||!rate)return;
-  let queue=[],busy=false,seq=0,lastMode='',lastSpoken='',lastAt=0,lineCount=0,voiceList=[];
-  const seen=new WeakMap();
-  const nodes=['ct','act','nct','txc'].map(id=>$(id)).filter(Boolean);
-  const koreanVoices=()=>synth?synth.getVoices().filter(v=>/^ko([-_]|$)/i.test(v.lang)):[];
-
-  // 브라우저 음성 목록에는 성별 정보가 없는 경우가 많아, 알려진 남성 음성 이름을 우선 선택한다.
-  function chooseVoices(){
-    voiceList=koreanVoices();
-    const male=voiceList.filter(v=>/(injoon|joon|male|남성|man)/i.test(v.name));
-    const nonFemale=voiceList.filter(v=>!/(heami|sunhi|yuna|seoyeon|female|여성|woman)/i.test(v.name));
-    const pool=male.length?male:(nonFemale.length?nonFemale:voiceList);
-    return {caster:pool[0]||null,analyst:pool[1]||pool[0]||null,confirmed:male.length>0};
-  }
-  let selected=chooseVoices();
-  const activeMode=()=>S==='RACING'||S==='FINISH'?'horse':S==='A_BATTLE'||S==='A_FINISH'?'arena':S==='N_BATTLE'||S==='N_FINISH'?'neon':S==='T_MATCH'||S==='T_FINISH'?'tennis':String(S||'').startsWith('TN_')?'championship':'';
-  const important=t=>/(우승|챔피언|최후의|GAME SET|역전|추월|선두 교체|매치 포인트|링아웃|장외|KO|GAME!|서든데스|연장 종료|결승선|골인|대역전)/i.test(t);
-  function casterDelivery(t){
-    let s=String(t||'').replace(/\s+/g,' ').trim();
-    if(!s)return s;
-    if(/(우승|챔피언|GAME SET|결승선|골인|대역전)/i.test(s))s='와아아아아!! '+s;
-    else if(important(s))s='오오오! '+s;
-    // 경기장 중계처럼 문장 끝을 또렷하게 끊어준다.
-    if(!/[!?…]$/.test(s))s+='!';
-    return s;
-  }
-  function analystLine(t){
-    if(/우승|챔피언|최후의|GAME SET|결승선|골인/i.test(t))return '끝났습니다! 마지막 순간까지 집중력을 잃지 않았어요. 이 승리는 정말 값집니다!';
-    if(/역전|추월|선두 교체|매치 포인트|대역전/i.test(t))return '여기서 흐름이 완전히 넘어왔습니다! 타이밍을 읽고 승부수를 던진 판단이 결정적이었어요!';
-    if(/링아웃|장외|KO|GAME!/i.test(t))return '아, 이건 큽니다! 한 번의 교전으로 판세가 크게 기울었어요. 대응할 틈을 주지 않았습니다!';
-    if(/감속|실패|피로|주춤|실수|불리/i.test(t))return '이 장면은 뼈아픕니다. 지금부터는 무리하지 말고 손실을 최소화하는 운영이 필요해요!';
-    return '좋습니다! 지금 선택이 다음 흐름에 영향을 주겠어요. 여기서 한 번 더 승부를 걸 수 있을까요?';
-  }
-  function stop(){
-    seq++;queue=[];busy=false;
-    if(synth)try{synth.cancel()}catch(e){}
-  }
-  function speakNext(){
-    if(!synth||busy||!queue.length||!enabled.checked||mut)return;
-    const item=queue.shift(),token=seq;busy=true;
-    const u=new SpeechSynthesisUtterance(item.text);
-    const base=Number(rate.value)/100;
-    u.lang='ko-KR';u.volume=Math.min(1,Number(volume.value)/100*(item.critical?1.08:1));
-    u.rate=base*(item.role==='analyst'?.99:(item.critical?1.16:1.1));
-    // 두 사람 모두 낮은 톤. 남성 음성이 1개뿐이면 같은 음성을 서로 다른 낮은 피치로 구분.
-    u.pitch=item.role==='analyst'?.72:(item.critical?.91:.84);
-    const v=selected=chooseVoices();
-    const voice=item.role==='analyst'?v.analyst:v.caster;
-    if(voice)u.voice=voice;
-    const done=()=>{if(token!==seq)return;busy=false;setTimeout(speakNext,75)};
-    u.onend=done;u.onerror=done;
-    try{synth.speak(u)}catch(e){done()}
-  }
-  function enqueue(text){
-    if(!synth||!enabled.checked||mut)return;
-    text=String(text||'').replace(/\s+/g,' ').trim();
-    if(!text||text.length<2)return;
-    const now=Date.now();
-    if(text===lastSpoken&&now-lastAt<4500)return;
-    lastSpoken=text;lastAt=now;
-    const mode=activeMode();
-    if(mode&&mode!==lastMode){stop();lastMode=mode;lineCount=0}
-    const critical=important(text);
-    lineCount++;
-    queue.push({text:casterDelivery(text),role:'caster',critical});
-    // 해설위원은 주요 장면마다, 그 외에는 두 번에 한 번씩 전술·흐름을 짚는다.
-    if(critical||lineCount%2===0)queue.push({text:analystLine(text),role:'analyst',critical});
-    if(queue.length>8){
-      const drop=queue.findIndex(x=>!x.critical);
-      queue.splice(drop>=0?drop:0,1);
-    }
-    speakNext();
-  }
-  nodes.forEach(el=>{
-    const watch=()=>{
-      const text=el.textContent||'';
-      if(!text.trim()||text===seen.get(el))return;
-      seen.set(el,text);
-      if(el.getClientRects().length)enqueue(text);
-    };
-    new MutationObserver(watch).observe(el,{childList:true,characterData:true,subtree:true});
-  });
-  enabled.addEventListener('change',()=>{if(!enabled.checked)stop()});
-  volume.addEventListener('input',()=>{if(synth&&busy){const pending=queue.slice();stop();queue=pending;speakNext()}});
-  rate.addEventListener('input',()=>{if(synth&&busy){const pending=queue.slice();stop();queue=pending;speakNext()}});
-  $('voiceTest').addEventListener('click',()=>{
-    stop();lastMode=activeMode();
-    queue=[
-      {text:'자아아! THUNDER MULTI 경기 시작합니다! 오늘 승부, 누가 가져갈까요!',role:'caster',critical:true},
-      {text:'선수들의 움직임을 보시죠. 초반 운영과 결정적인 순간의 판단, 그 차이가 승부를 가를 겁니다!',role:'analyst',critical:true}
-    ];
-    speakNext();
-  });
-  if(synth&&synth.onvoiceschanged!==undefined)synth.onvoiceschanged=()=>{selected=chooseVoices()};
-  if(!synth){enabled.checked=false;enabled.disabled=true;$('voiceTest').disabled=true}
+ const synth=window.speechSynthesis,enabled=$('voiceOn'),volume=$('voiceVol'),rate=$('voiceRate');
+ if(!enabled||!volume||!rate)return;
+ let queue=[],busy=false,seq=0,lastMode='',lastSpoken='',lastAt=0,lastEventKey='',lastEventAt=0,voiceList=[];
+ const seen=new WeakMap(),eventLog=[],nodes=['ct','act','nct','txc'].map(id=>$(id)).filter(Boolean);
+ const endpointInput=$('aiEndpoint'),aiToggle=$('aiCommentary'),aiStatus=$('aiStatus');
+ const getEndpoint=()=>endpointInput?endpointInput.value.trim():'';
+ const setStatus=s=>{if(aiStatus)aiStatus.textContent=s};
+ if(endpointInput){try{endpointInput.value=localStorage.getItem('tm_ai_endpoint')||''}catch(e){} endpointInput.addEventListener('change',()=>{try{localStorage.setItem('tm_ai_endpoint',getEndpoint())}catch(e){};setStatus(getEndpoint()?'AI 연결 주소 저장됨 · 연결은 이벤트 발생 시 확인':'AI 연결 주소가 설정되지 않음')})}
+ const koreanVoices=()=>synth?synth.getVoices().filter(v=>/^ko([-_]|$)/i.test(v.lang)):[];
+ function chooseVoices(){
+  voiceList=koreanVoices();
+  const male=voiceList.filter(v=>/(injoon|joon|male|남성|man)/i.test(v.name));
+  const notFemale=voiceList.filter(v=>!/(heami|sunhi|yuna|seoyeon|female|여성|woman)/i.test(v.name));
+  const pool=male.length?male:(notFemale.length?notFemale:voiceList);
+  return{caster:pool[0]||null,analyst:pool[1]||pool[0]||null};
+ }
+ let selected=chooseVoices();
+ const mode=()=>S==='RACING'||S==='FINISH'?'horse':S==='A_BATTLE'||S==='A_FINISH'?'pro-gamer':S==='N_BATTLE'||S==='N_FINISH'?'neon-top':S==='T_MATCH'||S==='T_FINISH'?'tennis':String(S||'').startsWith('TN_')?'championship':String(S||'unknown') ;
+ const snapshot=()=>({
+  mode:mode(),screen:String(S||''),time:$('tm')?.textContent||$('atm')?.textContent||$('ntm')?.textContent||'',
+  leader:$('ld')?.textContent||'',remaining:$('rm')?.textContent||'',
+  arenaAlive:$('aalive')?.textContent||'',arenaPhase:$('aphase')?.textContent||'',
+  neonAlive:$('nalive')?.textContent||'',neonPhase:$('nphase')?.textContent||'',
+  tennisScore:$('txc')?.textContent||'',visibleEvent:$('ep')?.textContent||$('txe')?.textContent||''
+ });
+ const important=t=>/(킬|처치|탈락|KO|우승|챔피언|최후의|GAME SET|역전|추월|선두 교체|매치 포인트|링아웃|장외|골인|결승선|득점|점수|아이템|획득|콤보|연속|서든데스|연장|ACE|게임 종료|세트 종료)/i.test(t);
+ function classify(t){
+  if(/우승|챔피언|최후의|GAME SET|골인|결승선/i.test(t))return'finish';
+  if(/킬|처치|탈락|KO|링아웃|장외/i.test(t))return'elimination';
+  if(/역전|추월|선두 교체/i.test(t))return'overtake';
+  if(/득점|점수|ACE|매치 포인트|게임 종료|세트 종료/i.test(t))return'score';
+  if(/아이템|획득/i.test(t))return'item';
+  if(/콤보|연속/i.test(t))return'combo';
+  return'game_event';
+ }
+ function recordEvent(raw,source){
+  const text=String(raw||'').replace(/\s+/g,' ').trim();if(text.length<3)return;
+  const now=Date.now(),key=mode()+'|'+text;
+  if(key===lastEventKey&&now-lastEventAt<2800)return;
+  if(!important(text)&&source!=='commentary')return;
+  lastEventKey=key;lastEventAt=now;
+  const event={id:now+'-'+Math.random().toString(36).slice(2,7),type:classify(text),text,source,importance:important(text)?'high':'normal',timestamp:new Date().toISOString(),state:snapshot()};
+  eventLog.push(event);if(eventLog.length>40)eventLog.shift();
+  window.dispatchEvent(new CustomEvent('thunder:game-event',{detail:event}));
+  if(aiToggle&&aiToggle.checked&&getEndpoint())requestAI(event);
+  else speakFallback(text,event);
+ }
+ function fallbackAnalyst(t){
+  if(/우승|챔피언|최후의|GAME SET|골인|결승선/i.test(t))return'끝났습니다! 마지막 순간까지 집중력을 잃지 않았어요. 정말 값진 승리입니다!';
+  if(/역전|추월|선두 교체/i.test(t))return'여기서 흐름이 완전히 넘어왔습니다! 타이밍을 읽은 판단이 결정적이었어요!';
+  if(/킬|처치|탈락|KO|링아웃|장외/i.test(t))return'아, 이건 큽니다! 한 번의 교전으로 판세가 크게 기울었어요!';
+  if(/득점|점수|ACE|매치 포인트/i.test(t))return'점수 하나가 분위기를 바꿉니다. 지금부터 집중력이 중요해요!';
+  return'좋습니다! 지금 선택이 다음 경기 흐름에 영향을 주겠어요!';
+ }
+ function speakFallback(t,event){
+  const key=event.importance==='high',caster=(key?'와아아아! ':'오오! ')+t+(/[!?…]$/.test(t)?'':'!');
+  const lines=[{text:caster,role:'caster',critical:key}];
+  if(key||eventLog.length%2===0)lines.push({text:fallbackAnalyst(t),role:'analyst',critical:key});
+  addSpeech(lines);
+ }
+ function addSpeech(lines){
+  if(!synth||!enabled.checked||mut)return;
+  lines.forEach(x=>{const clean=String(x.text||'').trim();if(clean&&clean!==lastSpoken){queue.push({...x,text:clean});lastSpoken=clean}});
+  if(queue.length>10){const d=queue.findIndex(x=>!x.critical);queue.splice(d>=0?d:0,1)}
+  speakNext();
+ }
+ function stop(){seq++;queue=[];busy=false;if(synth)try{synth.cancel()}catch(e){}}
+ function speakNext(){
+  if(!synth||busy||!queue.length||!enabled.checked||mut)return;
+  const item=queue.shift(),token=seq;busy=true;const u=new SpeechSynthesisUtterance(item.text);
+  u.lang='ko-KR';u.volume=Math.min(1,Number(volume.value)/100*(item.critical?1.08:1));
+  u.rate=Number(rate.value)/100*(item.role==='analyst'?.99:(item.critical?1.16:1.1));
+  u.pitch=item.role==='analyst'?.72:(item.critical?.91:.84);
+  selected=chooseVoices();const v=item.role==='analyst'?selected.analyst:selected.caster;if(v)u.voice=v;
+  const done=()=>{if(token!==seq)return;busy=false;setTimeout(speakNext,90)};
+  u.onend=done;u.onerror=done;try{synth.speak(u)}catch(e){done()}
+ }
+ function parseAI(data){
+  if(typeof data==='string'){try{data=JSON.parse(data)}catch(e){return{caster:data}}}
+  const choice=data?.choices?.[0]?.message?.content;
+  if(choice){try{const p=JSON.parse(choice);return p}catch(e){return{caster:choice}}}
+  if(data?.output_text)return parseAI(data.output_text);
+  return data||{};
+ }
+ async function requestAI(event){
+  const url=getEndpoint();if(!url)return;
+  setStatus('AI 해설 생성 중…');
+  const prompt=[
+   '너는 한국 e스포츠 대회의 열정적인 2인 중계진이다.',
+   '캐스터는 남성 스포츠 캐스터처럼 짧고 폭발적으로 현장을 중계한다. 해설위원은 남성 분석가처럼 전술과 경기 흐름을 짚는다.',
+   '실제 전달된 이벤트와 상태만 사용하고 존재하지 않는 선수명, 킬, 점수, 아이템을 절대 지어내지 않는다.',
+   '매번 표현을 바꾸고 직전 대사를 반복하지 않는다. 중요 이벤트는 특히 긴박하고 격양되게, 일반 이벤트는 과장하지 않는다.',
+   '한국어로 답하고 JSON 객체만 출력한다. 형식: {"caster":"캐스터 대사 1문장","analyst":"해설위원 대사 1문장"}',
+   '한 번에 각 1문장, 짧고 말하기 쉽게 작성한다.'
+  ].join('\n');
+  const payload={model:'gpt-4o-mini',temperature:0.9,max_tokens:150,messages:[
+   {role:'system',content:prompt},
+   {role:'user',content:JSON.stringify({event,state:event.state,recent_events:eventLog.slice(-5).map(x=>({type:x.type,text:x.text,state:x.state}))})}
+  ]};
+  const controller=typeof AbortController!=='undefined'?new AbortController():null;
+  const timeout=controller?setTimeout(()=>controller.abort(),4200):null;
+  try{
+   const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:controller?controller.signal:undefined});
+   if(!res.ok)throw new Error('HTTP '+res.status);
+   const parsed=parseAI(await res.json()),lines=[];
+   if(parsed.caster)lines.push({text:parsed.caster,role:'caster',critical:event.importance==='high'});
+   if(parsed.analyst)lines.push({text:parsed.analyst,role:'analyst',critical:event.importance==='high'});
+   if(!lines.length)throw new Error('응답에 caster/analyst 대사가 없음');
+   addSpeech(lines);setStatus('AI 해설 연결됨 · 이벤트 '+eventLog.length+'건');
+  }catch(err){
+   setStatus('AI 연결 실패 · 기본 중계 사용 ('+(err.name==='AbortError'?'시간 초과':err.message)+')');
+   speakFallback(event.text,event);
+  }finally{if(timeout)clearTimeout(timeout)}
+ }
+ // 실제 경기 화면의 로그와 상태 HUD를 감시해 이벤트 데이터로 구조화한다.
+ const watchIds=['ep','txe','ct','act','nct','txc','ld','rm','aalive','aphase','nalive','nphase'];
+ watchIds.forEach(id=>{const el=$(id);if(!el)return;new MutationObserver(()=>{
+  const txt=(el.textContent||'').trim();if(!txt||txt===seen.get(el))return;seen.set(el,txt);
+  const commentary=['ct','act','nct','txc'].includes(id),eventBox=['ep','txe'].includes(id);
+  if(commentary||eventBox)recordEvent(txt,id);
+  else if(['ld','aalive','nalive'].includes(id))recordEvent(txt,id);
+ }).observe(el,{childList:true,characterData:true,subtree:true})});
+ enabled.addEventListener('change',()=>{if(!enabled.checked)stop()});
+ volume.addEventListener('input',()=>{if(synth&&busy){const pending=queue.slice();stop();queue=pending;speakNext()}});
+ rate.addEventListener('input',()=>{if(synth&&busy){const pending=queue.slice();stop();queue=pending;speakNext()}});
+ $('voiceTest').addEventListener('click',()=>{stop();addSpeech([
+  {text:'자아아! THUNDER MULTI 경기 시작합니다! 오늘 승부, 누가 가져갈까요!',role:'caster',critical:true},
+  {text:'선수들의 움직임을 보시죠. 초반 운영과 결정적인 순간의 판단, 그 차이가 승부를 가를 겁니다!',role:'analyst',critical:true}
+ ])});
+ if(synth&&synth.onvoiceschanged!==undefined)synth.onvoiceschanged=()=>{selected=chooseVoices()};
+ if(!synth){enabled.checked=false;enabled.disabled=true;$('voiceTest').disabled=true}
+ window.THUNDER_AI={getEvents:()=>eventLog.slice(),getLatestEvent:()=>eventLog[eventLog.length-1]||null};
+ if(aiToggle&&!getEndpoint())setStatus('AI API 주소를 설정하면 LLM 해설을 사용합니다');
 })();
 
 </script>
