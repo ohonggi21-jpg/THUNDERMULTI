@@ -1,0 +1,30 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "tmRooms": {
+      "$roomId": {
+        ".read": "auth != null",
+        ".write": "auth != null && (!data.exists() || data.child('host').val() === auth.uid)",
+        "participants": {
+          "$uid": {
+            ".read": "auth != null",
+            ".write": "auth != null && auth.uid === $uid"
+          }
+        }
+      }
+    },
+    "tmTennisRooms": {
+      "$roomId": {
+        ".read": "auth != null",
+        ".write": "auth != null && (!data.exists() || data.child('host').val() === auth.uid)",
+        "participants": {
+          "$uid": {
+            ".read": "auth != null",
+            ".write": "auth != null && auth.uid === $uid"
+          }
+        }
+      }
+    }
+  }
+}
