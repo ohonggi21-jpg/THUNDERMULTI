@@ -254,7 +254,7 @@ kbd{display:inline-block;padding:1px 6px;border:1px solid #8ab6d9;border-radius:
 <div id="go">GO!!</div>
 <button id="cb" type="button" aria-label="응원">📣</button>
 <button id="sb" type="button" aria-label="사운드">♪</button>
-<div id="sp"><label><input type="checkbox" id="mu"> 전체 음소거</label><label>배경음악<br><input type="range" id="vm" min="0" max="100" value="60"></label><label>효과음<br><input type="range" id="vs" min="0" max="100" value="80"></label><hr style="border:0;border-top:1px solid #ffd75e55;width:100%"><label><input type="checkbox" id="voiceOn" checked> 🎙️ 2인 음성 중계</label><label>중계 음량<br><input type="range" id="voiceVol" min="0" max="100" value="82"></label><label>말하기 속도<br><input type="range" id="voiceRate" min="80" max="120" value="100"></label><button type="button" class="voice-test" id="voiceTest">▶ 중계 테스트</button><div class="voice-note">캐스터와 분석가가 번갈아 중계합니다. 한국어 음성 종류는 브라우저·운영체제에 따라 달라질 수 있어요.</div></div>
+<div id="sp"><label><input type="checkbox" id="mu"> 전체 음소거</label><label>배경음악<br><input type="range" id="vm" min="0" max="100" value="60"></label><label>효과음<br><input type="range" id="vs" min="0" max="100" value="80"></label><hr style="border:0;border-top:1px solid #ffd75e55;width:100%"><label><input type="checkbox" id="voiceOn" checked> 🎙️ 2인 음성 중계</label><label>중계 음량<br><input type="range" id="voiceVol" min="0" max="100" value="82"></label><label>말하기 속도<br><input type="range" id="voiceRate" min="80" max="120" value="100"></label><button type="button" class="voice-test" id="voiceTest">▶ 중계 테스트</button><div class="voice-note">남성 한국어 음성을 우선 선택합니다. 기기에 남성 음성이 없으면 가장 낮은 톤의 한국어 음성으로 대체됩니다.</div></div>
 <div class="ov" id="oT"><div class="wrap"><h1>THUNDER</h1><div class="kr">MULTI ARENA</div><div class="tag" id="tg"></div><div class="menu">
 <button class="mode-btn horse" id="bS" type="button"><div class="mi">🏇</div><div class="mt">경마 경기</div><div class="md">40가지 이벤트! 결승선 질주!</div></button>
 <button class="mode-btn arena" id="bA" type="button"><div class="mi">⚔️</div><div class="mt">프로게이머</div><div class="md">30가지 이벤트! 5인 배틀로얄!</div></button>
@@ -1271,23 +1271,42 @@ $('bT').onclick=()=>{if(S!=='TITLE')return;sfx('click');start()};
 })();
 
 
-/* ===== THUNDER MULTI · 2인 음성 중계 ===== */
+/* ===== THUNDER MULTI · 남성 캐스터 & 해설위원 중계 ===== */
 (function(){
   const synth=window.speechSynthesis;
   const enabled=$('voiceOn'),volume=$('voiceVol'),rate=$('voiceRate');
   if(!enabled||!volume||!rate)return;
-  let queue=[],busy=false,seq=0,lastMode='',lastSpoken='',lastAt=0,lineCount=0;
+  let queue=[],busy=false,seq=0,lastMode='',lastSpoken='',lastAt=0,lineCount=0,voiceList=[];
   const seen=new WeakMap();
   const nodes=['ct','act','nct','txc'].map(id=>$(id)).filter(Boolean);
-  const voices=()=>synth?synth.getVoices().filter(v=>/^ko([-_]|$)/i.test(v.lang)):[];
+  const koreanVoices=()=>synth?synth.getVoices().filter(v=>/^ko([-_]|$)/i.test(v.lang)):[];
+
+  // 브라우저 음성 목록에는 성별 정보가 없는 경우가 많아, 알려진 남성 음성 이름을 우선 선택한다.
+  function chooseVoices(){
+    voiceList=koreanVoices();
+    const male=voiceList.filter(v=>/(injoon|joon|male|남성|man)/i.test(v.name));
+    const nonFemale=voiceList.filter(v=>!/(heami|sunhi|yuna|seoyeon|female|여성|woman)/i.test(v.name));
+    const pool=male.length?male:(nonFemale.length?nonFemale:voiceList);
+    return {caster:pool[0]||null,analyst:pool[1]||pool[0]||null,confirmed:male.length>0};
+  }
+  let selected=chooseVoices();
   const activeMode=()=>S==='RACING'||S==='FINISH'?'horse':S==='A_BATTLE'||S==='A_FINISH'?'arena':S==='N_BATTLE'||S==='N_FINISH'?'neon':S==='T_MATCH'||S==='T_FINISH'?'tennis':String(S||'').startsWith('TN_')?'championship':'';
-  const important=t=>/(우승|챔피언|최후의|GAME SET|역전|추월|선두 교체|매치 포인트|링아웃|장외|KO|GAME!|서든데스|연장 종료)/i.test(t);
+  const important=t=>/(우승|챔피언|최후의|GAME SET|역전|추월|선두 교체|매치 포인트|링아웃|장외|KO|GAME!|서든데스|연장 종료|결승선|골인|대역전)/i.test(t);
+  function casterDelivery(t){
+    let s=String(t||'').replace(/\s+/g,' ').trim();
+    if(!s)return s;
+    if(/(우승|챔피언|GAME SET|결승선|골인|대역전)/i.test(s))s='와아아아아!! '+s;
+    else if(important(s))s='오오오! '+s;
+    // 경기장 중계처럼 문장 끝을 또렷하게 끊어준다.
+    if(!/[!?…]$/.test(s))s+='!';
+    return s;
+  }
   function analystLine(t){
-    if(/우승|챔피언|최후의|GAME SET/i.test(t))return '결국 승부를 결정지었습니다. 오늘 경기의 주인공이 탄생했네요!';
-    if(/역전|추월|선두 교체|매치 포인트/i.test(t))return '지금 흐름이 바뀌었습니다. 다음 장면이 정말 중요하겠어요!';
-    if(/링아웃|장외|KO|GAME!/i.test(t))return '큰 교전 하나가 승부를 흔들었습니다. 남은 선수들의 대응을 봐야겠어요.';
-    if(/감속|실패|피로|주춤|실수|불리/i.test(t))return '이런 변수가 쌓이면 순위가 크게 달라질 수 있습니다.';
-    return '좋습니다. 경기 흐름을 계속 지켜보겠습니다!';
+    if(/우승|챔피언|최후의|GAME SET|결승선|골인/i.test(t))return '끝났습니다! 마지막 순간까지 집중력을 잃지 않았어요. 이 승리는 정말 값집니다!';
+    if(/역전|추월|선두 교체|매치 포인트|대역전/i.test(t))return '여기서 흐름이 완전히 넘어왔습니다! 타이밍을 읽고 승부수를 던진 판단이 결정적이었어요!';
+    if(/링아웃|장외|KO|GAME!/i.test(t))return '아, 이건 큽니다! 한 번의 교전으로 판세가 크게 기울었어요. 대응할 틈을 주지 않았습니다!';
+    if(/감속|실패|피로|주춤|실수|불리/i.test(t))return '이 장면은 뼈아픕니다. 지금부터는 무리하지 말고 손실을 최소화하는 운영이 필요해요!';
+    return '좋습니다! 지금 선택이 다음 흐름에 영향을 주겠어요. 여기서 한 번 더 승부를 걸 수 있을까요?';
   }
   function stop(){
     seq++;queue=[];busy=false;
@@ -1296,11 +1315,16 @@ $('bT').onclick=()=>{if(S!=='TITLE')return;sfx('click');start()};
   function speakNext(){
     if(!synth||busy||!queue.length||!enabled.checked||mut)return;
     const item=queue.shift(),token=seq;busy=true;
-    const u=new SpeechSynthesisUtterance(item.text),ko=voices();
-    u.lang='ko-KR';u.volume=Number(volume.value)/100;u.rate=(Number(rate.value)/100)*(item.role==='analyst'?.96:1.04);
-    u.pitch=item.role==='analyst'?.82:1.16;
-    if(ko.length)u.voice=ko[Math.min(item.role==='analyst'?1:0,ko.length-1)];
-    const done=()=>{if(token!==seq)return;busy=false;setTimeout(speakNext,90)};
+    const u=new SpeechSynthesisUtterance(item.text);
+    const base=Number(rate.value)/100;
+    u.lang='ko-KR';u.volume=Math.min(1,Number(volume.value)/100*(item.critical?1.08:1));
+    u.rate=base*(item.role==='analyst'?.99:(item.critical?1.16:1.1));
+    // 두 사람 모두 낮은 톤. 남성 음성이 1개뿐이면 같은 음성을 서로 다른 낮은 피치로 구분.
+    u.pitch=item.role==='analyst'?.72:(item.critical?.91:.84);
+    const v=selected=chooseVoices();
+    const voice=item.role==='analyst'?v.analyst:v.caster;
+    if(voice)u.voice=voice;
+    const done=()=>{if(token!==seq)return;busy=false;setTimeout(speakNext,75)};
     u.onend=done;u.onerror=done;
     try{synth.speak(u)}catch(e){done()}
   }
@@ -1311,13 +1335,15 @@ $('bT').onclick=()=>{if(S!=='TITLE')return;sfx('click');start()};
     const now=Date.now();
     if(text===lastSpoken&&now-lastAt<4500)return;
     lastSpoken=text;lastAt=now;
-    const key=important(text),mode=activeMode();
-    if(mode&&mode!==lastMode){stop();lastMode=mode}
+    const mode=activeMode();
+    if(mode&&mode!==lastMode){stop();lastMode=mode;lineCount=0}
+    const critical=important(text);
     lineCount++;
-    queue.push({text,role:'caster',key});
-    if(key||lineCount%2===0)queue.push({text:analystLine(text),role:'analyst',key});
+    queue.push({text:casterDelivery(text),role:'caster',critical});
+    // 해설위원은 주요 장면마다, 그 외에는 두 번에 한 번씩 전술·흐름을 짚는다.
+    if(critical||lineCount%2===0)queue.push({text:analystLine(text),role:'analyst',critical});
     if(queue.length>8){
-      const drop=queue.findIndex(x=>!x.key);
+      const drop=queue.findIndex(x=>!x.critical);
       queue.splice(drop>=0?drop:0,1);
     }
     speakNext();
@@ -1336,10 +1362,13 @@ $('bT').onclick=()=>{if(S!=='TITLE')return;sfx('click');start()};
   rate.addEventListener('input',()=>{if(synth&&busy){const pending=queue.slice();stop();queue=pending;speakNext()}});
   $('voiceTest').addEventListener('click',()=>{
     stop();lastMode=activeMode();
-    queue=[{text:'안녕하세요! THUNDER MULTI 경기 중계입니다!',role:'caster',key:true},{text:'오늘 승부의 흐름과 선수들의 전략까지 함께 짚어보겠습니다!',role:'analyst',key:true}];
+    queue=[
+      {text:'자아아! THUNDER MULTI 경기 시작합니다! 오늘 승부, 누가 가져갈까요!',role:'caster',critical:true},
+      {text:'선수들의 움직임을 보시죠. 초반 운영과 결정적인 순간의 판단, 그 차이가 승부를 가를 겁니다!',role:'analyst',critical:true}
+    ];
     speakNext();
   });
-  if(synth&&synth.onvoiceschanged!==undefined)synth.onvoiceschanged=()=>synth.getVoices();
+  if(synth&&synth.onvoiceschanged!==undefined)synth.onvoiceschanged=()=>{selected=chooseVoices()};
   if(!synth){enabled.checked=false;enabled.disabled=true;$('voiceTest').disabled=true}
 })();
 
