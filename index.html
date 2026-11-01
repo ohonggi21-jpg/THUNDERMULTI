@@ -366,7 +366,7 @@ const fxm=h=>h.fx.reduce((a,e)=>e.d>0?a:a+e.m,0);
 function ctxOf(h){const o=live(),r=o.indexOf(h),ah=o[r-1],bh=o[r+1];let nr=null,nd=99;o.forEach(x=>{const d=Math.abs(x.pos-h.pos);if(x!=h&&d<nd){nd=d;nr=x}});return{p:h.pos/1000,r,ah,bh,d:ah?ah.pos-h.pos:9e9,bd:bh?h.pos-bh.pos:9e9,nr:nd<32?nr:null,n:HS.filter(x=>!x.out).length,last:r>0&&r==o.length-1}}
 function tryEvent(){const A=live();if(!A.length)return;const i0=wp(A.map(h=>h.cd>0?0:1/(1+h.ec*.3)));if(i0<0)return;const h=A[i0],c=ctxOf(h),late=c.p>.7;const i=wp(EV.map((e,k)=>{if(G.t-(G.last[k]??-9)<5||!e.cond(h,c))return 0;let w=e.w;if(late&&LATE.includes(k))w*=2.3;if(h.sk>=2)w*=e.neg?.1:2.5;return w}));if(i>=0)fire(i,h,c)}
 function fire(i,h,c){const e=EV[i],n0=h.fx.length;G.last[i]=G.t;h.cd=rr(1.2,2.2);h.ec++;G.evn++;if(e.m&&e.d)ad(h,e.m,e.d,e.wb);let tx=e.tx;const o=e.hk&&e.hk(h,c);if(o)tx=o;const sm=h.fx.slice(n0).reduce((a,x)=>x.d>0?a:a+x.m,0),g=!e.neg&&sm>=0;h.sk=g?0:h.sk+1;const nn=(c.nr||{}).name||'';tx=tx.replace('@',h.name).replace('#',(c.ah||{}).name||'').replace('$와',nn?nn+P(nn,'과','와'):'').replace('$',nn);h.bd={tx:e.n,t:2.2,g};const p=$('ep');p.textContent=`${h.num}번 ${h.name} · ${e.n}`;p.className='on'+(g?'':' bad');G.evT2=2.2;sfx(g?'up':'down');say(tx,i==38||i==8?2:1);G.log.push({t:G.t,tx:`${h.name} · ${e.n}${tx&&tx!==e.n?' — '+tx:''}`});const x=X(h.pos),y=ty0+lh*(h.i+.84);for(let k=0;k<10;k++)PT.push({x,y:y-20*hs,vx:rr(-120,120),vy:rr(-120,-20),l:.7,m:.7,c:g?'#fff6b0':'#b58a52',s:3,g:300})}
-function say(tx,pr=1){if(pr<3&&shown.includes(tx))return;if(pr>=3)cmq=[];cmq.push({tx,pr,t:tt});if(pr>=2)cmT=Math.min(cmT,.25)}
+function say(tx,pr=1){if(pr<3&&(shown.includes(tx)||cmq.some(q=>q.tx===tx)))return;if(pr>=3)cmq=[];cmq.push({tx,pr,t:tt});if(pr>=2)cmT=Math.min(cmT,.25)}
 function pump(dt){cmT-=dt;if(cmT>0)return;cmq=cmq.filter(q=>q.pr>1||tt-q.t<3);if(!cmq.length)return;cmq.sort((a,b)=>b.pr-a.pr||a.t-b.t);const q=cmq.shift();shown.push(q.tx);if(shown.length>9)shown.shift();$('ct').textContent=q.tx;cmT=q.pr>=2?2.4:1.7}
 function idle(){const o=live();if(!o.length)return;const L=o[0],S2=o[1],Z=o[o.length-1],p=L.pos/1000,g=S2?(L.pos-S2.pos)|0:0,a=[];if(p<.2)a.push("모두 출발이 좋습니다!",`${L.name}, 치고 나옵니다!`);else if(p<.75){a.push(`현재 선두는 ${L.name}! `+(S2?`2위 ${S2.name}${P(S2.name,'과','와')} 격차 ${g}m.`:'단독 선두.'),`${L.name}, 결승선까지 ${1000-L.pos|0}m!`);if(S2&&g<25)a.push(`${L.name}, ${S2.name}${P(S2.name,'과','와')} 나란합니다!`)}else{a.push(`결승선까지 ${1000-L.pos|0}m! ${L.name}, 지킬 수 있을까요?`);if(Z!=L&&L.pos-Z.pos<150)a.push(`${Z.name}, 마지막 힘!`)}HS.forEach(h=>{if(h.out&&p>.1&&G.t-G.outT<9)a.push(`${h.name}, 이탈했습니다!`);else if(!h.out&&!h.fin&&h.v<h.base*.7)a.push(`${h.name}, 속도가 줄었습니다!`)});say(a[a.length*R()|0],0)}
 function newRace(){HS=SEL.map(mk);G={t:0,last:{},retired:0,log:[],evn:0,evT:.8,evT2:0,idle:2,lead:-1,lt:0,rk:{},ot:0,fin:[],ts:1,hf:0,won:0,f:{},outT:0,finT:0};PT=[];cmq=[];shown=[];cmT=0;$('ct').textContent='';$('ep').className='';$('rk').innerHTML=HS.map(h=>`<div class="ch" id="k${h.i}" style="border-color:${h.col}"></div>`).join('');$('bar').innerHTML=HS.map(h=>`<div id="m${h.i}" style="background:${h.col};left:0%"></div>`).join('')+'<i></i>'}
@@ -408,7 +408,7 @@ const A_s = (() => {
   const cam={x:600,y:500,z:.85,tx:600,ty:500,tz:.85};
   const st={sel:[],fighters:[],t:0,dur:40,evT:1.4,phase:0,won:null,overtime:0,isOT:false,finT:0,cmq:[],cmT:0,shown:[],log:[],last:{},evn:0,lastChance:0,cheerBoost:0};
   let pT=[];
-  const say=(tx,pr=1)=>{if(pr<3&&st.shown.includes(tx))return;if(pr>=3)st.cmq=[];st.cmq.push({tx,pr,t:tt});if(pr>=2)st.cmT=Math.min(st.cmT,.25)};
+  const say=(tx,pr=1)=>{if(pr<3&&(st.shown.includes(tx)||st.cmq.some(q=>q.tx===tx)))return;if(pr>=3)st.cmq=[];st.cmq.push({tx,pr,t:tt});if(pr>=2)st.cmT=Math.min(st.cmT,.25)};
   const pumpCM=dt=>{st.cmT-=dt;if(st.cmT>0)return;st.cmq=st.cmq.filter(q=>q.pr>1||tt-q.t<3);if(!st.cmq.length)return;st.cmq.sort((a,b)=>b.pr-a.pr||a.t-b.t);const q=st.cmq.shift();st.shown.push(q.tx);if(st.shown.length>9)st.shown.shift();$('act').textContent=q.tx;st.cmT=q.pr>=2?2.3:1.6};
   const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y),pick=a=>a[R()*a.length|0],alive=()=>st.fighters.filter(f=>f.alive);
   const pickTarget=f=>{const e=alive().filter(x=>x!==f);if(!e.length)return null;return e.reduce((best,x)=>{const d=dist(f,x),sc=d*(.45+(x.hp/x.maxHp)*.55);return !best||sc<best.sc?{x,sc}:best},{x:null,sc:1e9}).x};
@@ -493,7 +493,7 @@ const N_s = (() => {
   const st = { sel: [], tops: [], t: 0, dur: 40, won: null, evT: 1.2, phase: 0, cmq: [], cmT: 0, shown: [], log: [], last: {}, evn: 0, finT: 0, isOT: false, overtime: 0, lastChance: 0 };
   let pT = [];
   const alive = () => st.tops.filter(t => t.alive);
-  const say = (tx, pr = 1) => { if (pr < 3 && st.shown.includes(tx)) return; if (pr >= 3) st.cmq = []; st.cmq.push({ tx, pr, t: tt }); if (pr >= 2) st.cmT = Math.min(st.cmT, .25); };
+  const say = (tx, pr = 1) => { if (pr < 3 && (st.shown.includes(tx) || st.cmq.some(q => q.tx === tx))) return; if (pr >= 3) st.cmq = []; st.cmq.push({ tx, pr, t: tt }); if (pr >= 2) st.cmT = Math.min(st.cmT, .25); };
   const pumpCM = dt => { st.cmT -= dt; if (st.cmT > 0) return; st.cmq = st.cmq.filter(q => q.pr > 1 || tt - q.t < 3); if (!st.cmq.length) return; st.cmq.sort((a, b) => b.pr - a.pr || a.t - b.t); const q = st.cmq.shift(); st.shown.push(q.tx); if (st.shown.length > 9) st.shown.shift(); const el = $('nct'); if (el) el.textContent = q.tx; st.cmT = q.pr >= 2 ? 2.3 : 1.6; };
   
   const spawnSpark = (x, y, big, col) => { const c = safeColor(col) || (big ? '#fff' : '#ffdd88'); for (let i = 0; i < (big ? 20 : 9); i++) { const a = rr(0, Math.PI * 2), sp = rr(100, big ? 500 : 300); pT.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, l: big ? .6 : .4, m: big ? .6 : .4, c, s: big ? 6 : 3.5, g: 80 }); } };
@@ -1219,7 +1219,7 @@ function tick(d,rd){const st=TX.st;TX.time+=rd;if(TX.evT>0){TX.evT-=d;if(TX.evT<
 if(TX.gap>0){TX.gap-=d;return}
 if(!TX.anim){const info=step(st);TX.last=info;TX.anim=build(info);if(info.ev)showEv(info.ev);if(info.mp)say('🔥 매치 포인트!');return}
 const a=TX.anim;a.t+=d;
-if(a.t>=a.dur){const i=a.info;TX.anim=null;hud();TX.pop={t:0,txt:i.type=='ace'?'ACE!':i.type=='df'?'DF':'+1',w:i.w};say(i.text+(i.game?' — '+(i.round?(st.rounds.length)+'판 종료! '+TX.st.P[i.w].name+' 승리':'게임 '+TX.st.P[i.w].name):''));
+if(a.t>=a.dur){const i=a.info;TX.anim=null;hud();TX.pop={t:0,txt:i.type=='ace'?'ACE!':i.type=='df'?'DF':'+1',w:i.w};say(i.text+(i.game?' — '+(i.round?(st.rounds.length)+'세트 종료!':'게임 종료!'):''));
  sfx(i.w===0?'lock':'beep');TX.gap=i.round?1.1:i.game?.45:.15;if(i.done)finish()}}
 function finish(){const st=TX.st;TX.win=st.win;if(TN&&TN.multi&&TN.sp==='tennis')return;go('T_FINISH');MODE='tennis';TX.fin=3.4;flash=1;shk=7;sfx('fan');after(500,()=>sfx('fin'));say('🏆 '+st.P[st.win].name+' 우승!');
 for(let i=0;i<90;i++)TX.cf.push({x:rr(0,W),y:rr(-CH*.5,0),vx:rr(-40,40),vy:rr(60,200),c:['#ffd75e','#e63946','#fff','#4fc3f7','#7dff9b'][i%5]})}
