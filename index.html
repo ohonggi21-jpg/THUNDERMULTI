@@ -242,6 +242,77 @@ kbd{display:inline-block;padding:1px 6px;border:1px solid #8ab6d9;border-radius:
 .guide-footer .btn{flex-shrink:0}
 @media(max-width:620px){.guide-cards,.guide-controls,.guide-tips{grid-template-columns:1fr}.guide-tournament{grid-template-columns:repeat(2,minmax(0,1fr))}.guide-bracket{grid-template-columns:1fr 15px 1fr 15px .8fr}.guide-round span{font-size:9px;padding:7px 2px}.guide-round b{font-size:10px}.guide-footer{flex-direction:column}.guide-footer .btn{width:min(100%,360px)}}
 @media(orientation:landscape) and (max-height:700px){.guide-wrap{gap:8px!important}.guide-head{padding:3px 8px}.guide-head h2{font-size:25px}.guide-content{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.guide-content section{padding:11px}.guide-content h3{font-size:17px}.guide-content p{font-size:11px}.guide-card{padding:9px}.guide-card p{font-size:10px}.guide-card small{font-size:9px}.guide-controls p{font-size:10px}.guide-note{font-size:10px!important}.guide-footer{padding-bottom:4px}}
+
+/* ===== 모바일·태블릿 가로 화면 2차 최적화 ===== */
+@media (orientation:landscape){
+ html,body{width:100%;height:100%;height:100dvh;min-height:0}
+ #cv{width:100vw;height:100%;height:100dvh}
+ .ov{overflow-x:hidden;overscroll-behavior:contain}
+ .ov>.wrap{width:100%;max-width:none}
+ /* 타이틀: 모든 게임 선택지를 한 화면에 배치 */
+ #oT>.wrap{justify-content:center;gap:clamp(4px,1.2vh,12px);padding:clamp(6px,1.5vh,14px) max(14px,env(safe-area-inset-right)) clamp(6px,1.5vh,14px) max(14px,env(safe-area-inset-left))}
+ #oT h1{font-size:clamp(32px,6.5vw,76px)}
+ #oT .kr{font-size:clamp(15px,2.7vw,28px)}
+ #oT .tag{font-size:clamp(10px,1.5vw,15px)}
+ #oT .menu{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:min(100%,1180px);max-width:1180px;gap:clamp(5px,1vw,12px)}
+ #oT .mode-btn{min-width:0;max-width:none;width:100%;padding:clamp(6px,1.1vh,12px);border-radius:14px}
+ #oT .mode-btn .mi{font-size:clamp(23px,4.3vw,48px);margin-bottom:2px}
+ #oT .mode-btn .mt{font-size:clamp(12px,1.65vw,19px)}
+ #oT .mode-btn .md{font-size:clamp(9px,1.05vw,12px);line-height:1.2}
+ #oT .mode-btn.random{grid-column:2;grid-row:auto;width:100%;max-width:none!important;justify-self:stretch}
+ #oT #bHelp{min-height:34px;padding:.35em 1em;font-size:clamp(11px,1.25vw,14px)}
+ /* 참가자 추첨: 카드가 세로로 길게 늘어지지 않도록 가로 배열 */
+ #oR .cards,#oAR .cards,#oNR .cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:clamp(4px,.8vw,10px);width:min(100%,1200px);max-width:1200px}
+ #oR .rc,#oAR .rc,#oNR .rc{min-width:0;width:100%;padding:clamp(5px,.8vw,10px) 3px}
+ #oR .rc i,#oAR .rc i,#oNR .rc i{width:clamp(25px,4vw,42px);height:clamp(25px,4vw,42px);font-size:clamp(12px,1.8vw,19px)}
+ #oR .rc .nm,#oAR .rc .nm,#oNR .rc .nm{font-size:clamp(10px,1.35vw,15px)}
+ #oR .rc small,#oAR .rc small,#oNR .rc small{font-size:clamp(8px,1vw,11px)}
+ #rt,#art,#nrt{font-size:clamp(18px,3vw,32px)}
+ /* 결과/확인/일시정지 창은 화면 높이를 넘지 않고 내부 스크롤 */
+ #oX .wrap,#oAX .wrap,#oNX .wrap,#oP .wrap,#oC .wrap{justify-content:center;padding:8px}
+ #oX .card,#oAX .card,#oNX .card,#oP .card,#oC .card{width:min(100%,1100px);max-height:calc(100dvh - 16px);overflow-y:auto;overscroll-behavior:contain;padding:clamp(8px,1.4vw,18px)}
+ #oX .card h2,#oAX .card h2,#oNX .card h2{font-size:clamp(20px,3vw,38px)}
+ #oX .card h3,#oAX .card h3,#oNX .card h3{font-size:clamp(15px,2vw,25px)}
+ #oX .card ol,#oX .card ul,#oAX .card ol,#oAX .card ul,#oNX .card ol,#oNX .card ul{font-size:clamp(10px,1.2vw,14px)}
+ /* 게임 설명과 월드 챔피언십은 넓은 화면을 적극 활용 */
+ #oHelp .guide-content{grid-template-columns:repeat(2,minmax(0,1fr));max-width:1200px}
+ #oHelp .guide-head,#oHelp .guide-content{max-width:1200px}
+ #oTN>.wrap{width:100%;max-width:1300px}
+ #oTN .gr{grid-template-columns:repeat(4,minmax(0,1fr));max-width:1200px}
+ /* HUD와 버튼을 안전 영역 안에 고정 */
+ #hud,#ahud,#nhud{padding-left:max(8px,env(safe-area-inset-left));padding-right:max(52px,calc(env(safe-area-inset-right) + 44px))}
+ #cm,#acm,#ncm{padding-left:max(8px,env(safe-area-inset-left));padding-right:max(8px,env(safe-area-inset-right))}
+ #cb{right:max(8px,env(safe-area-inset-right))}
+ #pz{left:max(8px,env(safe-area-inset-left))}
+ #sb{right:max(6px,env(safe-area-inset-right))}
+}
+@media (orientation:landscape) and (max-height:480px){
+ #oT>.wrap{gap:3px;padding-top:4px;padding-bottom:4px}
+ #oT h1{font-size:clamp(25px,5.8vw,42px)}
+ #oT .kr{font-size:clamp(12px,2.4vw,18px)}
+ #oT .tag{display:none}
+ #oT .menu{gap:4px}
+ #oT .mode-btn{padding:4px;border-width:2px;border-radius:10px}
+ #oT .mode-btn .mi{font-size:clamp(20px,4vw,30px)}
+ #oT .mode-btn .mt{font-size:clamp(10px,1.5vw,14px)}
+ #oT .mode-btn .md{font-size:8px}
+ #oT #bHelp{min-height:29px;font-size:10px}
+ #oR .wrap,#oAR .wrap,#oNR .wrap{gap:4px;padding:5px}
+ #oR .rc,#oAR .rc,#oNR .rc{padding:3px 2px}
+ #oR .rc small,#oAR .rc small,#oNR .rc small{font-size:7px}
+ #oR .rc i,#oAR .rc i,#oNR .rc i{width:23px;height:23px}
+ #oX .card,#oAX .card,#oNX .card{max-height:calc(100dvh - 8px);padding:7px}
+ #oHelp .guide-wrap{gap:5px!important}
+ #oHelp .guide-content{gap:5px}
+ #oHelp .guide-content section{padding:7px}
+ #oHelp .guide-card{padding:6px}
+ #oTN>.wrap{gap:4px}
+}
+@media (orientation:landscape) and (min-width:900px){
+ #oT .menu{grid-template-columns:repeat(6,minmax(0,1fr))}
+ #oT .mode-btn.random{grid-column:auto}
+}
+
 </style></head><body class="TITLE">
 <canvas id="cv"></canvas>
 <div id="hud"><div id="tb"><b id="tm">0.0초</b><b id="ld">-</b><b id="rm">-</b></div><div id="bar"></div><div id="rk"></div></div>
