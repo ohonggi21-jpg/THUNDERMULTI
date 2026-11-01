@@ -193,6 +193,10 @@ h1{font:900 clamp(38px,10vw,110px)/.95 Impact,"Arial Black",sans-serif;letter-sp
  
 /* THUNDER MULTI in-game guide */
 .guide-open{margin-top:clamp(2px,1vh,10px);min-height:42px;border-color:#8ad7ff;color:#eaf8ff;background:linear-gradient(135deg,#173b62,#10253f);font-size:clamp(13px,2.2vw,17px);box-shadow:0 4px 0 #071a30,0 8px 18px #0009}
+/* 타이틀 화면에서 설명 버튼은 항상 보이는 왼쪽 위에 고정 */
+.TITLE #bHelp{position:fixed;top:max(10px,env(safe-area-inset-top));left:max(10px,env(safe-area-inset-left));z-index:15;margin:0;min-height:42px;padding:.55em 1em;font-size:clamp(12px,2vw,15px);box-shadow:0 4px 0 #071a30,0 8px 18px #0009}
+.TITLE #bHelp:active{transform:translateY(3px) scale(.98)}
+
 .guide-overlay{z-index:20!important;background:radial-gradient(ellipse at 50% 0%,#17395bF2,#020711F7 68%)!important}
 .guide-wrap{justify-content:flex-start!important;gap:14px!important;padding-top:max(22px,env(safe-area-inset-top))!important;padding-bottom:max(24px,env(safe-area-inset-bottom))!important}
 .guide-head{width:100%;max-width:980px;padding:14px 12px 4px;text-align:center}
