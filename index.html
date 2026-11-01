@@ -313,6 +313,31 @@ kbd{display:inline-block;padding:1px 6px;border:1px solid #8ab6d9;border-radius:
  #oT .mode-btn.random{grid-column:auto}
 }
 
+
+/* ===== 가로 화면 여백 축소 · 콘텐츠 확장 ===== */
+@media (orientation:landscape){
+ .ov>.wrap{padding:6px max(8px,env(safe-area-inset-right)) 6px max(8px,env(safe-area-inset-left));gap:clamp(4px,.8vh,8px)}
+ #oT>.wrap{justify-content:space-evenly}
+ #oT .menu{width:100%;max-width:none;gap:clamp(6px,.8vw,12px)}
+ #oT .mode-btn{max-width:none;min-height:clamp(88px,19vh,148px);padding:clamp(8px,1.4vh,14px) clamp(5px,.8vw,12px);display:flex;flex-direction:column;justify-content:center;align-items:center}
+ #oT .mode-btn .mi{font-size:clamp(30px,5vw,54px);margin-bottom:5px}
+ #oT .mode-btn .mt{font-size:clamp(14px,1.9vw,22px)}
+ #oT .mode-btn .md{font-size:clamp(10px,1.2vw,14px)}
+ #oR>.wrap,#oAR>.wrap,#oNR>.wrap{justify-content:space-evenly}
+ #oR .cards,#oAR .cards,#oNR .cards{width:100%;max-width:none}
+ #oR .rc,#oAR .rc,#oNR .rc{min-height:clamp(82px,17vh,132px);display:flex;flex-direction:column;justify-content:center;align-items:center}
+ #oX .card,#oAX .card,#oNX .card,#oP .card,#oC .card{width:min(100%,1500px)}
+ #oHelp .guide-head,#oHelp .guide-content{width:100%;max-width:none}
+ #oTN>.wrap{width:100%;max-width:none}
+ #oTN .gr{width:100%;max-width:none}
+}
+@media (orientation:landscape) and (max-height:480px){
+ #oT .mode-btn{min-height:78px;padding:5px}
+ #oT .mode-btn .mi{font-size:clamp(24px,4vw,36px)}
+ #oR .rc,#oAR .rc,#oNR .rc{min-height:68px}
+ .ov>.wrap{gap:3px}
+}
+
 </style></head><body class="TITLE">
 <canvas id="cv"></canvas>
 <div id="hud"><div id="tb"><b id="tm">0.0초</b><b id="ld">-</b><b id="rm">-</b></div><div id="bar"></div><div id="rk"></div></div>
