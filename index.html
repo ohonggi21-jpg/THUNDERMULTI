@@ -716,20 +716,22 @@ tok++;T.forEach(clearTimeout);T=[];t.M=MM;t.multi=1;t.run=0;t.zoom=-1;t.allT=0;t
 const cd=$('mcd');cd.style.display='flex';cd.replaceChildren();const seq=[['READY...',900],['3',560],['2',560],['1',560]];let at=0;seq.forEach(([x,d],i)=>{Mtm.push(setTimeout(()=>{if(!TN.multi)return;cd.style.display='flex';const sp=document.createElement('span');sp.textContent=x;if(x==='1'){sp.className='last';/* animationend 이벤트에 의존하지 않고 별도 타이머로 반드시 제거 */Mtm.push(setTimeout(()=>{cd.replaceChildren();cd.style.display='none'},520))}cd.replaceChildren(sp);sfx(i?'beep':'lock')},at));at+=d});
 Mtm.push(setTimeout(()=>{cd.replaceChildren();cd.style.display='none';if(!TN.multi)return;t.run=1;setM('g',160);$('go').classList.remove('on');void $('go').offsetWidth;$('go').classList.add('on');sfx('gun');shk=10},at+80))}
 function tennisPanelHud(g){
- const st=TX.st;if(!st)return;const P=st.P,fs=Math.max(18,Math.min(31,W*.023)),lh=fs*1.38,pad=18,bx=16,by=16,bw=W-32,bh=lh*3.55;
+ const st=TX.st;if(!st)return;
+ const squeeze=TN.matchCount===2?2:1,viewW=W/squeeze;
+ const P=st.P,fs=TN.matchCount===2?Math.max(14,Math.min(25,viewW*.028)):Math.max(18,Math.min(31,W*.023)),lh=fs*1.38,pad=12,bx=10,by=12,bw=viewW-20,bh=lh*3.55;
  const surf=TN.tennisSurf==='hard'?'하드 코트':TN.tennisSurf==='clay'?'클레이 코트':'잔디 코트';
  const pt=i=>st.pt[i]>3?'게임':['0','15','30','40'][st.pt[i]]||'0';
- cx.save();
- cx.fillStyle='rgba(3,10,24,.88)';cx.fillRect(bx,by,bw,bh);cx.strokeStyle='#ffd75e';cx.lineWidth=3;cx.strokeRect(bx,by,bw,bh);
+ cx.save();if(squeeze===2)cx.scale(2,1);
+ cx.fillStyle='rgba(3,10,24,.90)';cx.fillRect(bx,by,bw,bh);cx.strokeStyle='#ffd75e';cx.lineWidth=3;cx.strokeRect(bx,by,bw,bh);
  cx.textAlign='left';cx.textBaseline='middle';cx.fillStyle='#ffd75e';cx.font='900 '+fs+'px sans-serif';
- cx.fillText('🎾 '+('ABCD'[g])+'조  ·  '+surf+'  ·  '+TX.time.toFixed(0)+'초',bx+pad,by+lh*.62);
+ cx.fillText('🎾 '+(TN.multiStage==='Q'?('ABCD'[g]+'조'):TN.multiStage==='S'?('4강 '+(g+1)+'경기'):'결승')+' · '+surf+' · '+TX.time.toFixed(0)+'초',bx+pad,by+lh*.62);
  for(let i=0;i<2;i++){
   const yy=by+lh*(1.62+i*1.05),col=i?'#79caff':'#7dff9b',label=(st.srv===i?'🎾 ':'')+P[i].name+'   세트 '+st.rw[i]+'   게임 '+st.g[i]+'   포인트 '+pt(i);
   cx.fillStyle=col;cx.font='800 '+Math.round(fs*.83)+'px sans-serif';cx.fillText(label,bx+pad,yy,bw-pad*2);
   const barW=bw-pad*2,barY=yy+lh*.31;cx.fillStyle='#ffffff25';cx.fillRect(bx+pad,barY,barW,Math.max(5,fs*.15));cx.fillStyle=col;cx.fillRect(bx+pad,barY,barW*st.stam[i]/100,Math.max(5,fs*.15));
  }
  const ev=TX.evT>0&&TX.multiEv?TX.multiEv.text:(TX.last&&TX.last.text?TX.last.text:'랠리 진행 중');
- const ey=CH-lh*2.05,eh=lh*1.45;cx.fillStyle='rgba(2,8,19,.86)';cx.fillRect(bx,ey,bw,eh);cx.strokeStyle=TX.multiEv&&TX.evT>0?(TX.multiEv.good?'#7dff9b':'#ff9d9d'):'#ffffff88';cx.lineWidth=2;cx.strokeRect(bx,ey,bw,eh);
+ const ey=CH-lh*2.05,eh=lh*1.45;cx.fillStyle='rgba(2,8,19,.88)';cx.fillRect(bx,ey,bw,eh);cx.strokeStyle=TX.multiEv&&TX.evT>0?(TX.multiEv.good?'#7dff9b':'#ff9d9d'):'#ffffff88';cx.lineWidth=2;cx.strokeRect(bx,ey,bw,eh);
  cx.fillStyle=TX.multiEv&&TX.evT>0?(TX.multiEv.good?'#9dffb4':'#ffb2b2'):'#fff';cx.font='800 '+Math.round(fs*.82)+'px sans-serif';cx.fillText(ev,bx+pad,ey+eh/2,bw-pad*2);
  cx.restore();
 }
