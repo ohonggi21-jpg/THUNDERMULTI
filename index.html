@@ -246,8 +246,9 @@ kbd{display:inline-block;padding:1px 6px;border:1px solid #8ab6d9;border-radius:
 /* 요청한 한 가지 변경만: 랜덤 모드를 월드 챔피언십 옆으로 */
 .mode-btn.random{flex:1 1 45%!important;max-width:320px!important}
 
-/* 친구 점수 버튼을 하단 해설 패널 위로 살짝 이동 */
-#tmHostFab{bottom:calc(88px + env(safe-area-inset-bottom))!important}
+/* 친구 점수 버튼은 일시정지 버튼 바로 위에, 서로 겹치지 않게 배치 */
+#tmHostFab{bottom:calc(154px + env(safe-area-inset-bottom))!important}
+@media(max-height:500px){#tmHostFab{bottom:calc(102px + env(safe-area-inset-bottom))!important}}
 </style></head><body class="TITLE">
 <canvas id="cv"></canvas>
 <div id="hud"><div id="tb"><b id="tm">0.0초</b><b id="ld">-</b><b id="rm">-</b></div><div id="bar"></div><div id="rk"></div></div>
