@@ -30,6 +30,7 @@ h1{font:900 clamp(38px,10vw,110px)/.95 Impact,"Arial Black",sans-serif;letter-sp
 #sb{position:fixed;top:max(8px,env(safe-area-inset-top));right:max(8px,env(safe-area-inset-right));z-index:9;width:44px;height:44px;border-radius:50%;border:2px solid #ffd75e;background:#000a;color:#ffd75e;font-size:20px;cursor:pointer}
 #sp{position:fixed;top:max(60px,calc(env(safe-area-inset-top) + 52px));right:max(8px,env(safe-area-inset-right));z-index:9;display:none;flex-direction:column;gap:6px;background:#000d;border:1px solid #ffd75e;border-radius:12px;padding:10px;font-size:14px}
 #sp.on{display:flex}#sp input[type=range]{width:130px}
+#sp .voice-note{font-size:10px;line-height:1.35;color:#b9cbbf;max-width:220px}#sp .voice-test{border:1px solid #8ad7ff;border-radius:7px;padding:5px 8px;background:#10253f;color:#eaf8ff;font:700 12px inherit;cursor:pointer}
 .cards{display:flex;gap:6px;width:100%;max-width:920px;flex-wrap:wrap;justify-content:center}
 .rc{flex:1 1 130px;min-width:0;background:#0b1a12e6;border:2px solid #ffd75e66;border-radius:14px;padding:8px 4px;transition:.2s;position:relative;cursor:pointer}
 .rc.lk{border-color:#ffd75e;transform:scale(1.04)}.rc.sp .nm{filter:blur(1.5px)}
@@ -253,7 +254,7 @@ kbd{display:inline-block;padding:1px 6px;border:1px solid #8ab6d9;border-radius:
 <div id="go">GO!!</div>
 <button id="cb" type="button" aria-label="응원">📣</button>
 <button id="sb" type="button" aria-label="사운드">♪</button>
-<div id="sp"><label><input type="checkbox" id="mu"> 전체 음소거</label><label>배경음악<br><input type="range" id="vm" min="0" max="100" value="60"></label><label>효과음<br><input type="range" id="vs" min="0" max="100" value="80"></label></div>
+<div id="sp"><label><input type="checkbox" id="mu"> 전체 음소거</label><label>배경음악<br><input type="range" id="vm" min="0" max="100" value="60"></label><label>효과음<br><input type="range" id="vs" min="0" max="100" value="80"></label><hr style="border:0;border-top:1px solid #ffd75e55;width:100%"><label><input type="checkbox" id="voiceOn" checked> 🎙️ 2인 음성 중계</label><label>중계 음량<br><input type="range" id="voiceVol" min="0" max="100" value="82"></label><label>말하기 속도<br><input type="range" id="voiceRate" min="80" max="120" value="100"></label><button type="button" class="voice-test" id="voiceTest">▶ 중계 테스트</button><div class="voice-note">캐스터와 분석가가 번갈아 중계합니다. 한국어 음성 종류는 브라우저·운영체제에 따라 달라질 수 있어요.</div></div>
 <div class="ov" id="oT"><div class="wrap"><h1>THUNDER</h1><div class="kr">MULTI ARENA</div><div class="tag" id="tg"></div><div class="menu">
 <button class="mode-btn horse" id="bS" type="button"><div class="mi">🏇</div><div class="mt">경마 경기</div><div class="md">40가지 이벤트! 결승선 질주!</div></button>
 <button class="mode-btn arena" id="bA" type="button"><div class="mi">⚔️</div><div class="mt">프로게이머</div><div class="md">30가지 이벤트! 5인 배틀로얄!</div></button>
@@ -1267,6 +1268,79 @@ if(flash>0)flash=Math.max(0,flash-dt*1.6);shk*=.9;exc+=((S==='T_MATCH'?.5:S==='T
 $('oTX').addEventListener('click',e=>{const b=e.target.closest('[data-tx]');if(!b)return;aud();sfx('click');const a=b.dataset.tx;if(a=='go'&&S==='T_CONFIRM')ready();else if(a=='re'&&S==='T_CONFIRM')start();else if(a=='next'&&S==='T_RESULT')start();else if(a=='home')go('TITLE')});
 const SPD=[[.5,'🐢 0.5배속'],[1,'▶ 1배속'],[1.5,'⏩ 1.5배속'],[2,'⏩ 2배속']];let si=0;$('txs').onclick=()=>{si=(si+1)%3;TX.spd=SPD[si][0];$('txs').textContent=SPD[si][1]};
 $('bT').onclick=()=>{if(S!=='TITLE')return;sfx('click');start()};
+})();
+
+
+/* ===== THUNDER MULTI · 2인 음성 중계 ===== */
+(function(){
+  const synth=window.speechSynthesis;
+  const enabled=$('voiceOn'),volume=$('voiceVol'),rate=$('voiceRate');
+  if(!enabled||!volume||!rate)return;
+  let queue=[],busy=false,seq=0,lastMode='',lastSpoken='',lastAt=0,lineCount=0;
+  const seen=new WeakMap();
+  const nodes=['ct','act','nct','txc'].map(id=>$(id)).filter(Boolean);
+  const voices=()=>synth?synth.getVoices().filter(v=>/^ko([-_]|$)/i.test(v.lang)):[];
+  const activeMode=()=>S==='RACING'||S==='FINISH'?'horse':S==='A_BATTLE'||S==='A_FINISH'?'arena':S==='N_BATTLE'||S==='N_FINISH'?'neon':S==='T_MATCH'||S==='T_FINISH'?'tennis':String(S||'').startsWith('TN_')?'championship':'';
+  const important=t=>/(우승|챔피언|최후의|GAME SET|역전|추월|선두 교체|매치 포인트|링아웃|장외|KO|GAME!|서든데스|연장 종료)/i.test(t);
+  function analystLine(t){
+    if(/우승|챔피언|최후의|GAME SET/i.test(t))return '결국 승부를 결정지었습니다. 오늘 경기의 주인공이 탄생했네요!';
+    if(/역전|추월|선두 교체|매치 포인트/i.test(t))return '지금 흐름이 바뀌었습니다. 다음 장면이 정말 중요하겠어요!';
+    if(/링아웃|장외|KO|GAME!/i.test(t))return '큰 교전 하나가 승부를 흔들었습니다. 남은 선수들의 대응을 봐야겠어요.';
+    if(/감속|실패|피로|주춤|실수|불리/i.test(t))return '이런 변수가 쌓이면 순위가 크게 달라질 수 있습니다.';
+    return '좋습니다. 경기 흐름을 계속 지켜보겠습니다!';
+  }
+  function stop(){
+    seq++;queue=[];busy=false;
+    if(synth)try{synth.cancel()}catch(e){}
+  }
+  function speakNext(){
+    if(!synth||busy||!queue.length||!enabled.checked||mut)return;
+    const item=queue.shift(),token=seq;busy=true;
+    const u=new SpeechSynthesisUtterance(item.text),ko=voices();
+    u.lang='ko-KR';u.volume=Number(volume.value)/100;u.rate=(Number(rate.value)/100)*(item.role==='analyst'?.96:1.04);
+    u.pitch=item.role==='analyst'?.82:1.16;
+    if(ko.length)u.voice=ko[Math.min(item.role==='analyst'?1:0,ko.length-1)];
+    const done=()=>{if(token!==seq)return;busy=false;setTimeout(speakNext,90)};
+    u.onend=done;u.onerror=done;
+    try{synth.speak(u)}catch(e){done()}
+  }
+  function enqueue(text){
+    if(!synth||!enabled.checked||mut)return;
+    text=String(text||'').replace(/\s+/g,' ').trim();
+    if(!text||text.length<2)return;
+    const now=Date.now();
+    if(text===lastSpoken&&now-lastAt<4500)return;
+    lastSpoken=text;lastAt=now;
+    const key=important(text),mode=activeMode();
+    if(mode&&mode!==lastMode){stop();lastMode=mode}
+    lineCount++;
+    queue.push({text,role:'caster',key});
+    if(key||lineCount%2===0)queue.push({text:analystLine(text),role:'analyst',key});
+    if(queue.length>8){
+      const drop=queue.findIndex(x=>!x.key);
+      queue.splice(drop>=0?drop:0,1);
+    }
+    speakNext();
+  }
+  nodes.forEach(el=>{
+    const watch=()=>{
+      const text=el.textContent||'';
+      if(!text.trim()||text===seen.get(el))return;
+      seen.set(el,text);
+      if(el.getClientRects().length)enqueue(text);
+    };
+    new MutationObserver(watch).observe(el,{childList:true,characterData:true,subtree:true});
+  });
+  enabled.addEventListener('change',()=>{if(!enabled.checked)stop()});
+  volume.addEventListener('input',()=>{if(synth&&busy){const pending=queue.slice();stop();queue=pending;speakNext()}});
+  rate.addEventListener('input',()=>{if(synth&&busy){const pending=queue.slice();stop();queue=pending;speakNext()}});
+  $('voiceTest').addEventListener('click',()=>{
+    stop();lastMode=activeMode();
+    queue=[{text:'안녕하세요! THUNDER MULTI 경기 중계입니다!',role:'caster',key:true},{text:'오늘 승부의 흐름과 선수들의 전략까지 함께 짚어보겠습니다!',role:'analyst',key:true}];
+    speakNext();
+  });
+  if(synth&&synth.onvoiceschanged!==undefined)synth.onvoiceschanged=()=>synth.getVoices();
+  if(!synth){enabled.checked=false;enabled.disabled=true;$('voiceTest').disabled=true}
 })();
 
 </script>
