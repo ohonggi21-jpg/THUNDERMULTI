@@ -257,6 +257,9 @@ kbd{display:inline-block;padding:1px 6px;border:1px solid #8ab6d9;border-radius:
 }
 /* 친구 점수 버튼은 상단 왼쪽으로 이동해 일시정지·해설과 완전히 분리 */
 #tmHostFab{top:calc(62px + env(safe-area-inset-top))!important;bottom:auto!important;left:max(8px,env(safe-area-inset-left))!important;right:auto!important}
+
+/* 점수 버튼 두 종류 모두 하단 일시정지 버튼과 분리 */
+#tmHostFab,#tmFab{top:calc(62px + env(safe-area-inset-top))!important;bottom:auto!important;left:max(8px,env(safe-area-inset-left))!important;right:auto!important}
 </style></head><body class="TITLE">
 <canvas id="cv"></canvas>
 <div id="hud"><div id="tb"><b id="tm">0.0초</b><b id="ld">-</b><b id="rm">-</b></div><div id="bar"></div><div id="rk"></div></div>
