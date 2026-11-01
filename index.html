@@ -392,7 +392,7 @@ function newRace(){HS=SEL.map(mk);G={t:0,last:{},retired:0,log:[],evn:0,evT:.8,e
 function sim(dt){G.t+=dt;G.hf-=dt;if(G.hf<=0&&S=='RACING'){G.hf=.22;sfx('hoof')}HS.forEach(h=>{if(h.bd&&(h.bd.t-=dt)<=0)h.bd=null;h.cd-=dt;if(h.out){h.ph+=dt;return}h.fx=h.fx.filter(e=>{if(e.d>0){e.d-=dt;if(e.d<=0&&e.onStart){try{e.onStart(h)}catch(x){}}return 1}e.t-=dt;return e.t>0});h.stop-=dt;const p=h.pos/1000;let tg;if(h.fin)tg=16;else if(h.stop>0)tg=0;else{const m=Math.max(-.88,Math.min(1.1,fxm(h))),tr=1+(h.tr=='s'?(p<.3?.09:p>.7?-.05:0):h.tr=='l'?(p<.4?-.06:p>.7?.09:0):0)+.04*Math.sin(G.t*1.3+h.seed),cu=G.t>22?(G.t-22)*.07:0;tg=Math.max(h.base*.1,h.base*tr*(1+m+cu))}h.v+=(tg-h.v)*Math.min(1,dt*5);h.pos=Math.min(h.pos+h.v*dt,1055);h.ph+=dt*(8+h.v*.18);if(S=='RACING'&&R()<dt*h.v*.25&&PT.length<170)PT.push({x:X(h.pos)-30*hs,y:ty0+lh*(h.i+.84),vx:-rr(60,160),vy:-rr(20,80),l:.6,m:.6,c:R()<.5?'#8fc65a':'#c9a66b',s:3,g:200})});if(S=='RACING'){G.evT-=dt;if(G.evT<=0){G.evT=rr(.6,1.2);tryEvent()}G.idle-=dt;if(G.idle<=0&&!cmq.length){G.idle=rr(2.6,3.6);idle()}const o=live();if(o.length>1){const L=o[0],old=HS[G.lead];if(G.lead>=0&&L.i!=G.lead&&G.t>1.2&&G.t-G.lt>2&&old&&!old.out&&!old.fin){G.lt=G.ot=G.t;say(`선두 교체! ${L.name}!`,2);G.lead=L.i}else if(o.length==Object.keys(G.rk).length&&G.t-G.ot>1.6)o.forEach((h,n)=>{if(n>0&&G.rk[h.i]>n){const y=o.find(z=>z!=h&&G.rk[z.i]==n);if(y){G.ot=G.t;say(`${h.name}, ${y.name} 제치고 ${n+1}위!`,1)}}});G.rk={};o.forEach((h,n)=>G.rk[h.i]=n);const p=L.pos/1000;if(p>.8&&!G.f.a){G.f.a=1;setM('f',176);say("결승선이 얼마 남지 않았습니다!",2)}if(p>.93&&!G.f.b){G.f.b=1;say("결승선 바로 앞!",2)}}if(o.length>0&&(G.lead<0||!HS[G.lead]||HS[G.lead].out||HS[G.lead].fin))G.lead=o[0].i;HS.forEach(h=>{if(h.out&&!h.ot){h.ot=1;G.outT=G.t}})}const cr=HS.filter(h=>!h.fin&&!h.out&&h.pos>=1000);cr.forEach(h=>{h.fin=1;h.ft=G.t-(h.pos-1000)/Math.max(h.v,1);h.fx=[]});cr.sort((a,b)=>a.ft-b.ft).forEach(h=>{G.fin.push(h);if(!G.won)win(h)})}
 function win(h){G.won=h;window.THUNDER_AI?.pushEvent({type:'finish',text:`${h.name} 결승선 통과! 경마 우승!`,source:'horse-finish',importance:'critical',data:{winner:h.name,time:G.t.toFixed(1)}});go('FINISH');G.ts=.5;G.finT=0;sfx('fin');after(500,()=>sfx('fan'));say(`결승선! ${h.name} 우승!`,3);flash=1;shk=8;for(let i=0;i<110;i++)PT.push({x:rr(0,W),y:rr(-40,ty0),vx:rr(-60,60),vy:rr(20,140),l:3,m:3,c:['#ffd75e','#e63946','#fff','#4f8bff','#3ddc84'][i%5],s:5,g:60});after(1500,()=>G.ts=1)}
 const after=(ms,f)=>{const k=tok;T.push(setTimeout(()=>{if(k==tok)f()},ms))};
-function go(s){if(s==='TITLE'&&typeof TX!=='undefined')TX.on=0;if(TN&&TN.on&&TN.cap&&TN.cap(s))return;S=s;tok++;T.forEach(clearTimeout);T=[];document.body.className=s;
+function go(s){if(s==='RESULT'&&MODE==='horse')recordHorseHall();if(s==='TITLE'&&typeof TX!=='undefined')TX.on=0;if(TN&&TN.on&&TN.cap&&TN.cap(s))return;S=s;tok++;T.forEach(clearTimeout);T=[];document.body.className=s;
 const OVS={oT:['TITLE'],oR:['ROULETTE','HORSE_CONFIRM'],oAR:['A_ROULETTE','A_CONFIRM'],oNR:['N_ROULETTE','N_CONFIRM'],oD:['READY'],oAD:['A_READY'],oND:['N_READY'],oX:['RESULT'],oAX:['A_RESULT'],oNX:['N_RESULT']};
 Object.keys(OVS).forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none'});
 Object.keys(OVS).forEach(id=>{if(OVS[id].includes(s)){const el=document.getElementById(id);if(el)el.style.display='block'}});
@@ -475,7 +475,7 @@ const A_s = (() => {
     {n:'궁극의 결전',w:5,c:()=>alive().length===2,r:()=>{alive().forEach(f=>{f.eff.haste=2;f.eff.defense=1});sfx('big');shk=8;return`궁극의 결전!`}}
   ];
   function tryEvent(){const A=alive();if(A.length<2)return;const valid=EVENTS.filter(e=>(st.t-(st.last[e.n]??-99)>=4)&&e.c());if(!valid.length)return;let r=R()*valid.reduce((a,e)=>a+e.w,0);for(const e of valid){r-=e.w;if(r<=0){const m=e.r();if(m){say(m,2);st.log.push({t:st.t,tx:m})}st.last[e.n]=st.t;st.evn++;return}}}
-  function endBattle(w){if(st.won)return;window.THUNDER_AI?.pushEvent({type:'finish',text:`${w.n} 최후의 챔피언으로 우승!`,source:'pro-finish',importance:'critical',data:{winner:w.n,remaining:1}});st.won=w;go('A_FINISH');st.finT=0;sfx('fin');setTimeout(()=>sfx('fan'),500);say(`🏆 GAME SET! 최후의 챔피언은 ${w.n}!`,3);flash=1;shk=10;st.cheerBoost=2;for(let i=0;i<90;i++)pT.push({x:w.x+rr(-220,220),y:w.y-rr(20,220),vx:rr(-140,140),vy:rr(-240,-40),l:2.8,m:2.8,c:['#ffd75e','#4a9eff','#fff','#7dff9b'][i%4],s:6,g:260})}
+  function endBattle(w){if(st.won)return;st.won=w;recordArenaHall(st,'pro');window.THUNDER_AI?.pushEvent({type:'finish',text:`${w.n} 최후의 챔피언으로 우승!`,source:'pro-finish',importance:'critical',data:{winner:w.n,remaining:1}});go('A_FINISH');st.finT=0;sfx('fin');setTimeout(()=>sfx('fan'),500);say(`🏆 GAME SET! 최후의 챔피언은 ${w.n}!`,3);flash=1;shk=10;st.cheerBoost=2;for(let i=0;i<90;i++)pT.push({x:w.x+rr(-220,220),y:w.y-rr(20,220),vx:rr(-140,140),vy:rr(-240,-40),l:2.8,m:2.8,c:['#ffd75e','#4a9eff','#fff','#7dff9b'][i%4],s:6,g:260})}
   function cheer(){if(!st.fighters.length)return;let f = (aCheerIdx>=0 && st.fighters[aCheerIdx]) ? st.fighters[aCheerIdx] : (alive()[0]||st.fighters[0]);if(!f)return;[523,659,784,1047].forEach((fq,i)=>tone(fq,.16,'triangle',.14,i*.05));shk=4;st.cheerBoost=1.5;const cols=['#ffd75e','#ff2a85','#00e5ff','#7dff9b','#fff'];for(let i=0;i<24;i++)pT.push({x:f.x+rr(-50,50),y:f.y-40+rr(-20,20),vx:rr(-180,180),vy:rr(-300,-80),l:1,m:1,c:cols[i%5],s:5.5,g:360});say(f.alive?`📣 ${f.n} 화이팅!`:`📣 ${f.n} 선수에게 응원!`,1)}
   function reset(){aCheerIdx=-1;st.sel=[];st.fighters=[];st.t=0;st.evT=1.4;st.won=null;st.overtime=0;st.isOT=false;st.finT=0;st.cmq=[];st.cmT=0;st.shown=[];st.log=[];st.last={};st.evn=0;st.lastChance=0;st.cheerBoost=0;pT=[];cam.x=600;cam.y=490;cam.z=.85;try{$('act').textContent=''}catch(e){}}
   function startRoulette(){reset();go('A_ROULETTE');st.sel=CHARS.slice().sort(()=>R()-.5).slice(0,5);$('art').textContent='전투원 추첨 중...';const cd=$('acd');cd.innerHTML=[0,1,2,3,4].map(i=>`<div class="rc sp" id="arc${i}"><i>?</i><div class="nm">???</div><small>&nbsp;</small></div>`).join('');const stop=[1000,1550,2100,2650,3200];const fill=(i,p,lk)=>{const e=$('arc'+i);e.className='rc'+(lk?' lk':' sp');e.innerHTML=`<i style="background:${p.c}">${lk?i+1:'?'}</i><div class="nm">${p.n}</div><small>${lk?`${p.w}<br>${p.ab}`:'&nbsp;'}</small>`};[0,1,2,3,4].forEach(i=>{let d=45,el=0,lp=-1;const step=()=>{if(el>=stop[i]){fill(i,st.sel[i],1);sfx(i===4?'big':'lock');if(i===4){flash=.8;shk=6;after(600,()=>{go('A_CONFIRM');$('art').textContent='전투원 결정 완료!'})}return}let k;do k=CHARS.length*R()|0;while(k===lp);lp=k;fill(i,CHARS[k]);sfx('tick');el+=d;d*=1.13;after(d,step)};after(i*140,step)})}
@@ -622,7 +622,7 @@ const N_s = (() => {
   ];
   
   function tryEvent() { const A = alive(); if (A.length < 2) return; const valid = EV.filter(e => (st.t - (st.last[e.n] ?? -99) >= 3.5) && e.c()); if (!valid.length) return; let r = R() * valid.reduce((a, e) => a + e.w, 0); for (const e of valid) { r -= e.w; if (r <= 0) { const m = e.r(); if (m) { say(m, 2); st.log.push({ t: st.t, tx: m }); } st.last[e.n] = st.t; st.evn++; return; } } }
-  function endBattle(w) { if (st.won) return; st.won = w; go('N_FINISH'); st.finT = 0; sfx('fin'); setTimeout(() => sfx('fan'), 500); say(`🏆 GAME SET! 최후의 팽이는 ${w.n}!`, 3); flash = 1; shk = 12; for (let i = 0; i < 120; i++) { const a = rr(0, Math.PI * 2), sp = rr(80, 340); pT.push({ x: w.x, y: w.y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, l: 2.5, m: 2.5, c: ['#ff2a85', '#00e5ff', '#ffd75e', '#fff'][i % 4], s: 6, g: 0 }); } }
+  function endBattle(w) { if (st.won) return; st.won = w; recordArenaHall(st,'neon'); go('N_FINISH'); st.finT = 0; sfx('fin'); setTimeout(() => sfx('fan'), 500); say(`🏆 GAME SET! 최후의 팽이는 ${w.n}!`, 3); flash = 1; shk = 12; for (let i = 0; i < 120; i++) { const a = rr(0, Math.PI * 2), sp = rr(80, 340); pT.push({ x: w.x, y: w.y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, l: 2.5, m: 2.5, c: ['#ff2a85', '#00e5ff', '#ffd75e', '#fff'][i % 4], s: 6, g: 0 }); } }
   function reset() { nCheerIdx=-1; st.sel = []; st.tops = []; st.t = 0; st.won = null; st.evT = 1.2; st.phase = 0; st.finT = 0; st.isOT = false; st.overtime = 0; st.lastChance = 0; st.cmq = []; st.cmT = 0; st.shown = []; st.log = []; st.last = {}; st.evn = 0; pT = []; cam.x = ACX; cam.y = ACY; cam.z = Math.min(W / (ARENA_R * 2 + 100), CH * .85 / (ARENA_R * 2 + 100)); const el = $('nct'); if (el) el.textContent = ''; }
   function startRoulette() { reset(); go('N_ROULETTE'); st.sel = NCH.slice().sort(() => R() - .5).slice(0, 5); $('nrt').textContent = '팽이 추첨 중...'; const cd = $('ncd'); cd.innerHTML = [0,1,2,3,4].map(i => `<div class="rc sp" id="nrc${i}"><i>?</i><div class="nm">???</div><small>&nbsp;</small></div>`).join(''); const stops = [1000, 1550, 2100, 2650, 3200]; const fill = (i, p, lk) => { const e = $('nrc' + i); if (!e || !p) return; const c = safeColor(p.c); e.className = 'rc' + (lk ? ' lk' : ' sp'); e.innerHTML = `<i style="background:${c}">${lk ? i+1 : '?'}</i><div class="nm">${p.n||'???'}</div><small>${lk ? `질량 ${p.mass||1}<br>${p.ab||''}` : '&nbsp;'}</small>`; }; [0,1,2,3,4].forEach(i => { let d = 45, el = 0, lp = -1; const step = () => { if (el >= stops[i]) { fill(i, st.sel[i], 1); sfx(i === 4 ? 'big' : 'lock'); if (i === 4) { flash = .8; shk = 6; after(600, () => { go('N_CONFIRM'); $('nrt').textContent = '팽이 결정 완료!'; }); } return; } let k; do k = NCH.length * R() | 0; while (k === lp); lp = k; fill(i, NCH[k]); sfx('tick'); el += d; d *= 1.13; after(d, step); }; after(i * 140, step); }); }
   function startReady() { const saved = st.sel.slice(); go('N_READY'); reset(); st.sel = saved; const sp5 = [[ACX, ACY - 300], [ACX + 280, ACY - 100], [ACX - 280, ACY - 100], [ACX + 200, ACY + 220], [ACX - 200, ACY + 220]]; const spawns = st.sel.length == 2 ? [sp5[1], sp5[2]] : sp5; st.tops = st.sel.map((ch, i) => { const base = ch || { n: '???', c: '#ffffff', mass: 1, drain: 2.5, spd: 1, ab: '' }; const col = safeColor(base.c); const a = Math.atan2(ACY - spawns[i][1], ACX - spawns[i][0]); return { ...base, c: col, x: spawns[i][0], y: spawns[i][1], vx: Math.cos(a + rr(-0.5, 0.5)) * 200, vy: Math.sin(a + rr(-0.5, 0.5)) * 200, angle: R() * 6, rpm: 300, maxRpm: 300, alive: true, kills: 0, damageDealt: 0, hitFlash: 0, eff: {}, deathT: 0, trail: [], massBoost: null }; }); let t = 0; [['READY...', 900], ['3', 560], ['2', 560], ['1', 560]].forEach(([x, d]) => { after(t, () => { $('ncnt').innerHTML = '<span>' + x + '</span>'; sfx(x[0] === 'R' ? 'lock' : 'beep'); }); t += d; }); after(t, () => { go('N_BATTLE'); $('go').classList.remove('on'); void $('go').offsetWidth; $('go').classList.add('on'); sfx('gun'); shk = 10; say("GO! 5개 팽이 아레나 입장!", 3); }); }
@@ -1204,7 +1204,50 @@ ov(`<div class="tnh">🎾 TENNIS</div><div class="tag">${sx} 단식 · ${SUN[TX.
 function ready(){if(TX.prediction)TX.prediction.locked=true;go('T_READY');MODE='tennis';setM('d',126,.3);TX.st=mk(TX.pl[0],TX.pl[1],TX.surf);resetView();hud();say('코트 위에 선수들이 입장합니다!');let t=0;[['READY...',800],['3',500],['2',500],['1',500]].forEach(([x,d],i)=>{after(t,()=>{ov(`<div class="cnt3">${x}</div>`);sfx(i?'beep':'lock')});t+=d});after(t,begin)}
 function begin(){go('T_MATCH');MODE='tennis';$('oTX').innerHTML='';setM('g',140,.55);sfx('gun');shk=6;say('경기 시작! 3판 2선승제');TX.gap=.4}
 TX.restart=ready;TX.start=start;
-function showHall(){const r=rec(),g=r.g||{},players=Object.entries(r).filter(([k,v])=>k!=='g'&&v&&typeof v==='object').sort((a,b)=>(b[1].w||0)-(a[1].w||0)||(b[1].b||0)-(a[1].b||0)).slice(0,10);go('T_RESULT');ov(`<div class="tnh">🏆 명예의 전당</div><div class="tag">🎾 테니스 기록</div><div class="tag">이 브라우저에 저장된 누적 기록 · 기기 간 자동 공유는 되지 않아요.</div><div class="gc wide"><h4>🌟 역대 선수 TOP 10</h4>${players.length?`<ol class="rl">${players.map(([n,v],i)=>`<li><b>${i+1}위 ${n}</b><small>${v.w||0}승 ${v.l||0}패 · 최다 연승 ${v.b||0}</small></li>`).join('')}</ol>`:'<p class="sm">아직 기록이 없어요. 테니스 경기를 플레이해 보세요!</p>'}</div><div class="gr"><div class="gc"><h4>🎾 통산 예측 승자 적중</h4><b>${g.predHit||0} / ${g.predTotal||0}</b></div><div class="gc"><h4>🎯 정확한 세트 스코어</h4><b>${g.predExact||0}회</b></div><div class="gc"><h4>⚡ 최다 에이스</h4><b>${g.aces||0}개</b></div><div class="gc"><h4>🔥 최장 랠리</h4><b>${g.rally||0}구</b></div><div class="gc"><h4>⏱️ 최단 경기</h4><b>${g.fast&&g.fast!==999?g.fast+'초':'기록 없음'}</b></div></div><button class="btn" type="button" data-tx="home">닫기</button>`)}
+/* ===== 통합 명예의 전당 기록 ===== */
+const HALL_KEY='tmHallV1';
+function hallData(){try{return JSON.parse(localStorage.getItem(HALL_KEY)||'{}')}catch(e){return {}}}
+function hallSave(d){try{localStorage.setItem(HALL_KEY,JSON.stringify(d))}catch(e){console.warn('명예의 전당 저장 실패',e)}}
+function hallRecord(game,rows){
+ const d=hallData();d[game]=d[game]||{};
+ rows.forEach(x=>{if(!x||!x.name)return;const n=String(x.name).slice(0,60),p=Math.max(0,Math.round(Number(x.points)||0)),r=d[game][n]||{games:0,wins:0,points:0,best:0,bestPlace:99};
+ r.games++;r.points+=p;r.best=Math.max(r.best,p);r.bestPlace=Math.min(r.bestPlace,Math.max(1,x.place||99));if(x.win)r.wins++;
+ d[game][n]=r});
+ hallSave(d);
+}
+function hallRows(game){
+ const d=hallData()[game]||{};
+ return Object.entries(d).map(([name,r])=>({name,...r})).sort((a,b)=>b.best-a.best||b.points-a.points||b.wins-a.wins).slice(0,10);
+}
+function recordHorseHall(){
+ if(!G||!G.won||G.hallSaved)return;G.hallSaved=1;
+ const order=HS.slice().sort((a,b)=>(b.fin?1:0)-(a.fin?1:0)||(a.fin&&b.fin?a.ft-b.ft:b.pos-a.pos));
+ hallRecord('horse',order.map((h,i)=>({name:h.name,place:i+1,win:h===G.won,points:Math.max(50,1100-i*120+Math.round((h.pos||0)/10))})));
+}
+function recordArenaHall(st,game){
+ if(!st||!st.won||st.hallSaved)return;st.hallSaved=1;
+ const list=(game==='pro'?st.fighters:st.tops)||[];
+ const order=list.slice().sort((a,b)=>(b.kills||0)-(a.kills||0)||(b.damageDealt||0)-(a.damageDealt||0)||Number(b.alive)-Number(a.alive));
+ hallRecord(game,order.map((p,i)=>({name:p.n,place:i+1,win:p===st.won,points:Math.round((p.kills||0)*250+(p.damageDealt||0)*10+(p===st.won?500:0)+(p.alive?150:0))})));
+}
+function showHall(){
+ const names=[['horse','🏇 경마'],['pro','⚔️ 프로게이머 경기'],['neon','🌀 네온 팽이'],['tennis','🎾 테니스']];
+ const d=hallData(),r=rec(),g=r.g||{};
+ const overall=[];
+ names.forEach(([key,label])=>Object.entries(d[key]||{}).forEach(([name,v])=>overall.push({name,game:label,...v})));
+ overall.sort((a,b)=>b.best-a.best||b.points-a.points);
+ const gameHtml=names.map(([key,label])=>{
+  const rows=hallRows(key);
+  return `<div class="gc wide"><h4>${label} · 최고 점수 TOP 10</h4>${rows.length?`<ol class="rl">${rows.map((p,i)=>`<li><b>${i+1}위 ${p.name}</b><small>최고 ${p.best.toLocaleString()}점 · 누적 ${p.points.toLocaleString()}점 · ${p.wins}승 / ${p.games}경기</small></li>`).join('')}</ol>`:'<p class="sm">아직 기록이 없어요. 이 종목을 플레이해 보세요!</p>'}</div>`;
+ }).join('');
+ const top=overall.slice(0,10);
+ go('T_RESULT');
+ ov(`<div class="tnh">🏆 명예의 전당</div><div class="tag">이 브라우저에 저장된 네 종목 누적 기록 · 기기 간 자동 공유는 되지 않아요.</div>
+ <div class="gc wide"><h4>👑 전체 게임 최고 점수 TOP 10</h4>${top.length?`<ol class="rl">${top.map((p,i)=>`<li><b>${i+1}위 ${p.name}</b><small>${p.game} · 최고 ${p.best.toLocaleString()}점 · 누적 ${p.points.toLocaleString()}점</small></li>`).join('')}</ol>`:'<p class="sm">아직 기록이 없어요. 게임을 플레이하면 여기에 등록됩니다!</p>'}</div>
+ <div class="gr">${gameHtml}</div>
+ <div class="gc wide"><h4>🎾 테니스 추가 기록</h4><div class="gr"><div class="gc"><small>예측 승자 적중</small><b>${g.predHit||0} / ${g.predTotal||0}</b></div><div class="gc"><small>정확한 세트 스코어</small><b>${g.predExact||0}회</b></div><div class="gc"><small>최다 에이스</small><b>${g.aces||0}개</b></div><div class="gc"><small>최장 랠리</small><b>${g.rally||0}구</b></div><div class="gc"><small>최단 경기</small><b>${g.fast&&g.fast!==999?g.fast+'초':'기록 없음'}</b></div></div></div>
+ <button class="btn" type="button" data-tx="home">닫기</button>`);
+}
 /* ---------- 진행 ---------- */
 const say=t=>{const e=$('txc');if(e)e.textContent=t},pt4=['0','15','30','40'];
 function hud(){const st=TX.st,P=st.P,row=i=>`<div class="tr"><b>${FL[P[i].cc]} ${P[i].name}</b><span class="rw">${'●'.repeat(st.rw[i])}${'○'.repeat(2-st.rw[i])}</span><span class="gm">${st.g[i]}</span><span class="pt">${st.pt[i]>3?'게임':pt4[st.pt[i]]}</span><i>${st.srv===i?'🎾':''}</i><em style="width:${st.stam[i]}%;background:${i?C1:C0}"></em></div>`;
@@ -1243,7 +1286,7 @@ if(a.t>=a.dur){const i=a.info;TX.anim=null;hud();TX.pop={t:0,txt:i.type=='ace'?'
  sfx(i.w===0?'lock':'beep');TX.gap=i.round?1.1:i.game?.45:.15;if(i.done)finish()}}
 function finish(){const st=TX.st;TX.win=st.win;if(TN&&TN.multi&&TN.sp==='tennis')return;go('T_FINISH');MODE='tennis';TX.fin=3.4;flash=1;shk=7;sfx('fan');after(500,()=>sfx('fin'));say('🏆 '+st.P[st.win].name+' 우승!');
 for(let i=0;i<90;i++)TX.cf.push({x:rr(0,W),y:rr(-CH*.5,0),vx:rr(-40,40),vy:rr(60,200),c:['#ffd75e','#e63946','#fff','#4fc3f7','#7dff9b'][i%5]})}
-function result(){const st=TX.st,w=st.win,l=1-w,P=st.P,S0=st.S,R0=rec();R0.g=R0.g||{aces:0,rally:0,fast:999};
+function result(){if(TX.resultSaved)return;TX.resultSaved=1;const st=TX.st,w=st.win,l=1-w,P=st.P,S0=st.S,R0=rec();R0.g=R0.g||{aces:0,rally:0,fast:999};
 const nw=R0[P[w].name]=R0[P[w].name]||{w:0,l:0,s:0,b:0},nl=R0[P[l].name]=R0[P[l].name]||{w:0,l:0,s:0,b:0},fav=TX.prob[0]>=TX.prob[1]?0:1,upset=w!==fav,t=Math.round(TX.time);
 if(!TX.saved){TX.saved=1;nw.w++;nw.s++;nw.b=Math.max(nw.b,nw.s);nl.l++;nl.s=0}
 const pred=TX.prediction||{},actualScore=`${st.rw[w]}-${st.rw[l]}`,predHit=pred.locked&&pred.winner===w,predExact=predHit&&pred.score===actualScore;R0.g.predTotal=(R0.g.predTotal||0)+(pred.locked&&pred.winner!=null?1:0);R0.g.predHit=(R0.g.predHit||0)+(predHit?1:0);R0.g.predExact=(R0.g.predExact||0)+(predExact?1:0);
