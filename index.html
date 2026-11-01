@@ -280,7 +280,7 @@ kbd{display:inline-block;padding:1px 6px;border:1px solid #8ab6d9;border-radius:
 <button class="mode-btn tennis" id="bT" type="button"><div class="mi">🎾</div><div class="mt">TENNIS</div><div class="md">3판 2선승제 · 테니스 스타 배틀!</div></button>
 <button class="mode-btn wc" id="bW" type="button"><div class="mi">🏆</div><div class="mt">월드 챔피언십</div><div class="md">네 가지 종목 중 하나를 선택하고 세계 챔피언에 도전하세요!</div></button>
 <button class="mode-btn random" id="bR" type="button"><div class="mi">🎲</div><div class="mt">랜덤 모드!</div><div class="md">네 게임 중 하나를 무작위로!</div></button>
-</div><button class="btn s guide-open" id="bHelp" type="button">📘 게임 설명 · 플레이 가이드</button></div></div>
+</div><button class="btn s guide-open" id="bHelp" type="button">📘 게임 설명 · 플레이 가이드</button><button class="btn s" id="bHall" type="button">🏅 테니스 명예의 전당</button></div></div>
 <div class="ov guide-overlay" id="oHelp" aria-label="THUNDER MULTI 게임 설명">
  <div class="wrap guide-wrap">
   <div class="guide-head"><div class="guide-kicker">THUNDER MULTI · PLAYER'S GUIDE</div><h2>📘 게임 설명서</h2><p>네 가지 종목, 랜덤 모드, 그리고 세계 챔피언을 향한 도전!</p></div>
@@ -1199,11 +1199,12 @@ function pcard(i,hide){const p=TX.pl[i],r=rec()[p.name]||{w:0,l:0};if(hide)retur
 return`<div class="tpc" style="--c:${i?C1:C0}"><div class="fl">${FL[p.cc]}</div><h3>${p.name}</h3><p class="sm">${p.cc} · ${p.age}세 · 세계 ${p.rank}위</p><p class="sm">${STL[p.sty]} · 주력 ${SUN[p.fav]}</p><p class="cd ${p.cond>=0?'up':'dn'}">컨디션 ${p.cond>0?'+':''}${p.cond}</p>${[['서브',p.sv],['포핸드',p.fh],['백핸드',p.bh],['발리',p.vo],['스피드',p.sp],['체력',p.st],['집중력',p.fo],['멘탈',p.me],['경험',p.ex]].map(x=>bar(x[0],x[1])).join('')}<p class="sm">전적 ${r.w}승 ${r.l}패</p><div class="odd">배당 <b>${TX.odds[i].toFixed(2)}</b>배 · 승률 ${Math.round(TX.prob[i]*100)}%</div></div>`}
 function start(){TX.on=1;aud();go('T_ROULETTE');MODE='tennis';setM('r',150);newMatch();ov(`<div class="tnh">🎾 TENNIS</div><div class="tag">선수 추첨 중…</div><div class="tcs">${pcard(0,1)}<div class="vsx">VS</div>${pcard(1,1)}</div>`);
 let k=0;const spin=()=>{if(k++<14){const a=PL[R()*16|0],b=PL[R()*16|0];document.querySelectorAll('#oTX .tpc h3').forEach((h,i)=>h.textContent=(i?b:a)[0]);sfx('tick');after(60+k*14,spin)}else{sfx('big');flash=.7;confirmUI()}};after(200,spin)}
-function confirmUI(){go('T_CONFIRM');MODE='tennis';const sx=TX.sex=='M'?'남자':'여자';
-ov(`<div class="tnh">🎾 TENNIS</div><div class="tag">${sx} 단식 · ${SUN[TX.surf]} · 3판 2선승제 · 노애드</div><div class="tcs">${pcard(0)}<div class="vsx">VS</div>${pcard(1)}</div><div class="tbt"><button class="btn" type="button" data-tx="go">🎾 경기 시작!</button><button class="btn s QRB" type="button" onclick="TM_openHost('single')">📱 친구 예측 QR</button><div class="tmFriends"></div><button class="btn s" type="button" data-tx="re">🔄 선수 다시 뽑기</button><button class="btn s" type="button" data-tx="home">타이틀로</button></div>`);if(window.TM_paint)window.TM_paint()}
-function ready(){go('T_READY');MODE='tennis';setM('d',126,.3);TX.st=mk(TX.pl[0],TX.pl[1],TX.surf);resetView();hud();say('코트 위에 선수들이 입장합니다!');let t=0;[['READY...',800],['3',500],['2',500],['1',500]].forEach(([x,d],i)=>{after(t,()=>{ov(`<div class="cnt3">${x}</div>`);sfx(i?'beep':'lock')});t+=d});after(t,begin)}
+function confirmUI(){go('T_CONFIRM');MODE='tennis';const sx=TX.sex=='M'?'남자':'여자';TX.prediction={winner:null,score:null,locked:false};
+ov(`<div class="tnh">🎾 TENNIS</div><div class="tag">${sx} 단식 · ${SUN[TX.surf]} · 3판 2선승제 · 노애드</div><div class="tcs">${pcard(0)}<div class="vsx">VS</div>${pcard(1)}</div><div class="gc wide" style="margin:12px auto;max-width:900px"><h4>🎯 경기 결과 예측</h4><p class="sm">경기 시작 버튼을 누르면 예측이 마감돼요. 승자와 세트 스코어를 골라 보세요.</p><div class="vs">${[0,1].flatMap(i=>['2-0','2-1'].map(sc=>`<button class="pc ${TX.prediction.winner===i&&TX.prediction.score===sc?'sel':''}" type="button" data-tx="pred" data-v="${i}|${sc}">${TX.pl[i].name} ${sc}</button>`)).join('')}</div></div><div class="tbt"><button class="btn" type="button" data-tx="go">🎾 경기 시작! · 예측 마감</button><button class="btn s QRB" type="button" onclick="TM_openHost('single')">📱 친구 예측 QR</button><div class="tmFriends"></div><button class="btn s" type="button" data-tx="re">🔄 선수 다시 뽑기</button><button class="btn s" type="button" data-tx="home">타이틀로</button></div>`);if(window.TM_paint)window.TM_paint()}
+function ready(){if(TX.prediction)TX.prediction.locked=true;go('T_READY');MODE='tennis';setM('d',126,.3);TX.st=mk(TX.pl[0],TX.pl[1],TX.surf);resetView();hud();say('코트 위에 선수들이 입장합니다!');let t=0;[['READY...',800],['3',500],['2',500],['1',500]].forEach(([x,d],i)=>{after(t,()=>{ov(`<div class="cnt3">${x}</div>`);sfx(i?'beep':'lock')});t+=d});after(t,begin)}
 function begin(){go('T_MATCH');MODE='tennis';$('oTX').innerHTML='';setM('g',140,.55);sfx('gun');shk=6;say('경기 시작! 3판 2선승제');TX.gap=.4}
 TX.restart=ready;TX.start=start;
+function showHall(){const r=rec(),g=r.g||{},players=Object.entries(r).filter(([k,v])=>k!=='g'&&v&&typeof v==='object').sort((a,b)=>(b[1].w||0)-(a[1].w||0)||(b[1].b||0)-(a[1].b||0)).slice(0,10);go('T_RESULT');ov(`<div class="tnh">🏅 테니스 명예의 전당</div><div class="tag">이 브라우저에 저장된 누적 기록 · 기기 간 자동 공유는 되지 않아요.</div><div class="gc wide"><h4>🌟 역대 선수 TOP 10</h4>${players.length?`<ol class="rl">${players.map(([n,v],i)=>`<li><b>${i+1}위 ${n}</b><small>${v.w||0}승 ${v.l||0}패 · 최다 연승 ${v.b||0}</small></li>`).join('')}</ol>`:'<p class="sm">아직 기록이 없어요. 테니스 경기를 플레이해 보세요!</p>'}</div><div class="gr"><div class="gc"><h4>🎾 통산 예측 승자 적중</h4><b>${g.predHit||0} / ${g.predTotal||0}</b></div><div class="gc"><h4>🎯 정확한 세트 스코어</h4><b>${g.predExact||0}회</b></div><div class="gc"><h4>⚡ 최다 에이스</h4><b>${g.aces||0}개</b></div><div class="gc"><h4>🔥 최장 랠리</h4><b>${g.rally||0}구</b></div><div class="gc"><h4>⏱️ 최단 경기</h4><b>${g.fast&&g.fast!==999?g.fast+'초':'기록 없음'}</b></div></div><button class="btn" type="button" data-tx="home">닫기</button>`)}
 /* ---------- 진행 ---------- */
 const say=t=>{const e=$('txc');if(e)e.textContent=t},pt4=['0','15','30','40'];
 function hud(){const st=TX.st,P=st.P,row=i=>`<div class="tr"><b>${FL[P[i].cc]} ${P[i].name}</b><span class="rw">${'●'.repeat(st.rw[i])}${'○'.repeat(2-st.rw[i])}</span><span class="gm">${st.g[i]}</span><span class="pt">${st.pt[i]>3?'게임':pt4[st.pt[i]]}</span><i>${st.srv===i?'🎾':''}</i><em style="width:${st.stam[i]}%;background:${i?C1:C0}"></em></div>`;
@@ -1245,12 +1246,13 @@ for(let i=0;i<90;i++)TX.cf.push({x:rr(0,W),y:rr(-CH*.5,0),vx:rr(-40,40),vy:rr(60
 function result(){const st=TX.st,w=st.win,l=1-w,P=st.P,S0=st.S,R0=rec();R0.g=R0.g||{aces:0,rally:0,fast:999};
 const nw=R0[P[w].name]=R0[P[w].name]||{w:0,l:0,s:0,b:0},nl=R0[P[l].name]=R0[P[l].name]||{w:0,l:0,s:0,b:0},fav=TX.prob[0]>=TX.prob[1]?0:1,upset=w!==fav,t=Math.round(TX.time);
 if(!TX.saved){TX.saved=1;nw.w++;nw.s++;nw.b=Math.max(nw.b,nw.s);nl.l++;nl.s=0}
+const pred=TX.prediction||{},actualScore=`${st.rw[w]}-${st.rw[l]}`,predHit=pred.locked&&pred.winner===w,predExact=predHit&&pred.score===actualScore;R0.g.predTotal=(R0.g.predTotal||0)+(pred.locked&&pred.winner!=null?1:0);R0.g.predHit=(R0.g.predHit||0)+(predHit?1:0);R0.g.predExact=(R0.g.predExact||0)+(predExact?1:0);
 const nb=[];if(S0.ace[0]+S0.ace[1]>0&&Math.max(...S0.ace)>R0.g.aces){R0.g.aces=Math.max(...S0.ace);nb.push('최다 에이스 '+R0.g.aces+'개')}if(S0.rally>R0.g.rally){R0.g.rally=S0.rally;nb.push('최장 랠리 '+S0.rally+'구')}if(t<R0.g.fast){R0.g.fast=t;nb.push('최단 경기 '+t+'초')}saveRec(R0);
 go('T_RESULT');MODE='tennis';setM('',0);
 ov(`<div class="card"><h2>🏆 우승!</h2><h3 style="color:${w?C1:C0}">${FL[P[w].cc]} ${P[w].name}</h3><p>${st.rw[w]}:${st.rw[l]}로 승리했습니다!${upset?' <b style="color:#ffd75e">🔥 대이변! (배당 '+TX.odds[w].toFixed(2)+'배)</b>':''}</p>
 <ol class="rl" style="list-style:none">${st.rounds.map((r,i)=>`<li style="--c:${r.w?C1:C0}"><b>${i+1}판</b> ${r.g[0]} : ${r.g[1]} <small>${P[r.w].name} 승</small></li>`).join('')}</ol>
 <p class="sm">에이스 ${S0.ace[0]}/${S0.ace[1]} · 더블폴트 ${S0.df[0]}/${S0.df[1]} · 위너 ${S0.win[0]}/${S0.win[1]} · 최장 랠리 ${S0.rally}구 · 경기 시간 ${t}초</p>
-<p class="sm">누적 전적 ${P[w].name} ${nw.w}승 ${nw.l}패(현재 ${nw.s}연승) · ${P[l].name} ${nl.w}승 ${nl.l}패</p>${nb.length?'<p class="sm">🏅 신기록! '+nb.join(' · ')+'</p>':''}
+<p class="sm">누적 전적 ${P[w].name} ${nw.w}승 ${nw.l}패(현재 ${nw.s}연승) · ${P[l].name} ${nl.w}승 ${nl.l}패</p><p class="sm">🎯 내 예측: ${pred.locked&&pred.winner!=null?`${TX.pl[pred.winner].name} ${pred.score} · ${predExact?'정확히 적중!':predHit?'승자는 적중 · 스코어는 빗나감':'빗나감'}`:'참여하지 않음'}</p>${nb.length?'<p class="sm">🏅 신기록! '+nb.join(' · ')+'</p>':''}
 <div class="b2"><button class="btn" type="button" data-tx="next">다음 게임!</button><button class="btn s" type="button" data-tx="home">타이틀로 돌아가기</button></div></div>`)}
 /* ---------- 그리기 ---------- */
 const FLO=(u,v)=>0;
@@ -1283,9 +1285,10 @@ TX.t0=0;
 TX.frame=dt=>{TX.t0+=dt;const sp=TX.spd;if(S==='T_MATCH'){tick(dt*sp,dt);movePlayers(dt*sp)}else if(S==='T_FINISH'){TX.fin-=dt;if(TX.fin<=0)result()}
 if(flash>0)flash=Math.max(0,flash-dt*1.6);shk*=.9;exc+=((S==='T_MATCH'?.5:S==='T_FINISH'?.9:.15)-exc)*dt*2;if(AC)cg.gain.value=mut?0:exc*vs*.35;draw(dt)};
 /* ---------- 입력 ---------- */
-$('oTX').addEventListener('click',e=>{const b=e.target.closest('[data-tx]');if(!b)return;aud();sfx('click');const a=b.dataset.tx;if(a=='go'&&S==='T_CONFIRM')ready();else if(a=='re'&&S==='T_CONFIRM')start();else if(a=='next'&&S==='T_RESULT')start();else if(a=='home')go('TITLE')});
+$('oTX').addEventListener('click',e=>{const b=e.target.closest('[data-tx]');if(!b)return;aud();sfx('click');const a=b.dataset.tx;if(a==='pred'&&S==='T_CONFIRM'&&TX.prediction&&!TX.prediction.locked){const [winner,score]=b.dataset.v.split('|');TX.prediction.winner=+winner;TX.prediction.score=score;confirmUI()}else if(a=='go'&&S==='T_CONFIRM')ready();else if(a=='re'&&S==='T_CONFIRM')start();else if(a=='next'&&S==='T_RESULT')start();else if(a=='home')go('TITLE')});
 const SPD=[[.5,'🐢 0.5배속'],[1,'▶ 1배속'],[1.5,'⏩ 1.5배속'],[2,'⏩ 2배속']];let si=0;$('txs').onclick=()=>{si=(si+1)%3;TX.spd=SPD[si][0];$('txs').textContent=SPD[si][1]};
 $('bT').onclick=()=>{if(S!=='TITLE')return;sfx('click');start()};
+$('bHall').onclick=()=>{if(S!=='TITLE')return;sfx('click');showHall()};
 })();
 
 
