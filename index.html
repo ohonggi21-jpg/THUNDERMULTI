@@ -237,7 +237,7 @@ body.TENNIS_PREP #sp,body.TENNIS_MATCH #sp,body.TENNIS_RESULT #sp{z-index:26}
 <button class="mode-btn neon" id="bN" type="button"><div class="mi">🌀</div><div class="mt">네온 팽이</div><div class="md">30가지 이벤트! 링아웃 배틀!</div></button>
 <button class="mode-btn wc" id="bW" type="button"><div class="mi">🏆</div><div class="mt">월드 챔피언십</div><div class="md">세 가지 종목 중 하나를 선택하고 세계 챔피언에 도전하세요!</div></button>
 <button class="mode-btn tennis" id="bTennis" type="button"><div class="mi">🎾</div><div class="mt">테니스 경기</div><div class="md">40개 이벤트! 빠른 프로 경기 시뮬레이션!</div></button>
-<button class="mode-btn random" id="bR" type="button"><div class="mi">🎲</div><div class="mt">랜덤 모드!</div><div class="md">세 게임 중 하나를 무작위로!</div></button>
+<button class="mode-btn random" id="bR" type="button"><div class="mi">🎲</div><div class="mt">랜덤 모드!</div><div class="md">5개 모드 중 하나를 무작위로!</div></button>
 </div></div></div>
 <div class="ov" id="oR"><div class="wrap"><div id="rt">출전마 추첨 중...</div><div class="cards" id="cd"></div><button class="btn" id="bC" type="button">확인하고 경주 준비!</button><button class="btn s QRB" type="button" onclick="TM_openHost('single')">📱 친구 예측 QR</button><div class="tmFriends"></div></div></div>
 <div class="ov" id="oAR"><div class="wrap"><div id="art">전투원 추첨 중...</div><div class="cards" id="acd"></div><button class="btn" id="bAC" type="button">전투원 확인!</button><button class="btn s QRB" type="button" onclick="TM_openHost('single')">📱 친구 예측 QR</button><div class="tmFriends"></div></div></div>
@@ -771,7 +771,7 @@ $('cb').onclick=()=>cheer();
 document.addEventListener('keydown',e=>{if(e.code==='Space'&&(S==='RACING'||S==='A_BATTLE'||S==='N_BATTLE')&&e.target.tagName!=='INPUT'){e.preventDefault();cheer()}});
 document.getElementById('errBox').addEventListener('click',function(){this.style.display='none';this.textContent=''});window.addEventListener('error',e=>{if(!e.message&&e.target&&e.target!==window)return;const box=$('errBox');box.style.display='block';box.textContent+=`⚠️ ${e.message||e}\n @ ${(e.filename||'').split('/').pop()}:${e.lineno||''}:${e.colno||''} ${e.error&&e.error.stack?String(e.error.stack).replace(/\s+/g,' ').slice(0,260):''}\n`},true);
 window.addEventListener('unhandledrejection',e=>{const box=$('errBox');box.style.display='block';box.textContent+=`⚠️ ${e.reason&&e.reason.message||e.reason}\n`});
-const TG=["3가지 게임, 한 번에!","🎲 랜덤 모드로 무작위 도전!","경마·아레나·팽이, 최후의 승자는?","응원과 함께 승리를 기원하세요!"];let ti=0;$('tg').textContent=TG[0];setInterval(()=>{if(S==='TITLE')$('tg').textContent=TG[++ti%4]},3200);
+const TG=["4개 종목 + 월드 챔피언십!","🎲 랜덤 모드로 무작위 도전!","경마·아레나·팽이·테니스, 최후의 승자는?","응원과 함께 승리를 기원하세요!"];let ti=0;$('tg').textContent=TG[0];setInterval(()=>{if(S==='TITLE')$('tg').textContent=TG[++ti%4]},3200);
 rs(); setM('t',108); requestAnimationFrame(loop);
 
 /* ===== WORLD CHAMPIONSHIP + PAUSE (추가 모듈) ===== */
