@@ -190,6 +190,53 @@ h1{font:900 clamp(38px,10vw,110px)/.95 Impact,"Arial Black",sans-serif;letter-sp
 .mq.dn em{display:block;animation:tnp .6s both}.mq.sm em{font-size:9px;padding:2px 4px}.mq.dn.sm em{white-space:nowrap}
 #mcd{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;font:900 clamp(60px,16vw,180px) Impact,sans-serif;color:#fff;text-shadow:0 0 30px #ffd75e,0 6px 0 #7a1020}#mcd span{display:inline-block;animation:tnp .55s both}#mcd span.last{animation:tnLast .56s forwards}@keyframes tnLast{0%{transform:scale(.3);opacity:0}22%{transform:scale(1.08);opacity:1}72%{transform:scale(1);opacity:1}100%{transform:scale(1.45);opacity:0}}
 #oC{z-index:30;background:#000c}
+ 
+/* THUNDER MULTI in-game guide */
+.guide-open{margin-top:clamp(2px,1vh,10px);min-height:42px;border-color:#8ad7ff;color:#eaf8ff;background:linear-gradient(135deg,#173b62,#10253f);font-size:clamp(13px,2.2vw,17px);box-shadow:0 4px 0 #071a30,0 8px 18px #0009}
+.guide-overlay{z-index:20!important;background:radial-gradient(ellipse at 50% 0%,#17395bF2,#020711F7 68%)!important}
+.guide-wrap{justify-content:flex-start!important;gap:14px!important;padding-top:max(22px,env(safe-area-inset-top))!important;padding-bottom:max(24px,env(safe-area-inset-bottom))!important}
+.guide-head{width:100%;max-width:980px;padding:14px 12px 4px;text-align:center}
+.guide-kicker{font-size:11px;font-weight:900;letter-spacing:.24em;color:#7bdcff}
+.guide-head h2{margin:6px 0;font-size:clamp(28px,5vw,48px);font-weight:1000;color:#fff;text-shadow:0 3px 18px #28a8ff77}
+.guide-head>p{color:#c7d9ed;font-size:clamp(12px,2vw,16px)}
+.guide-content{width:100%;max-width:980px;display:grid;gap:12px;text-align:left}
+.guide-content section{padding:clamp(14px,2.5vw,22px);border:1px solid #8acbff35;border-radius:18px;background:linear-gradient(145deg,#0b2035ed,#07111ff2);box-shadow:0 9px 24px #0005}
+.guide-no{font-size:10px;font-weight:1000;letter-spacing:.18em;color:#76d8ff}
+.guide-content h3{font-size:clamp(19px,3vw,25px);margin:5px 0 10px;color:#fff}
+.guide-content p{font-size:clamp(12px,1.8vw,15px);line-height:1.65;color:#c9d7e8}
+.guide-content h4{font-size:16px;margin:0 0 5px;color:#fff}
+.guide-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.guide-card{display:flex;gap:11px;align-items:flex-start;min-width:0;padding:13px;border-radius:13px;background:#ffffff09;border:1px solid #ffffff20}
+.guide-card.horse{border-color:#e2b84c66}.guide-card.arena{border-color:#4a9eff77}.guide-card.neon{border-color:#ff2a8577}.guide-card.tennis{border-color:#8af0c477}
+.guide-icon{font-size:30px;line-height:1.2;min-width:34px;text-align:center}
+.guide-card p{font-size:12px;line-height:1.55}
+.guide-card small{display:block;margin-top:7px;color:#ffe18a;font-size:11px;font-weight:800;line-height:1.4}
+.guide-mini{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:10px;padding:12px 14px;border-radius:12px;background:#ffd75e12;border:1px solid #ffd75e44;font-size:12px}
+.guide-mini b{color:#ffd75e}.guide-mini span{color:#d9e4f2}
+.guide-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.guide-controls>div{padding:11px 12px;border-radius:12px;background:#ffffff09}
+.guide-controls b{display:block;margin-bottom:4px;color:#83dcff;font-size:13px}
+.guide-controls p{font-size:12px}
+kbd{display:inline-block;padding:1px 6px;border:1px solid #8ab6d9;border-radius:5px;background:#102d45;color:#fff;font:700 11px inherit}
+.guide-note{margin-top:10px!important;padding:10px 12px;border-left:3px solid #ffd75e;background:#ffd75e0c;border-radius:0 9px 9px 0;color:#ffe8a8!important;font-size:12px!important}
+.guide-bracket{display:grid;grid-template-columns:1fr 24px 1fr 24px .8fr;gap:5px;align-items:center;margin:14px 0;padding:10px;border-radius:14px;background:#ffffff08}
+.guide-round{display:grid;gap:6px;min-width:0}
+.guide-round b{font-size:12px;color:#ffd75e;text-align:center;margin-bottom:2px}
+.guide-round span{padding:8px 4px;text-align:center;border:1px solid #75bce955;border-radius:8px;background:#142d45;font-size:11px;color:#e8f5ff;font-weight:800}
+.guide-round.champion span{background:linear-gradient(135deg,#654b0a,#302407);border-color:#ffd75e;color:#fff0b1}
+.guide-arrow{text-align:center;color:#7bdcff;font-size:18px;font-weight:900}
+.guide-tournament{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.guide-tournament>div{padding:10px;border-radius:10px;background:#ffffff09}
+.guide-tournament b{font-size:12px;color:#e4f4ff}
+.guide-tournament p{font-size:11px;margin-top:3px}
+.guide-tips{list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.guide-tips li{display:grid;gap:4px;padding:11px;border-radius:11px;background:#ffffff09}
+.guide-tips b{font-size:13px;color:#ffd75e}.guide-tips span{font-size:12px;line-height:1.5;color:#c9d7e8}
+.guide-footer{width:100%;max-width:980px;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:4px 0 12px}
+.guide-footer p{font-size:13px;color:#c9d7e8;text-align:left}
+.guide-footer .btn{flex-shrink:0}
+@media(max-width:620px){.guide-cards,.guide-controls,.guide-tips{grid-template-columns:1fr}.guide-tournament{grid-template-columns:repeat(2,minmax(0,1fr))}.guide-bracket{grid-template-columns:1fr 15px 1fr 15px .8fr}.guide-round span{font-size:9px;padding:7px 2px}.guide-round b{font-size:10px}.guide-footer{flex-direction:column}.guide-footer .btn{width:min(100%,360px)}}
+@media(orientation:landscape) and (max-height:700px){.guide-wrap{gap:8px!important}.guide-head{padding:3px 8px}.guide-head h2{font-size:25px}.guide-content{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.guide-content section{padding:11px}.guide-content h3{font-size:17px}.guide-content p{font-size:11px}.guide-card{padding:9px}.guide-card p{font-size:10px}.guide-card small{font-size:9px}.guide-controls p{font-size:10px}.guide-note{font-size:10px!important}.guide-footer{padding-bottom:4px}}
 </style></head><body class="TITLE">
 <canvas id="cv"></canvas>
 <div id="hud"><div id="tb"><b id="tm">0.0초</b><b id="ld">-</b><b id="rm">-</b></div><div id="bar"></div><div id="rk"></div></div>
@@ -210,7 +257,55 @@ h1{font:900 clamp(38px,10vw,110px)/.95 Impact,"Arial Black",sans-serif;letter-sp
 <button class="mode-btn tennis" id="bT" type="button"><div class="mi">🎾</div><div class="mt">TENNIS</div><div class="md">3판 2선승제 · 테니스 스타 배틀!</div></button>
 <button class="mode-btn wc" id="bW" type="button"><div class="mi">🏆</div><div class="mt">월드 챔피언십</div><div class="md">네 가지 종목 중 하나를 선택하고 세계 챔피언에 도전하세요!</div></button>
 <button class="mode-btn random" id="bR" type="button"><div class="mi">🎲</div><div class="mt">랜덤 모드!</div><div class="md">네 게임 중 하나를 무작위로!</div></button>
-</div></div></div>
+</div><button class="btn s guide-open" id="bHelp" type="button">📘 게임 설명 · 플레이 가이드</button></div></div>
+<div class="ov guide-overlay" id="oHelp" aria-label="THUNDER MULTI 게임 설명">
+ <div class="wrap guide-wrap">
+  <div class="guide-head"><div class="guide-kicker">THUNDER MULTI · PLAYER'S GUIDE</div><h2>📘 게임 설명서</h2><p>네 가지 종목, 랜덤 모드, 그리고 세계 챔피언을 향한 도전!</p></div>
+  <div class="guide-content">
+   <section class="guide-intro"><span class="guide-no">01 · ABOUT</span><h3>⚡ THUNDER MULTI는?</h3><p>여러 종목의 선수와 캐릭터가 펼치는 경기를 관전하고, 마음에 드는 참가자를 응원하며 승자를 지켜보는 멀티 스포츠 게임입니다.</p><p>경기 중에는 상황별 이벤트와 실시간 해설이 등장하고, 경기가 끝나면 순위와 주요 기록을 확인할 수 있어요.</p></section>
+   <section><span class="guide-no">02 · GAME MODES</span><h3>🎮 게임 모드</h3>
+    <div class="guide-cards">
+     <article class="guide-card horse"><div class="guide-icon">🏇</div><div><h4>경마 경기</h4><p>3마리의 경주마가 결승선을 향해 달립니다. 가속, 컨디션 변화, 실수, 날씨와 코스 상황 등 다양한 이벤트가 승부를 뒤흔들어요.</p><small>핵심: 결승선에 가장 먼저 도착한 경주마가 우승!</small></div></article>
+     <article class="guide-card arena"><div class="guide-icon">⚔️</div><div><h4>프로게이머</h4><p>5명의 프로게이머 캐릭터가 각자의 무기와 전투 스타일로 맞붙는 배틀로얄입니다. 탐색부터 교전, 생존 경쟁, 최후의 결전까지 전투가 진행돼요.</p><small>핵심: 마지막까지 생존한 전투원이 우승!</small></div></article>
+     <article class="guide-card neon"><div class="guide-icon">🌀</div><div><h4>네온 팽이</h4><p>5개의 개성 있는 팽이가 링 안에서 충돌합니다. 공격과 회전력 변화, 다양한 이벤트를 버티며 최후의 승자를 가려요.</p><small>핵심: 링아웃되지 않고 최후까지 남는 팽이가 우승!</small></div></article>
+     <article class="guide-card tennis"><div class="guide-icon">🎾</div><div><h4>테니스</h4><p>선수가 무작위로 매칭되는 단식 경기입니다. 코트 위 랠리와 득점을 지켜보고, 먼저 두 세트를 따내는 선수가 승리해요.</p><small>핵심: 3판 2선승제 · 노애드 규칙</small></div></article>
+    </div>
+    <div class="guide-mini"><b>🎲 랜덤 모드</b><span>경마, 프로게이머, 네온 팽이, 테니스 및 월드 챔피언십 중 하나가 무작위로 선택됩니다.</span></div>
+   </section>
+   <section><span class="guide-no">03 · HOW TO PLAY</span><h3>🕹️ 조작과 관전 방법</h3>
+    <div class="guide-controls">
+     <div><b>📣 응원 버튼</b><p>경기 화면의 응원 버튼을 누르거나 키보드 <kbd>Space</kbd>를 누르세요. 경마·프로게이머·네온 팽이 경기 중 응원 효과가 발동합니다.</p></div>
+     <div><b>⭐ 응원 참가자 선택</b><p>경기 전 참가자 카드에서 응원할 대상을 선택할 수 있는 모드는 원하는 카드를 눌러 선택하세요.</p></div>
+     <div><b>⏸️ 일시정지</b><p>일시정지 버튼에서 경기를 계속하거나 다시 시작하고, 타이틀 화면으로 돌아갈 수 있습니다.</p></div>
+     <div><b>🔊 사운드 설정</b><p>오른쪽 위 음표 버튼을 눌러 전체 음소거, 배경음악, 효과음 크기를 조절하세요.</p></div>
+     <div><b>⏩ 테니스 속도</b><p>테니스 경기 화면의 속도 버튼으로 관전 배속을 바꿀 수 있습니다.</p></div>
+     <div><b>📺 멀티 화면</b><p>월드 챔피언십의 동시 중계 화면에서는 원하는 경기 패널을 눌러 크게 볼 수 있습니다.</p></div>
+    </div>
+    <p class="guide-note">참가자와 컴퓨터가 경기를 자동으로 진행하는 관전형 게임이에요. 직접 캐릭터를 이동시키거나 공격하는 조작은 없습니다.</p>
+   </section>
+   <section><span class="guide-no">04 · WORLD CHAMPIONSHIP</span><h3>🏆 월드 챔피언십</h3><p>종목을 고르면 참가자가 추첨되고, 각 조의 우승자가 다음 라운드로 올라갑니다. 최종 결승에서 우승하면 그 종목의 세계 챔피언!</p>
+    <div class="guide-bracket">
+     <div class="guide-round"><b>예선 · 4개 조</b><span> A조 우승자 </span><span> B조 우승자 </span><span> C조 우승자 </span><span> D조 우승자 </span></div>
+     <div class="guide-arrow">➜</div>
+     <div class="guide-round"><b>4강 · 2경기</b><span>1경기 승자</span><span>2경기 승자</span></div>
+     <div class="guide-arrow">➜</div>
+     <div class="guide-round champion"><b>🏆 결승</b><span>최종 우승자</span></div>
+    </div>
+    <div class="guide-tournament">
+     <div><b>🏇 경마</b><p>12마리 · 4개 조 × 3마리</p></div>
+     <div><b>⚔️ 프로게이머</b><p>20명 · 4개 조 × 5명</p></div>
+     <div><b>🌀 네온 팽이</b><p>20개 · 4개 조 × 5개</p></div>
+     <div><b>🎾 테니스</b><p>20명 중 8명 추첨 · 8강부터 시작</p></div>
+    </div>
+    <p class="guide-note">테니스 월드 챔피언십은 8강 4경기가 동시에 열리고, 4강 2경기도 동시에 진행됩니다. 결승은 한 경기씩 크게 중계됩니다.</p>
+   </section>
+   <section><span class="guide-no">05 · RESULTS & TIPS</span><h3>💡 경기 팁</h3>
+    <ul class="guide-tips"><li><b>응원 대상을 미리 고르기</b><span>선택 가능한 참가자 카드가 나오면 응원하고 싶은 선수를 지정하세요.</span></li><li><b>이벤트와 해설 확인하기</b><span>경기 중 발생하는 이벤트 알림과 해설을 보면 승부가 바뀌는 이유를 알 수 있어요.</span></li><li><b>결과 화면 살펴보기</b><span>우승자뿐 아니라 순위, 생존 여부, 기록과 주요 이벤트도 확인해 보세요.</span></li><li><b>친구와 예측 대결</b><span>지원되는 경기 준비 화면의 QR 예측 공유 기능으로 친구와 우승자를 예상해 보세요.</span></li></ul>
+   </section>
+  </div>
+  <div class="guide-footer"><p>준비됐나요? 가장 마음에 드는 종목을 선택하고 경기를 시작하세요!</p><button class="btn" id="hClose" type="button">⚡ 확인! 게임하러 가기</button></div>
+ </div>
+</div>
 <div class="ov" id="oR"><div class="wrap"><div id="rt">출전마 추첨 중...</div><div class="cards" id="cd"></div><button class="btn" id="bC" type="button">확인하고 경주 준비!</button><button class="btn s QRB" type="button" onclick="TM_openHost('single')">📱 친구 예측 QR</button><div class="tmFriends"></div></div></div>
 <div class="ov" id="oAR"><div class="wrap"><div id="art">전투원 추첨 중...</div><div class="cards" id="acd"></div><button class="btn" id="bAC" type="button">전투원 확인!</button><button class="btn s QRB" type="button" onclick="TM_openHost('single')">📱 친구 예측 QR</button><div class="tmFriends"></div></div></div>
 <div class="ov" id="oNR"><div class="wrap"><div id="nrt">팽이 추첨 중...</div><div class="cards" id="ncd"></div><button class="btn" id="bNC" type="button">팽이 확인!</button><button class="btn s QRB" type="button" onclick="TM_openHost('single')">📱 친구 예측 QR</button><div class="tmFriends"></div></div></div>
@@ -683,6 +778,10 @@ function loop(n){if(paused){last=n;requestAnimationFrame(loop);return}
   scene(dt); hud(); requestAnimationFrame(loop);
 }
 
+$('bHelp').onclick=()=>{if(S!=='TITLE')return;aud();sfx('click');$('oHelp').style.display='block';$('oHelp').scrollTop=0};
+$('hClose').onclick=()=>{aud();sfx('click');$('oHelp').style.display='none'};
+$('oHelp').addEventListener('click',e=>{if(e.target===$('oHelp'))$('oHelp').style.display='none'});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('oHelp').style.display==='block')$('oHelp').style.display='none'});
 $('bS').onclick=()=>{if(S!=='TITLE')return;isRandom=false;aud();sfx('click');startR()};
 $('bA').onclick=()=>{if(S!=='TITLE')return;isRandom=false;aud();sfx('click');A_s.startRoulette()};
 $('bN').onclick=()=>{if(S!=='TITLE')return;isRandom=false;aud();sfx('click');N_s.startRoulette()};
