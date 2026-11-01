@@ -675,7 +675,7 @@ const pl=()=>{const t=TN,p=t.pred,m=(n,ok)=>`<span class="${ok==null?'':ok?'ok':
 const br=()=>{const t=TN,n=p=>p?p.name:'?';return`<div class="br"><div>예선 ${[0,1,2,3].map(i=>`<span class="${t.qw[i]?'w':''}">${'ABCD'[i]}:${n(t.qw[i])}</span>`).join(' ')}</div><div>4강 ${[0,1].map(i=>`<span class="${t.sw[i]?'w':''}">${n(t.sw[i])}</span>`).join(' ')}</div><div>결승 <span class="${t.champ?'w':''}">${n(t.champ)}</span></div></div>`};
 A.intro=()=>{if(TN.stage=='Q')return scr(`<div class="tnh">📺 예선 동시 중계</div>${br()}<div class="tag">4${unit()} 동시 시작 · 각 ${unit()}의 우승자 1명만 4강 진출</div><div class="gr">${TN.G.map((l,g)=>`<div class="gc"><h4>${'ABCD'[g]}${unit()}</h4>${l.map(p=>`<div class="pc" style="--c:${p.col}"><i></i><b>${p.name}</b></div>`).join('')}</div>`).join('')}</div>${pl()}<button class="btn" type="button" data-a="go">📺 4경기 동시 시작!</button><button class="btn s" type="button" data-a="title">타이틀로</button>`);const t=TN,m=t.mt(),f=t.stage=='F';scr(`<div class="tnh ${f?'fin':''}">${f?'🏆 결승전 🏆':m.title}</div>${br()}<div class="tag">${t.sp=='horse'?(m.list.length===2?'두 마리 맞대결':`${m.list.length}마리 출전`):`선수 소개 · ${m.list.length}명 출전`}</div><ul class="rl">${m.list.map(p=>`<li style="--c:${p.col}"><b>${p.name}</b><small>${ds(p)}</small></li>`).join('')}</ul>${pl()}<button class="btn" type="button" data-a="go">🏁 경기 시작!</button><button class="btn s" type="button" data-a="title">타이틀로</button>`)};
 function launch(){const t=TN,m=t.mt();paused=0;$('oP').style.display='none';
-if(t.sp=='tennis'){const surf=['hard','clay','grass'][R()*3|0],run=(a,b)=>{const st=TX._t.mk(a.e,b.e,surf);let n=0;while(!st.done&&n++<500)TX._t.step(st);return{winner:st.P[st.win],score:st.rw[st.win]+':'+st.rw[1-st.win],loser:st.P[1-st.win]}};if(t.stage==='Q'){const batch=t.G.map((group,g)=>{const z=run(group[0],group[1]);t.qw[g]=by(z.winner.name);t.lvl[z.winner.name]=1;t.rec[z.winner.name]={place:1,m:200};t.rec[z.loser.name]={place:2,m:100};return{group:g,a:group[0],b:group[1],winner:z.winner,loser:z.loser,score:z.score}});t.tennisBatch=batch;t.tennisSurf=surf;scr(`<div class="tnh">🎾 8강 예선 결과</div><div class="tag">4경기 동시 진행 완료 · ${surf==='hard'?'하드':surf==='clay'?'클레이':'잔디'} 코트</div><div class="gr">${batch.map(x=>`<div class="gc"><h4>${'ABCD'[x.group]}조 경기</h4><div class="vs"><b>${x.a.name}</b><em>${x.score}</em><b>${x.b.name}</b></div><div class="tag">🏆 ${x.winner.name} 4강 진출</div></div>`).join('')}</div>${pl()}<button class="btn" type="button" data-a="next">4강 진출자 확인 · 다음 ▶</button>`);sfx('fan');return}const z=run(m.list[0],m.list[1]),win=z.winner.name; t.tennisRows=[{name:win,m:200,tx:`${surf} 코트 · ${z.score} 승리`},{name:z.loser.name,m:100,tx:`${surf} 코트 · ${z.score} 패배`}];t.tennisSurf=surf;rec1();return res()}
+if(t.sp==='tennis'){if(t.stage==='Q'){t.tennisSurf=['hard','clay','grass'][R()*3|0];TX.on=0;return startMulti()}const surf=['hard','clay','grass'][R()*3|0],z=TX._t.mk(m.list[0].e,m.list[1].e,surf);let n=0;while(!z.done&&n++<500)TX._t.step(z);const w=z.win,l=1-w;t.tennisRows=[{name:z.P[w].name,m:200,tx:`${surf} 코트 · ${z.rw[w]}:${z.rw[l]} 승리`},{name:z.P[l].name,m:100,tx:`${surf} 코트 · ${z.rw[w]}:${z.rw[l]} 패배`}];t.tennisSurf=surf;rec1();return res()}
 if(t.stage=='Q')return startMulti();
 if(t.sp=='horse'){SEL=m.list.map(p=>[...p.e,['최상','양호','양호','보통','보통'][R()*5|0]]);cheerIdx=-1;G=null;HS=[];startReady()}
 else if(t.sp=='arena'){A_s.st.sel=m.list.map(p=>p.e);A_s.startReady()}else{N_s.st.sel=m.list.map(p=>p.e);N_s.startReady()}}
@@ -705,28 +705,30 @@ function ask(m,f){$('cmsg').textContent=m;$('oC').style.display='block';$('cy').
 /* 예선 4경기 동시 중계: 조마다 독립 엔진 상태(HS/G 또는 st/cam/pT)를 보관하고 프레임마다 교체하며 진행·렌더 */
 let MM=[],Mtm=[];const E=()=>TN.sp=='arena'?A_s:N_s;
 function stopM(){TN.multi=0;TN.run=0;Mtm.forEach(clearTimeout);Mtm=[];$('mv').style.display='none';$('mcd').innerHTML='';$('mcd').style.display='none'}
+function tennisLd(g){TX._multi.load(MM[g].tx)}
+function tennisSv(g){MM[g].tx=TX._multi.save()}
 function ld(g){const m=MM[g];if(TN.sp=='horse'){HS=m.HS;G=m.G;PT=m.PT;cmq=m.cmq;cmT=m.cmT;shown=m.shown;scroll=m.scroll}else{const e=E();Object.assign(e.st,m.st);Object.assign(e.cam,m.cam);e.setP(m.pT)}}
 function sv(g){const m=MM[g];if(TN.sp=='horse'){m.HS=HS;m.G=G;m.PT=PT;m.cmq=cmq;m.cmT=cmT;m.shown=shown;m.scroll=scroll}else{const e=E();m.st={...e.st};m.cam={...e.cam};m.pT=e.getP()}}
 function startMulti(){const t=TN;stopM();paused=0;MM=[];
-for(let g=0;g<4;g++){const l=t.G[g];if(t.sp=='horse'){SEL=l.map(p=>[...p.e,['최상','양호','양호','보통','보통'][R()*5|0]]);G=null;HS=[];startReady();MM.push({HS,G,PT,cmq,cmT,shown,scroll:0,fd:-1})}
+for(let g=0;g<4;g++){const l=t.G[g];if(t.sp==='tennis'){MM.push({tx:TX._multi.prepare(l[0],l[1],t.tennisSurf),fd:-1,wn:''})}else if(t.sp=='horse'){SEL=l.map(p=>[...p.e,['최상','양호','양호','보통','보통'][R()*5|0]]);G=null;HS=[];startReady();MM.push({HS,G,PT,cmq,cmT,shown,scroll:0,fd:-1})}
 else{const e=E();e.st.sel=l.map(p=>p.e);e.startReady();MM.push({st:{...e.st},cam:{...e.cam},pT:e.getP(),fd:-1})}}
-tok++;T.forEach(clearTimeout);T=[];t.M=MM;t.multi=1;t.run=0;t.zoom=-1;t.allT=0;S=t.sp=='horse'?'RACING':t.sp=='arena'?'A_BATTLE':'N_BATTLE';document.body.className='TN_M';$('mv').style.display='block';setM('d',126,.3);
+tok++;T.forEach(clearTimeout);T=[];t.M=MM;t.multi=1;t.run=0;t.zoom=-1;t.allT=0;S=t.sp=='horse'?'RACING':t.sp=='arena'?'A_BATTLE':t.sp==='tennis'?'T_MATCH':'N_BATTLE';document.body.className='TN_M';$('mv').style.display='block';setM('d',126,.3);
 const cd=$('mcd');cd.style.display='flex';cd.replaceChildren();const seq=[['READY...',900],['3',560],['2',560],['1',560]];let at=0;seq.forEach(([x,d],i)=>{Mtm.push(setTimeout(()=>{if(!TN.multi)return;cd.style.display='flex';const sp=document.createElement('span');sp.textContent=x;if(x==='1'){sp.className='last';/* animationend 이벤트에 의존하지 않고 별도 타이머로 반드시 제거 */Mtm.push(setTimeout(()=>{cd.replaceChildren();cd.style.display='none'},520))}cd.replaceChildren(sp);sfx(i?'beep':'lock')},at));at+=d});
 Mtm.push(setTimeout(()=>{cd.replaceChildren();cd.style.display='none';if(!TN.multi)return;t.run=1;setM('g',160);$('go').classList.remove('on');void $('go').offsetWidth;$('go').classList.add('on');sfx('gun');shk=10},at+80))}
-function stat(g){const m=MM[g];if(TN.sp=='horse'){const o=ranked(),L=o[0];return`${G.t.toFixed(0)}초 · 1위 ${L.name} ${Math.min(100,L.pos/10|0)}%`}
+function stat(g){const m=MM[g];if(TN.sp==='tennis'){tennisLd(g);const z=TX.st;return `${Math.floor(TX.time)}초 · ${z.rw[0]}:${z.rw[1]} · ${z.P[z.srv].name} 서브`}if(TN.sp=='horse'){const o=ranked(),L=o[0];return`${G.t.toFixed(0)}초 · 1위 ${L.name} ${Math.min(100,L.pos/10|0)}%`}
 const e=E(),st=e.st,L=TN.sp=='arena'?st.fighters:st.tops,A=L.filter(f=>f.alive).sort((a,b)=>(TN.sp=='arena'?b.hp-a.hp:b.rpm-a.rpm)),k=L.reduce((a,f)=>Math.max(a,f.kills),0);
 return`${st.t.toFixed(0)}초 · 생존 ${A.length}/${L.length}`+(A[0]?` · ${A[0].n} ${TN.sp=='arena'?'HP '+(A[0].hp|0):'RPM '+(A[0].rpm|0)}`:'')+` · 최다처치 ${k}`}
 TN.mf=dt=>{const t=TN,M=MM,H=t.sp=='horse';if(t.run){const cd=$('mcd');if(cd.style.display!=='none'){cd.replaceChildren();cd.style.display='none'}}
-if(t.run)M.forEach((m,g)=>{if(m.fd>1.6)return;ld(g);let d=dt;if(H){S=m.fd>=0?'FINISH':'RACING';if(g)G.hf=9;d=dt*G.ts;sim(d);m.scroll=scroll+Math.max(...HS.map(h=>h.v))*d*W/1000*.9;m.won=G.won;m.wn=G.won&&G.won.name}else{d=m.fd>=0?dt*.5:dt;E().update(d);m.won=E().st.won;m.wn=m.won&&m.won.n}
+if(t.run)M.forEach((m,g)=>{if(m.fd>1.6)return;if(t.sp==='tennis'){tennisLd(g);S='T_MATCH';if(m.fd<0)TX._multi.step(dt);if(TX._multi.done()&&m.fd<0){const z=TX._multi.result();m.won=z.winner;m.wn=z.winner.name;m.result=z;m.fd=0}if(m.fd>=0)m.fd+=dt;tennisSv(g);return}ld(g);let d=dt;if(H){S=m.fd>=0?'FINISH':'RACING';if(g)G.hf=9;d=dt*G.ts;sim(d);m.scroll=scroll+Math.max(...HS.map(h=>h.v))*d*W/1000*.9;m.won=G.won;m.wn=G.won&&G.won.name}else{d=m.fd>=0?dt*.5:dt;E().update(d);m.won=E().st.won;m.wn=m.won&&m.won.n}
 if(m.won&&m.fd<0)m.fd=0;if(m.fd>=0)m.fd+=dt;sv(g)});
 exc+=(.5-exc)*dt*2;if(AC)cg.gain.value=mut?0:exc*vs*.35;if(flash>0)flash=Math.max(0,flash-dt*1.6);shk*=.9;
 cx.fillStyle='#000';cx.fillRect(0,0,W,CH);const z=t.zoom,R4=[];let k=0;for(let g=0;g<4;g++){R4[g]=z<0?[(g%2)*W/2,(g>>1)*CH/2,W/2,CH/2,.5]:g==z?[0,0,W,CH,1]:[6+(k++)*(W*.22+6),6,W*.22,CH*.22,.22]}
-(z<0?[0,1,2,3]:[z,...[0,1,2,3].filter(g=>g!=z)]).forEach(g=>{const[x,y,w,h,sc]=R4[g],m=M[g],q=$('mq'+g);cx.save();cx.beginPath();cx.rect(x,y,w,h);cx.clip();cx.translate(x,y);cx.scale(sc,sc);ld(g);/* 각 경기 장면을 그릴 때만 밝기를 보정하고, 테두리·라벨은 원래 색으로 유지 */if(H){S=m.fd>=0?'FINISH':'RACING';scene(m.fd>1.6||!t.run?0:dt)}else E().render();/* 모바일 성능을 위해 Canvas filter 대신 단일 반투명 레이어로 밝기 보정 */cx.fillStyle='rgba(255,255,255,0.105)';cx.fillRect(0,0,W,CH);
+(z<0?[0,1,2,3]:[z,...[0,1,2,3].filter(g=>g!=z)]).forEach(g=>{const[x,y,w,h,sc]=R4[g],m=M[g],q=$('mq'+g);cx.save();cx.beginPath();cx.rect(x,y,w,h);cx.clip();cx.translate(x,y);cx.scale(sc,sc);if(t.sp==='tennis'){tennisLd(g);S='T_MATCH';TX._multi.draw(dt)}else{ld(g)}/* 각 경기 장면을 그릴 때만 밝기를 보정하고, 테두리·라벨은 원래 색으로 유지 */if(t.sp==='tennis'){/* tennis draw was rendered above */}else if(H){S=m.fd>=0?'FINISH':'RACING';scene(m.fd>1.6||!t.run?0:dt)}else E().render();/* 모바일 성능을 위해 Canvas filter 대신 단일 반투명 레이어로 밝기 보정 */cx.fillStyle='rgba(255,255,255,0.105)';cx.fillRect(0,0,W,CH);
 const tx=stat(g);cx.restore();cx.strokeStyle=m.fd>=0?'#ffd75e':'#fff6';cx.lineWidth=m.fd>=0?3:1;cx.strokeRect(x,y,w,h);
 const key=[x,y,w,h].join();if(q._k!=key){q._k=key;q.style.cssText=`left:${x}px;top:${y}px;width:${w}px;height:${h}px`;q.classList.toggle('sm',sc<.4);q.classList.toggle('mn',g==z)}
 q.firstChild.textContent=`${'ABCD'[g]}${TN.sp=='horse'?'팀':'조'}`+(sc<.4?'':' · '+(m.fd>=0?'경기 종료':tx));q.classList.toggle('dn',m.fd>=0);q.lastChild.textContent=m.fd>=0?(sc<.4?'🏆':`경기 종료 🏁\n4강 진출! 🏆 ${m.wn||''}`):''});
 if(H)S='RACING';if(t.run&&M.every(m=>m.fd>=0)){t.allT+=dt;if(t.allT>3){t.run=0;finishM()}}}
-function finishM(){const t=TN;for(let g=0;g<4;g++){ld(g);t.i=g;rec1()}t.stage='S';t.i=0;adv('예선 종료!','4강 진출자 발표 · 각 '+unit()+' 우승자',t.qw,'⚔️ 4강 시작')}
+function finishM(){const t=TN;for(let g=0;g<4;g++){if(t.sp==='tennis'){const m=MM[g],z=m.result;t.i=g;t.tennisRows=[{name:z.winner.name,m:200,tx:`${t.tennisSurf} 코트 · ${z.score} 승리`},{name:z.loser.name,m:100,tx:`${t.tennisSurf} 코트 · ${z.score} 패배`}];rec1()}else{ld(g);t.i=g;rec1()}}t.stage='S';t.i=0;adv('예선 종료!','4강 진출자 발표 · 각 '+unit()+' 우승자',t.qw,'⚔️ 4강 시작')}
 $('mv').addEventListener('click',e=>{const q=e.target.closest('.mq');if(!q||!TN.multi)return;const g=+q.id.slice(2);TN.zoom=TN.zoom==g?-1:g;sfx('click')});
 $('tnw').addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b||b.disabled)return;aud();if(b.dataset.a.length>2)sfx('click');const f=A[b.dataset.a];if(f)f(b.dataset.v)});
 $('bW').onclick=()=>{if(S!=='TITLE')return;aud();sfx('click');A.menu()};
@@ -952,6 +954,15 @@ if(st.pt[w]>=4){info.game=true;st.g[w]++;st.srv=1-st.srv;st.pt=[0,0];st.strk=[0,
 return info}
 function oddsP(A,B,su){let a=0;const N=240;for(let k=0;k<N;k++){const st=mk(A,B,su);st.noEv=true;st.srv=k&1;let g=0;while(!st.done&&g++<400)step(st);if(st.win===0)a++}const p=cl(a/N,.04,.96);return[p,1-p]}
 TX._t={mk,step,oddsP,PL,mkP,EVT};
+TX._multi={
+ prepare:(a,b,surf)=>{TX.on=0;TX.surf=surf;TX.pl=[{...a.e,cc:a.raw?a.raw[3]:0},{...b.e,cc:b.raw?b.raw[3]:0}];TX.prob=oddsP(TX.pl[0],TX.pl[1],surf);TX.odds=TX.prob.map(p=>cl(.94/p,1.05,9.9));TX.st=mk(TX.pl[0],TX.pl[1],surf);resetView();TX.cf=[];return TX._multi.save()},
+ save:()=>{const o={};for(const k of Object.keys(TX)){if(k==='_t'||k==='_multi'||typeof TX[k]==='function')continue;try{o[k]=structuredClone(TX[k])}catch(e){o[k]=TX[k]}}return o},
+ load:o=>{for(const k of Object.keys(o))TX[k]=structuredClone(o[k]);TX.on=0;S='T_MATCH'},
+ step:(dt)=>{TX.t0+=dt;tick(dt*TX.spd,dt);if(flash>0)flash=Math.max(0,flash-dt*1.6);shk*=.9},
+ draw:dt=>draw(dt),
+ done:()=>!!(TX.st&&TX.st.done),
+ result:()=>{const st=TX.st,w=st.win,l=1-w;return{winner:st.P[w],loser:st.P[l],score:st.rw[w]+':'+st.rw[l],time:TX.time}}
+};
 /* ---------- 매치 준비 ---------- */
 function newMatch(){const sex=R()<.5?'M':'F',pool=PL.filter(b=>b[4]===sex).sort(()=>R()-.5).slice(0,2),su=['hard','clay','grass'][R()*3|0];TX.sex=sex;TX.surf=su;TX.pl=pool.map(mkP);TX.prob=oddsP(TX.pl[0],TX.pl[1],su);TX.odds=TX.prob.map(p=>cl(.94/p,1.05,9.9));TX.st=mk(TX.pl[0],TX.pl[1],su);resetView()}
 function resetView(){TX.anim=null;TX.gap=0;TX.time=0;TX.win=null;TX.saved=0;TX.pu=[0,0];TX.z=1;TX.cf=[];TX.pop=null;TX.fin=0;TX.evT=0;TX.last=null;TX.hl=[0,0]}
@@ -984,7 +995,7 @@ if(!TX.anim){const info=step(st);TX.last=info;TX.anim=build(info);if(info.ev)sho
 const a=TX.anim;a.t+=d;
 if(a.t>=a.dur){const i=a.info;TX.anim=null;hud();TX.pop={t:0,txt:i.type=='ace'?'ACE!':i.type=='df'?'DF':'+1',w:i.w};say(i.text+(i.game?' — '+(i.round?(st.rounds.length)+'판 종료! '+TX.st.P[i.w].name+' 승리':'게임 '+TX.st.P[i.w].name):''));
  sfx(i.w===0?'lock':'beep');TX.gap=i.round?1.1:i.game?.45:.15;if(i.done)finish()}}
-function finish(){const st=TX.st;TX.win=st.win;go('T_FINISH');MODE='tennis';TX.fin=3.4;flash=1;shk=7;sfx('fan');after(500,()=>sfx('fin'));say('🏆 '+st.P[st.win].name+' 우승!');
+function finish(){const st=TX.st;TX.win=st.win;if(TN&&TN.multi&&TN.sp==='tennis')return;go('T_FINISH');MODE='tennis';TX.fin=3.4;flash=1;shk=7;sfx('fan');after(500,()=>sfx('fin'));say('🏆 '+st.P[st.win].name+' 우승!');
 for(let i=0;i<90;i++)TX.cf.push({x:rr(0,W),y:rr(-CH*.5,0),vx:rr(-40,40),vy:rr(60,200),c:['#ffd75e','#e63946','#fff','#4fc3f7','#7dff9b'][i%5]})}
 function result(){const st=TX.st,w=st.win,l=1-w,P=st.P,S0=st.S,R0=rec();R0.g=R0.g||{aces:0,rally:0,fast:999};
 const nw=R0[P[w].name]=R0[P[w].name]||{w:0,l:0,s:0,b:0},nl=R0[P[l].name]=R0[P[l].name]||{w:0,l:0,s:0,b:0},fav=TX.prob[0]>=TX.prob[1]?0:1,upset=w!==fav,t=Math.round(TX.time);
