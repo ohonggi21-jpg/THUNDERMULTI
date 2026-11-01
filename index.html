@@ -1004,7 +1004,7 @@ function showEv(ev){const P=TX.st.P,w=ev.who===2?'양 선수':P[ev.who].name,e=$
 function build(info){const st=TX.st,nr=st.side?1:0,vB=i=>i===nr?.97:.03,s=info.s,sh=[];let t=0;
 if(info.type=='df'){for(let q=0;q<2;q++){sh.push({h:s,a:{u:.2,v:vB(s)},b:{u:q?-1.25:1.25,v:s===nr?.22:.78},t0:t,t1:t+.18,arc:30,out:1});t+=.2}return{sh,dur:t+.2,info,t:0,q:-1}}
 const want=info.type=='err'?1-info.w:info.w;let cnt=Math.max(1,info.n);while(((s+cnt-1)%2)!==want)cnt++;let pu=0;
-for(let q=0;q<cnt;q++){const h=(s+q)%2,last=q===cnt-1,out=last&&info.type=='err',a={u:q?pu:(s===nr?-.2:.2),v:vB(h)},b=q===0?{u:(R()<.5?-1:1)*rr(.3,.6),v:h===nr?.34:.66}:{u:(R()<.5?-1:1)*rr(.1,.75),v:h===nr?.1:.9};
+for(let q=0;q<cnt;q++){const h=(s+q)%2,last=q===cnt-1,out=last&&info.type=='err',a={u:q?pu:TX.pu[h],v:vB(h)},b=q===0?{u:(R()<.5?-1:1)*rr(.3,.6),v:h===nr?.34:.66}:{u:(R()<.5?-1:1)*rr(.1,.75),v:h===nr?.1:.9};
 if(out){b.u=R()<.5?-1.22:1.22;if(R()<.4){b.u=rr(-.4,.4);b.v=h===nr?.56:.44}}sh.push({h,a,b,t0:t,t1:t+(q?.12:.18),arc:q?26:34,out});t+=q?.12:.18;pu=b.u}
 return{sh,dur:t+.22,info,t:0,q:-1}}
 function tick(d,rd){const st=TX.st;TX.time+=rd;if(TX.evT>0){TX.evT-=d;if(TX.evT<=0)$('txe').style.opacity=0}
@@ -1035,16 +1035,16 @@ if(st.surf=='grass'){cx.fillStyle='#ffffff14';for(let k=0;k<8;k+=2){cx.beginPath
 cx.strokeStyle='#fff';cx.lineWidth=2;const L=(a,b,c,d)=>{cx.beginPath();cx.moveTo(X(a,b),Y(b));cx.lineTo(X(c,d),Y(d));cx.stroke()};L(-1,0,1,0);L(-1,1,1,1);L(-1,0,-1,1);L(1,0,1,1);L(-.8,0,-.8,1);L(.8,0,.8,1);L(-.8,.28,.8,.28);L(-.8,.72,.8,.72);L(0,.28,0,.72);
 const pv=i=>i===nr?.97:.03,per=(i)=>{const v=pv(i),a=TX.anim,sw=a&&a.q>=0&&a.sh[a.q]&&a.sh[a.q].h===i?Math.max(0,1-(a.t-a.sh[a.q].t0)/.12):0,fin=S==='T_FINISH'||S==='T_RESULT',cheer=fin&&st.win===i;if(fin&&st.win!==i){}
  const x=X(TX.pu[i],v),y=Y(v);person(x,y,SC(v)*1.15,i?C1:C0,sw,cheer,i===nr?1:-1)};
-per(1-nr);
 const nv=Y(.5);cx.fillStyle='#e8eef5aa';cx.fillRect(X(-1.1,.5),nv-26*SC(.5),X(1.1,.5)-X(-1.1,.5),26*SC(.5));cx.fillStyle='#fff';cx.fillRect(X(-1.1,.5),nv-27*SC(.5),X(1.1,.5)-X(-1.1,.5),3);
 const a=TX.anim;let bx=null;
 if(a){let q=a.sh.findIndex(s=>a.t>=s.t0&&a.t<s.t1);if(q<0&&a.t>=a.sh[a.sh.length-1].t1)q=a.sh.length-1;
- if(q!==a.q&&q>=0){a.q=q;tone(650+rr(0,250),.05,'square',.07);if(q)noise(.03,.1,900)}
- if(q>=0){const s=a.sh[q],f=cl((a.t-s.t0)/(s.t1-s.t0),0,1),u=s.a.u+(s.b.u-s.a.u)*f,v=s.a.v+(s.b.v-s.a.v)*f;bx={x:X(u,v),y:Y(v),h:Math.sin(Math.PI*f)*s.arc*SC(v)*2,r:4.5*SC(v)*1.6};
- const rc=s.h===0?1:0,tu=cl(s.b.u,-1.05,1.05);TX.pu[s.h]+=(s.a.u-TX.pu[s.h])*Math.min(1,dt*9);TX.pu[1-s.h]+=((s.type==='ace'?s.b.u*.4:tu)-TX.pu[1-s.h])*Math.min(1,dt*7)}}
-else{TX.pu[0]+=(0-TX.pu[0])*Math.min(1,dt*4);TX.pu[1]+=(0-TX.pu[1])*Math.min(1,dt*4);const sv=pv(st.srv);bx={x:X(TX.pu[st.srv]+.12,sv),y:Y(sv),h:30*SC(sv),r:4*SC(sv)*1.6}}
+ if(q!==a.q&&q>=0){a.q=q;tone(650+rr(0,250),.05,'square',.07);if(q)noise(.03,.1,900)}else if(q<0){a.q=-1}
+ if(q>=0){const sh=a.sh[q],f=cl((a.t-sh.t0)/(sh.t1-sh.t0),0,1),u=sh.a.u+(sh.b.u-sh.a.u)*f,v=sh.a.v+(sh.b.v-sh.a.v)*f;bx={x:X(u,v),y:Y(v),h:Math.sin(Math.PI*f)*sh.arc*SC(v)*2,r:4.5*SC(v)*1.6};
+ const tu=cl(sh.b.u,-1.05,1.05),nearRate=1-Math.exp(-dt*15),farRate=1-Math.exp(-dt*12),receiverTarget=sh.type==='ace'?cl(sh.b.u*.72,-1.05,1.05):tu;
+ TX.pu[sh.h]+=(sh.a.u-TX.pu[sh.h])*nearRate;TX.pu[1-sh.h]+=(receiverTarget-TX.pu[1-sh.h])*farRate}}
+else{const settle=1-Math.exp(-dt*5);TX.pu[0]+=(0-TX.pu[0])*settle;TX.pu[1]+=(0-TX.pu[1])*settle;const sv=pv(st.srv);bx={x:X(TX.pu[st.srv]+.12,sv),y:Y(sv),h:30*SC(sv),r:4*SC(sv)*1.6}}
 if(bx&&S!=='T_RESULT'&&!(S==='T_FINISH')){cx.fillStyle='#0005';cx.beginPath();cx.ellipse(bx.x,bx.y,bx.r*1.4,bx.r*.6,0,0,7);cx.fill();cx.fillStyle='#e6ff4a';cx.beginPath();cx.arc(bx.x,bx.y-bx.h,bx.r,0,7);cx.fill()}
-per(nr);
+per(1-nr);per(nr);
 if(S==='T_FINISH'||S==='T_RESULT'){const w=st.win,tx=W/2,ty=CH*.52;cx.fillStyle='#ffd75e';cx.beginPath();cx.moveTo(tx-26,ty-60);cx.lineTo(tx+26,ty-60);cx.quadraticCurveTo(tx+26,ty-20,tx,ty-12);cx.quadraticCurveTo(tx-26,ty-20,tx-26,ty-60);cx.fill();cx.fillRect(tx-5,ty-14,10,18);cx.fillRect(tx-20,ty+4,40,8)}
 if(TX.pop){const p=TX.pop;p.t+=dt;if(p.t>.9)TX.pop=null;else{const pv2=pv(p.w),x=X(TX.pu[p.w],pv2),y=Y(pv2)-95*SC(pv2)-p.t*40;cx.globalAlpha=1-p.t/.9;cx.fillStyle=p.w?C1:C0;cx.font='900 '+Math.round(26*SC(pv2)*1.3)+'px sans-serif';cx.textAlign='center';cx.fillText(p.txt,x,y);cx.globalAlpha=1}}
 TX.cf.forEach(c=>{c.x+=c.vx*dt;c.y+=c.vy*dt;if(c.y>CH)c.y=-10;cx.fillStyle=c.c;cx.fillRect(c.x,c.y,6,4)});cx.restore();
