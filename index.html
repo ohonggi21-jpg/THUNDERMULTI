@@ -419,6 +419,27 @@ body{position:fixed;inset:0}
  #oHelp .guide-content p,#oHelp .guide-card p,#oHelp .guide-controls p{font-size:7px}
 }
 
+
+/* ===== 가로·세로 화면을 남김없이 활용 ===== */
+html,body,#cv{width:100%;height:100%;height:100dvh}
+.ov{inset:0;width:100vw;height:100%;height:100dvh}
+.ov>.wrap{width:100%;max-width:none;height:100%;height:100dvh;min-height:0;padding:max(6px,env(safe-area-inset-top)) max(7px,env(safe-area-inset-right)) max(6px,env(safe-area-inset-bottom)) max(7px,env(safe-area-inset-left))}
+#oT .menu{width:100%;max-width:none}
+#oT .mode-btn{max-width:none}
+@media (orientation:landscape){
+ .ov>.wrap{justify-content:space-evenly}
+ .card{width:100%;max-width:min(100%,1100px)}
+ #oT .menu{grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(5px,1vw,14px)}
+ #oT .mode-btn{min-height:clamp(70px,16vh,150px)}
+ #oT .mode-btn.random{grid-column:2;grid-row:auto}
+ #oR .cards,#oAR .cards,#oNR .cards{width:100%;max-width:1200px}
+}
+@media (orientation:portrait){
+ .ov>.wrap{justify-content:space-evenly}
+ .card{width:100%;max-width:100%}
+ #oT .menu{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #oT .mode-btn.random{grid-column:1/-1}
+}
 </style></head><body class="TITLE">
 <canvas id="cv"></canvas>
 <div id="hud"><div id="tb"><b id="tm">0.0초</b><b id="ld">-</b><b id="rm">-</b></div><div id="bar"></div><div id="rk"></div></div>
