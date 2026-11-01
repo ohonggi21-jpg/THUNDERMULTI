@@ -1275,7 +1275,7 @@ $('bT').onclick=()=>{if(S!=='TITLE')return;sfx('click');start()};
 (function(){
  const synth=window.speechSynthesis,enabled=$('voiceOn'),volume=$('voiceVol'),rate=$('voiceRate');
  if(!enabled||!volume||!rate)return;
- let queue=[],busy=false,seq=0,lastMode='',lastSpoken='',lastAt=0,lastEventKey='',lastEventAt=0,voiceList=[];
+ let queue=[],busy=false,seq=0,lastMode='',lastSpoken='',lastAt=0,lastEventKey='',lastEventAt=0,voiceList=[],aiBusy=false,aiPending=null,lastAIAt=0;
  const seen=new WeakMap(),eventLog=[],nodes=['ct','act','nct','txc'].map(id=>$(id)).filter(Boolean);
  const endpointInput=$('aiEndpoint'),aiToggle=$('aiCommentary'),aiStatus=$('aiStatus');
  const getEndpoint=()=>endpointInput?endpointInput.value.trim():'';
@@ -1317,7 +1317,7 @@ $('bT').onclick=()=>{if(S!=='TITLE')return;sfx('click');start()};
   const event={id:now+'-'+Math.random().toString(36).slice(2,7),type:classify(text),text,source,importance:important(text)?'high':'normal',timestamp:new Date().toISOString(),state:snapshot()};
   eventLog.push(event);if(eventLog.length>40)eventLog.shift();
   window.dispatchEvent(new CustomEvent('thunder:game-event',{detail:event}));
-  if(aiToggle&&aiToggle.checked&&getEndpoint())requestAI(event);
+  if(aiToggle&&aiToggle.checked&&getEndpoint()&&event.importance==='high')requestAI(event);
   else speakFallback(text,event);
  }
  function fallbackAnalyst(t){
@@ -1357,7 +1357,15 @@ $('bT').onclick=()=>{if(S!=='TITLE')return;sfx('click');start()};
   if(data?.output_text)return parseAI(data.output_text);
   return data||{};
  }
- async function requestAI(event){
+ function requestAI(event){
+  if(!event||event.importance!=='high')return;
+  if(aiBusy){aiPending=event;return;}
+  const delay=Math.max(0,3500-(Date.now()-lastAIAt));
+  if(delay>0){aiPending=event;setTimeout(()=>{if(aiPending&&!aiBusy){const next=aiPending;aiPending=null;requestAI(next)}},delay);return;}
+  aiBusy=true;lastAIAt=Date.now();
+  requestAIActual(event).finally(()=>{aiBusy=false;if(aiPending){const next=aiPending;aiPending=null;setTimeout(()=>requestAI(next),3500)}});
+ }
+ async function requestAIActual(event){
   const url=getEndpoint();if(!url)return;
   setStatus('AI 해설 생성 중…');
   const prompt=[
