@@ -507,6 +507,21 @@
     @media (max-width: 680px) {
       .menu { grid-template-columns: repeat(2, minmax(130px, 1fr)); }
       .guide-grid, .guide-controls, .world-grid { grid-template-columns: 1fr; }
+      .selection-box {
+        bottom: 12px;
+        left: 12px;
+        right: 12px;
+        transform: none;
+        text-align: center;
+        border-radius: 12px;
+      }
+      .fab { width: 52px; height: 52px; bottom: 82px; right: 10px; }
+      .sound-btn { width: 38px; height: 38px; }
+      #txs { right: 10px; bottom: 138px; }
+      .commentary-box {
+        max-width: calc(100vw - 18px);
+        padding: 7px 10px;
+      }
     }
     @media (orientation: landscape) and (max-height: 720px) {
       .menu { grid-template-columns: repeat(3, minmax(120px, 1fr)); gap: 10px; }
@@ -515,6 +530,7 @@
       .title-tag { letter-spacing: 0.18em; }
       .world-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
       .world-card { min-height: 150px; }
+      .commentary { bottom: 8px; }
     }
   </style>
 </head>
@@ -725,8 +741,8 @@
     const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
     const rand = (min, max) => min + Math.random() * (max - min);
 
-    let width = 0;
-    let height = 0;
+    let width = window.innerWidth || 1280;
+    let height = window.innerHeight || 720;
     let gameMode = 'title';
     let gameTime = 0;
     let lastFrame = 0;
@@ -741,7 +757,25 @@
       tennis: null,
       cheerSelection: '',
       worldVisible: false,
+      timers: [],
+      activeMode: 'title',
+      selectedTargetMap: new Map(),
     };
+
+    function scheduleTimeout(fn, delay) {
+      const id = window.setTimeout(() => {
+        const idx = state.timers.indexOf(id);
+        if (idx >= 0) state.timers.splice(idx, 1);
+        fn();
+      }, delay);
+      state.timers.push(id);
+      return id;
+    }
+
+    function clearScheduledTimers() {
+      state.timers.forEach((id) => window.clearTimeout(id));
+      state.timers = [];
+    }
 
     function resize() {
       const ratio = Math.min(window.devicePixelRatio || 1, 2);
@@ -766,9 +800,11 @@
     }
 
     function setSelectionHint(text) {
-      state.cheerSelection = text;
-      selectionText.textContent = text;
-      selectionBox.classList.toggle('show', (gameMode === 'horse' || gameMode === 'arena' || gameMode === 'neon') && !!text);
+      const safe = text && String(text).trim() ? text : '응원할 참가자 카드를 눌러 선택하세요!';
+      state.cheerSelection = safe;
+      selectionText.textContent = safe;
+      const isInteractiveMode = gameMode === 'horse' || gameMode === 'arena' || gameMode === 'neon';
+      selectionBox.classList.toggle('show', isInteractiveMode && !!safe);
     }
 
     function updateHud(summary) {
@@ -787,12 +823,18 @@
 
     function setMode(nextMode) {
       gameMode = nextMode;
+      state.activeMode = nextMode;
+      clearScheduledTimers();
       titleOverlay.classList.toggle('hidden', nextMode !== 'title');
       hud.classList.toggle('show', nextMode !== 'title');
       cheerBtn.classList.toggle('show', nextMode === 'horse' || nextMode === 'arena' || nextMode === 'neon');
       txsBtn.classList.toggle('show', nextMode === 'tennis');
-      if (nextMode === 'title') {
+      if (nextMode !== 'title') {
+        selectionBox.classList.toggle('show', (nextMode === 'horse' || nextMode === 'arena' || nextMode === 'neon'));
+      } else {
         selectionBox.classList.remove('show');
+      }
+      if (nextMode === 'title') {
         hideComment();
       }
     }
@@ -853,7 +895,7 @@
 
       if (winner.progress >= 100) {
         showComment(`${winner.name} 우승! 경주가 종료되었습니다.`, '결과');
-        setTimeout(() => setMode('title'), 1500);
+        scheduleTimeout(() => setMode('title'), 1500);
       }
     }
 
@@ -887,7 +929,7 @@
       if (alive.length <= 1) {
         const winner = alive[0] || state.arena[0];
         showComment(`${winner.name} 최종 우승!`, '챔피언');
-        setTimeout(() => setMode('title'), 1500);
+        scheduleTimeout(() => setMode('title'), 1500);
         return;
       }
       const leader = alive.slice().sort((a, b) => b.hp - a.hp)[0];
@@ -925,7 +967,7 @@
       if (alive.length <= 1) {
         const winner = alive[0] || state.neon[0];
         showComment(`${winner.name}가 최후의 팽이로 남았습니다!`, '챔피언');
-        setTimeout(() => setMode('title'), 1500);
+        scheduleTimeout(() => setMode('title'), 1500);
         return;
       }
       const leader = alive.slice().sort((a, b) => b.rpm - a.rpm)[0];
@@ -971,7 +1013,7 @@
       if (state.tennis.leftScore >= 4 || state.tennis.rightScore >= 4) {
         const champ = state.tennis.leftScore > state.tennis.rightScore ? state.tennis.left : state.tennis.right;
         showComment(`${champ.name}가 세트에서 승리했습니다.`, '테니스');
-        setTimeout(() => setMode('title'), 1400);
+        scheduleTimeout(() => setMode('title'), 1400);
         return;
       }
 
@@ -1008,6 +1050,37 @@
       else if (modeName === 'random') startRandom();
     }
 
+    function handleCheer() {
+      if (gameMode === 'horse' && state.horse) {
+        const target = state.horse.slice().sort((a, b) => b.progress - a.progress)[0];
+        setSelectionHint('응원 대상: ' + target.name + ' (' + target.condition + ')');
+        showComment(`${target.name}에 응원 열풍이 몰아칩니다!`, '응원');
+      }
+      if (gameMode === 'arena' && state.arena) {
+        const alive = state.arena.filter(f => f.alive);
+        const target = alive[0] || state.arena[0];
+        setSelectionHint('응원 대상: ' + target.name);
+        showComment(`${target.name}에 대한 응원 효과가 발생했습니다!`, '응원');
+      }
+      if (gameMode === 'neon' && state.neon) {
+        const alive = state.neon.filter(t => t.alive);
+        const target = alive[0] || state.neon[0];
+        setSelectionHint('응원 대상: ' + target.name);
+        showComment(`${target.name}의 RPM이 한 단계 올랐습니다!`, '응원');
+      }
+    }
+
+    function togglePause(forceValue) {
+      const next = typeof forceValue === 'boolean' ? forceValue : !paused;
+      paused = next;
+      pauseOverlay.classList.toggle('show', paused);
+      if (paused) {
+        showComment('게임이 일시정지되었습니다. 계속하려면 이어하기를 눌러 주세요.', '일시정지');
+      } else {
+        hideComment();
+      }
+    }
+
     function attachEvents() {
       document.querySelectorAll('[data-mode]').forEach((button) => {
         button.addEventListener('click', () => startMode(button.dataset.mode));
@@ -1038,54 +1111,38 @@
         showComment(muted ? '사운드가 다시 켜졌습니다.' : '음소거 상태입니다.', '오디오');
       });
 
-      cheerBtn.addEventListener('click', () => {
-        if (gameMode === 'horse' && state.horse) {
-          const target = state.horse[0];
-          setSelectionHint('응원 대상: ' + target.name + ' (' + target.condition + ')');
-          showComment(`${target.name}에 응원 열풍이 몰아칩니다!`, '응원');
-        }
-        if (gameMode === 'arena' && state.arena) {
-          const alive = state.arena.filter(f => f.alive);
-          const target = alive[0] || state.arena[0];
-          setSelectionHint('응원 대상: ' + target.name);
-          showComment(`${target.name}에 대한 응원 효과가 발생했습니다!`, '응원');
-        }
-        if (gameMode === 'neon' && state.neon) {
-          const alive = state.neon.filter(t => t.alive);
-          const target = alive[0] || state.neon[0];
-          setSelectionHint('응원 대상: ' + target.name);
-          showComment(`${target.name}의 RPM이 한 단계 올랐습니다!`, '응원');
-        }
-      });
-
+      cheerBtn.addEventListener('click', handleCheer);
       txsBtn.addEventListener('click', cycleSpeed);
 
       document.getElementById('resumeBtn').addEventListener('click', () => {
-        paused = false;
-        pauseOverlay.classList.remove('show');
+        togglePause(false);
       });
       document.getElementById('backBtn').addEventListener('click', () => {
-        paused = false;
-        pauseOverlay.classList.remove('show');
+        togglePause(false);
         setMode('title');
       });
 
       document.addEventListener('keydown', (event) => {
         if (event.code === 'KeyP' || event.code === 'Escape') {
-          paused = !paused;
-          pauseOverlay.classList.toggle('show', paused);
+          event.preventDefault();
+          togglePause();
         }
         if (event.code === 'Space' && !event.repeat && (gameMode === 'horse' || gameMode === 'arena' || gameMode === 'neon')) {
-          cheerBtn.click();
+          event.preventDefault();
+          handleCheer();
         }
-        if (event.code === 'KeyS' && gameMode === 'tennis') cycleSpeed();
-        if (event.key === 'Enter' && guideOverlay.classList.contains('show')) guideOverlay.classList.remove('show');
+        if (event.code === 'KeyS' && gameMode === 'tennis') {
+          event.preventDefault();
+          cycleSpeed();
+        }
+        if (event.key === 'Enter' && guideOverlay.classList.contains('show')) {
+          guideOverlay.classList.remove('show');
+        }
       });
 
       document.addEventListener('visibilitychange', () => {
-        if (document.hidden && !paused) {
-          paused = true;
-          pauseOverlay.classList.add('show');
+        if (document.hidden && !paused && gameMode !== 'title') {
+          togglePause(true);
         }
       });
     }
