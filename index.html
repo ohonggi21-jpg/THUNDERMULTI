@@ -1275,7 +1275,7 @@ function hallRows(game){
 function recordHorseHall(){
  if(!G||!G.won||G.hallSaved)return;G.hallSaved=1;
  const order=HS.slice().sort((a,b)=>(b.fin?1:0)-(a.fin?1:0)||(a.fin&&b.fin?a.ft-b.ft:b.pos-a.pos));
- hallRecord('horse',order.map((h,i)=>({name:h.name,place:i+1,win:h===G.won,points:Math.max(50,1100-i*120+Math.round((h.pos||0)/10))})));
+ hallRecord('horse',order.map((h,i)=>({name:h.name,place:i+1,win:h===G.won,points:Math.max(500,Math.round((1100-i*120+Math.round((h.pos||0)/10))*10))})));
 }
 function recordArenaHall(st,game){
  if(!st||!st.won||st.hallSaved)return;st.hallSaved=1;
@@ -1348,7 +1348,7 @@ const nw=R0[P[w].name]=R0[P[w].name]||{w:0,l:0,s:0,b:0},nl=R0[P[l].name]=R0[P[l]
 if(!TX.saved){TX.saved=1;nw.w++;nw.s++;nw.b=Math.max(nw.b,nw.s);nl.l++;nl.s=0}
 const pred=TX.prediction||{},actualScore=`${st.rw[w]}-${st.rw[l]}`,predHit=pred.locked&&pred.winner===w,predExact=predHit&&pred.score===actualScore;R0.g.predTotal=(R0.g.predTotal||0)+(pred.locked&&pred.winner!=null?1:0);R0.g.predHit=(R0.g.predHit||0)+(predHit?1:0);R0.g.predExact=(R0.g.predExact||0)+(predExact?1:0);
 const nb=[];if(S0.ace[0]+S0.ace[1]>0&&Math.max(...S0.ace)>R0.g.aces){R0.g.aces=Math.max(...S0.ace);nb.push('최다 에이스 '+R0.g.aces+'개')}if(S0.rally>R0.g.rally){R0.g.rally=S0.rally;nb.push('최장 랠리 '+S0.rally+'구')}if(t<R0.g.fast){R0.g.fast=t;nb.push('최단 경기 '+t+'초')}saveRec(R0);
-const tennisPoints=i=>Math.round((S0.pts[i]||0)*10+(S0.ace[i]||0)*80+(S0.win[i]||0)*30+(i===w?500:0));
+const tennisPoints=i=>Math.round(((S0.pts[i]||0)*10+(S0.ace[i]||0)*80+(S0.win[i]||0)*30+(i===w?500:0))*10);
 hallRecord('tennis',P.map((p,i)=>({name:p.name,place:i===w?1:2,win:i===w,points:tennisPoints(i)})));
 go('T_RESULT');MODE='tennis';setM('',0);
 const tennisBadge=Math.max(...S0.ace)>0?`🎯 서브 에이스 왕 ${P[S0.ace.indexOf(Math.max(...S0.ace))].name}`:`🏃 마라톤 랠리 ${S0.rally}구`;ov(`<div class="card"><h2>🏆 우승!</h2>${badgeHTML(tennisBadge)}<h3 style="color:${w?C1:C0}">${FL[P[w].cc]} ${P[w].name}</h3><p>${st.rw[w]}:${st.rw[l]}로 승리했습니다!${upset?' <b style="color:#ffd75e">🔥 대이변! (배당 '+TX.odds[w].toFixed(2)+'배)</b>':''}</p>
