@@ -306,7 +306,7 @@ kbd{display:inline-block;padding:1px 6px;border:1px solid #8ab6d9;border-radius:
 <button class="mode-btn tennis" id="bT" type="button"><div class="mi">🎾</div><div class="mt">TENNIS</div><div class="md">3판 2선승제 · 테니스 스타 배틀!</div></button>
 <button class="mode-btn wc" id="bW" type="button"><div class="mi">🏆</div><div class="mt">월드 챔피언십</div><div class="md">네 가지 종목 중 하나를 선택하고 세계 챔피언에 도전하세요!</div></button>
 <button class="mode-btn random" id="bR" type="button"><div class="mi">🎲</div><div class="mt">랜덤 모드!</div><div class="md">다섯 모드 중 하나를 무작위로!</div></button>
-</div><button class="btn s guide-open" id="bHelp" type="button" aria-label="게임 설명 · 플레이 가이드" title="게임 설명 · 플레이 가이드">📘 게임 설명 · 플레이 가이드</button><button class="btn s" id="bHall" type="button">🏆 명예의 전당</button></div></div>
+</div><button class="btn s guide-open" id="bHelp" type="button" aria-label="게임 설명 · 플레이 가이드" title="게임 설명 · 플레이 가이드">📘 게임 설명 · 플레이 가이드</button><button class="btn s" id="bHall" type="button">🏆 명예의 전당</button><button class="btn s" id="bReset" type="button" style="border-color:#ff6b6b;color:#ffb0b0">🗑️ 게임 데이터 초기화</button></div></div>
 <div class="ov guide-overlay" id="oHelp" aria-label="THUNDER MULTI 게임 설명">
  <div class="wrap guide-wrap">
   <div class="guide-head"><div class="guide-kicker">THUNDER MULTI · PLAYER'S GUIDE</div><h2>📘 게임 설명서</h2><p>네 가지 종목, 랜덤 모드, 그리고 세계 챔피언을 향한 도전!</p></div>
@@ -846,6 +846,13 @@ $('hClose').onclick=()=>{aud();sfx('click');$('oHelp').style.display='none'};
 $('oHelp').addEventListener('click',e=>{if(e.target===$('oHelp'))$('oHelp').style.display='none'});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('oHelp').style.display==='block')$('oHelp').style.display='none'});
 $('bS').onclick=()=>{if(S!=='TITLE')return;isRandom=false;aud();sfx('click');startR()};
+$('bReset').onclick=()=>{
+ if(S!=='TITLE')return;
+ const ok=confirm('정말 게임 데이터를 초기화할까요?\\n\\n명예의 전당 기록, 테니스 기록, 닉네임, 사운드 설정이 이 브라우저에서 삭제됩니다. 이 작업은 되돌릴 수 없습니다.');
+ if(!ok)return;
+ ['tmHallV1','txRec','tmSettingsV1','tmProfile','tmHostRoom','tmHosted'].forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});
+ location.reload();
+};
 $('bA').onclick=()=>{if(S!=='TITLE')return;isRandom=false;aud();sfx('click');A_s.startRoulette()};
 $('bN').onclick=()=>{if(S!=='TITLE')return;isRandom=false;aud();sfx('click');N_s.startRoulette()};
 $('bR').onclick=()=>{if(S!=='TITLE')return;startRandom()};
