@@ -286,7 +286,7 @@ kbd{display:inline-block;padding:1px 6px;border:1px solid #8ab6d9;border-radius:
 <div id="go">GO!!</div>
 <button id="cb" type="button" aria-label="응원">📣</button>
 <button id="sb" type="button" aria-label="사운드">♪</button>
-<div id="sp"><label><input type="checkbox" id="mu"> 전체 음소거</label><label>배경음악<br><input type="range" id="vm" min="0" max="100" value="60"></label><label>효과음<br><input type="range" id="vs" min="0" max="100" value="80"></label><hr style="border:0;border-top:1px solid #ffd75e55;width:100%"><label><input type="checkbox" id="voiceOn" checked> 🎙️ 2인 음성 중계</label><label>중계 음량<br><input type="range" id="voiceVol" min="0" max="100" value="82"></label><label>말하기 속도<br><input type="range" id="voiceRate" min="80" max="120" value="100"></label><button type="button" class="voice-test" id="voiceTest">▶ 중계 테스트</button><label><input type="checkbox" id="aiCommentary" checked> 🧠 오프라인 스마트 AI 해설</label><div id="aiStatus" class="voice-note">경기 이벤트·시간·순위 변화를 분석해 캐스터와 해설위원 대사를 조합합니다.</div><div class="voice-note">외부 API·API 키·인터넷 연결 불필요. 음성은 기기에 설치된 한국어 음성을 사용합니다.</div></div>
+<div id="sp"><label><input type="checkbox" id="mu"> 전체 음소거</label><label>배경음악<br><input type="range" id="vm" min="0" max="100" value="60"></label><label>효과음<br><input type="range" id="vs" min="0" max="100" value="80"></label></div>
 <div class="ov" id="oT"><div class="wrap"><h1>THUNDER</h1><div class="kr">MULTI ARENA</div><div class="tag" id="tg"></div><div class="menu">
 <button class="mode-btn horse" id="bS" type="button"><div class="mi">🏇</div><div class="mt">경마 경기</div><div class="md">40가지 이벤트! 결승선 질주!</div></button>
 <button class="mode-btn arena" id="bA" type="button"><div class="mi">⚔️</div><div class="mt">프로게이머</div><div class="md">30가지 이벤트! 5인 배틀로얄!</div></button>
@@ -1382,66 +1382,6 @@ $('bHall').onclick=()=>{if(S!=='TITLE')return;sfx('click');showHall()};
 })();
 
 
-/* ===== THUNDER MULTI · 실시간 경기 분석 + 오프라인 2인 중계 ===== */
-(function(){
- const synth=window.speechSynthesis,enabled=$('voiceOn'),volume=$('voiceVol'),rate=$('voiceRate'),aiToggle=$('aiCommentary'),aiStatus=$('aiStatus');
- if(!enabled||!volume||!rate)return;
- const saved=window.TM_getSettings?.()||{};
- if(typeof saved.voiceEnabled==='boolean')enabled.checked=saved.voiceEnabled;
- if(Number.isFinite(saved.voiceVolume))volume.value=String(Math.max(0,Math.min(100,saved.voiceVolume)));
- if(Number.isFinite(saved.voiceRate))rate.value=String(Math.max(80,Math.min(120,saved.voiceRate)));
- let queue=[],busy=false,seq=0,lastEventKey='',lastEventAt=0,voiceList=[],lastCaster='',lastAnalyst='';
- const eventLog=[],spokenHistory=[];
- const setStatus=s=>{if(aiStatus)aiStatus.textContent=s};
- const koreanVoices=()=>synth?synth.getVoices().filter(v=>/^ko([-_]|$)/i.test(v.lang)):[];
- function chooseVoices(){voiceList=koreanVoices();const male=voiceList.filter(v=>/(injoon|joon|male|남성|man)/i.test(v.name));const neutral=voiceList.filter(v=>!/(heami|sunhi|yuna|seoyeon|female|여성|woman)/i.test(v.name));const pool=male.length?male:(neutral.length?neutral:voiceList);return{caster:pool[0]||null,analyst:pool[1]||pool[0]||null}}
- let selected=chooseVoices();
- const mode=()=>S==='RACING'||S==='FINISH'?'horse':/^A_/.test(String(S||''))?'pro-gamer':/^N_/.test(String(S||''))?'neon-top':/^T_/.test(String(S||''))?'tennis':String(S||'').startsWith('TN_')?'championship':'unknown';
- const modeName=m=>({'horse':'경마','pro-gamer':'프로게이머 배틀','neon-top':'네온 팽이','tennis':'테니스','championship':'월드 챔피언십'}[m]||'경기');
- const read=id=>$(id)?.textContent?.trim()||'';
- const snapshot=()=>({mode:mode(),screen:String(S||''),time:read('tm')||read('atm')||read('ntm'),leader:read('ld'),remaining:read('rm'),arenaAlive:read('aalive'),arenaPhase:read('aphase'),neonAlive:read('nalive'),neonPhase:read('nphase'),tennisScore:read('txc'),raceRanks:[...document.querySelectorAll('#rk .ch')].map(x=>x.textContent.trim()).filter(Boolean).slice(0,3),arenaFighters:[...document.querySelectorAll('#afighters .ch')].map(x=>x.textContent.trim()).filter(Boolean).slice(0,5),neonFighters:[...document.querySelectorAll('#nfighters .ch')].map(x=>x.textContent.trim()).filter(Boolean).slice(0,5)});
- const important=t=>/(킬|처치|탈락|KO|우승|챔피언|최후의|GAME SET|역전|추월|선두 교체|매치 포인트|링아웃|장외|골인|결승선|득점|점수|아이템|획득|콤보|연속|서든데스|연장|ACE|게임 종료|세트 종료|실책|네트|아웃|가속|감속|순풍|역풍|추격|압박)/i.test(t);
- function classify(t){if(/우승|챔피언|최후의|GAME SET|골인|결승선 통과|경기 종료/i.test(t))return'finish';if(/킬|처치|탈락|KO|링아웃|장외/i.test(t))return'elimination';if(/역전|추월|선두 교체|추격/i.test(t))return'overtake';if(/득점|점수|ACE|매치 포인트|게임 종료|세트 종료/i.test(t))return'score';if(/실책|네트|아웃|더블폴트|실수/i.test(t))return'mistake';if(/아이템|획득/i.test(t))return'item';if(/콤보|연속/i.test(t))return'combo';if(/순풍|역풍|가속|감속|압박|이벤트/i.test(t))return'race_event';return'game_event'}
- const casterLines={
- finish:['끝났습니다! 마지막 순간을 가져가며 승리를 확정합니다!','승부의 종착점! 이 선수가 오늘 경기의 주인공입니다!','결정적인 순간에 해냈습니다! 우승을 차지합니다!'],
- elimination:['한 명이 경기에서 이탈합니다! 생존 경쟁이 더 치열해집니다!','탈락자가 나왔습니다! 남은 선수들의 움직임도 달라지겠는데요!','이 교전에서 승부가 갈렸습니다! 한 명이 쓰러집니다!'],
- overtake:['순위가 뒤집힙니다! 흐름이 완전히 달라졌어요!','추월 성공! 선두 경쟁에 불이 붙습니다!','파고듭니다! 한순간에 순위가 바뀌었습니다!'],
- score:['점수 들어갑니다! 이 한 점이 분위기를 바꿀 수 있어요!','중요한 득점! 점수판에 변화가 생겼습니다!','결과를 만들어냅니다! 결정적인 순간의 득점입니다!'],
- mistake:['아, 실수가 나왔습니다! 상대에게 기회가 열립니다!','이건 아쉽습니다! 작은 실수가 큰 결과로 이어질 수 있어요!','흐름이 끊겼습니다! 방금 장면은 뼈아프겠는데요!'],
- item:['아이템 확보! 이제 사용 타이밍이 중요합니다!','새로운 변수가 등장했습니다! 아이템을 어떻게 활용할까요!','아이템을 손에 넣었습니다! 다음 교전이 기대됩니다!'],
- combo:['연속 공격이 들어갑니다! 흐름을 탔어요!','콤보가 이어집니다! 상대가 대응하기 쉽지 않습니다!','끊임없이 몰아칩니다! 연속 플레이가 나옵니다!'],
- race_event:['경기 흐름에 변수가 생겼습니다! {event}','주행에 큰 변화가 생겼습니다! {event}','이 상황이 순위 싸움에 영향을 줄 수 있습니다! {event}'],
- game_event:['경기장에서 중요한 장면이 나왔습니다! {event}','지금 이 장면 주목해야 합니다! {event}','승부의 흐름을 바꿀 만한 상황입니다! {event}']
- };
- const analystLines={
- finish:['결국 마지막 순간의 집중력이 차이를 만들었습니다. 기록과 흐름 모두 확인할 만한 경기였어요.','초반부터 쌓아 온 선택이 마지막 결과로 연결됐습니다. 우승자에게 축하를 보냅니다.','승부가 끝났습니다. 특히 결정적인 순간에 흔들리지 않았다는 점이 인상적이네요.'],
- elimination:['생존 인원이 줄어들수록 공간과 선택지가 급격히 좁아집니다. 다음 교전은 더 신중해야 합니다.','탈락한 선수와 남은 선수의 위치 관계가 중요해졌습니다. 무리한 진입은 위험하겠어요.','인원 우위가 생기면 시야와 자리 선점에서 유리해집니다. 이 흐름을 이어갈지가 관건입니다.'],
- overtake:['추월은 단순한 속도뿐 아니라 타이밍의 결과입니다. 이제 선두를 지키는 대응이 중요합니다.','순위가 바뀐 직후에는 추격하는 쪽의 선택이 급해질 수 있습니다. 페이스 조절을 봐야겠네요.','흐름이 넘어갔습니다. 이전 선두가 얼마나 빠르게 반응하는지가 관전 포인트입니다.'],
- score:['득점 이후 다음 포인트 운영이 중요합니다. 방금 성공에 취하지 않고 리듬을 유지해야 합니다.','점수 차와 남은 시간을 함께 봐야 하는 구간입니다. 한 번의 선택이 경기 전체를 바꿀 수 있어요.','점수를 냈다는 사실보다 어떤 패턴으로 만들었는지가 중요합니다. 상대의 대응을 지켜보죠.'],
- mistake:['실수의 원인을 바로 정리해야 합니다. 같은 상황이 반복되면 상대에게 읽힐 수 있어요.','상대가 압박을 높일 수 있는 순간입니다. 다음 선택에서 안정감을 되찾아야 합니다.','실책 하나가 곧 패배를 뜻하지는 않습니다. 다만 이후 운영에서 위험을 줄여야겠네요.'],
- item:['획득한 아이템을 언제 쓰느냐가 핵심입니다. 급하게 소비하기보다 결정적인 장면을 노릴 수 있겠어요.','아이템이 있다고 무조건 유리한 건 아닙니다. 위치와 상대의 상태까지 확인해야 합니다.','다음 교전에서 아이템 효과를 얼마나 크게 만들지가 중요하겠습니다.'],
- combo:['연속 성공으로 리듬을 가져왔습니다. 다만 상대가 패턴을 파악하기 전에 변화를 주는 것도 중요합니다.','콤보가 이어질 때는 공격 주도권을 잡기 쉽습니다. 상대가 끊어낼 수 있을지 보겠습니다.','좋은 연계입니다. 성공한 동작 이후의 위치 선정까지 깔끔한지가 관건이에요.'],
- race_event:['이 이벤트가 실제 순위 변화로 연결되는지 확인해야 합니다. 현재 위치와 남은 거리가 중요하겠네요.','주행 중 변수는 순간적인 이득보다 결승선까지 페이스를 유지하는지가 더 중요합니다.','다른 주자와의 격차를 함께 봐야 합니다. 이벤트 하나만으로 결과를 단정할 수는 없습니다.'],
- game_event:['한 장면만으로 승부를 단정할 수는 없습니다. 이어지는 운영과 대응을 함께 봐야겠어요.','현재 상황을 정리하고 다음 선택을 확인하겠습니다. 정보와 타이밍이 중요합니다.','이제 상대가 어떻게 반응하는지가 중요합니다. 다음 장면에서 경기의 방향이 드러나겠네요.']
- };
- const pick=(arr,last)=>{let a=arr.filter(x=>x!==last);if(!a.length)a=arr;return a[Math.floor(Math.random()*a.length)]};
- function contextual(e){const st=e.state||{},d=e.data||{},details=[];if(d.winner&&d.eliminated)details.push(d.winner+' 선수가 '+d.eliminated+' 선수를 탈락시켰습니다');else if(d.eliminated)details.push(d.eliminated+' 선수 탈락');if(d.attacker&&d.eliminated)details.push(d.attacker+' 선수의 공격으로');if(d.horse)details.push(d.horse+' 경주마');if(d.position)details.push('현재 '+d.position+'위');if(d.distance!==undefined)details.push('결승선까지 '+d.distance+'미터');if(d.winner&&!d.eliminated)details.push(d.winner+' 선수 우승');if(d.scorer)details.push(d.scorer+' 선수 득점');if(d.score)details.push('현재 점수 '+d.score[0]+' 대 '+d.score[1]);if(d.event)details.push(d.event);if(st.leader)details.push(st.leader);if(st.arenaAlive)details.push(st.arenaAlive);if(st.neonAlive)details.push(st.neonAlive);if(st.arenaPhase)details.push(st.arenaPhase);if(st.neonPhase)details.push(st.neonPhase);if(st.raceRanks?.length)details.push('상위 순위 '+st.raceRanks.slice(0,2).join(', '));if(st.time)details.push('경기 시간 '+st.time);return details.filter(Boolean).slice(0,3)}
- function buildLocalCommentary(e){const type=e.type||'game_event',st=e.state||{},d=e.data||{},event=e.text||'경기 상황 변화';let caster=pick(casterLines[type]||casterLines.game_event,lastCaster);if(caster.includes('{event}'))caster=caster.replace('{event}',event);else if(['finish','elimination','overtake','score','mistake','item','combo'].includes(type))caster+=' '+(event.length>70?event.slice(0,70):event);let analyst=pick(analystLines[type]||analystLines.game_event,lastAnalyst);const ctx=contextual(e);if(ctx.length&&Math.random()<.82)analyst+=' '+ctx.join('. ')+'.';if(d.positive===false&&type==='race_event')analyst+=' 부정적인 변수인 만큼 회복 타이밍이 중요합니다.';lastCaster=caster;lastAnalyst=analyst;return[{text:caster,role:'caster',critical:true},{text:modeName(st.mode||mode())+' 분석입니다. '+analyst,role:'analyst',critical:true}]}
- function stop(){seq++;queue=[];busy=false;if(synth)try{synth.cancel()}catch(e){}}
- function speakNext(){if(!synth||busy||!queue.length||!enabled.checked||mut)return;const item=queue.shift(),token=seq;busy=true;const u=new SpeechSynthesisUtterance(item.text);u.lang='ko-KR';u.volume=Math.min(1,Number(volume.value)/100);u.rate=Number(rate.value)/100*(item.role==='analyst'?.96:1.13);u.pitch=item.role==='analyst'?.72:.94;selected=chooseVoices();const v=item.role==='analyst'?selected.analyst:selected.caster;if(v)u.voice=v;const done=()=>{if(token!==seq)return;busy=false;setTimeout(speakNext,130)};u.onend=done;u.onerror=done;try{synth.speak(u)}catch(e){done()}}
- function addSpeech(lines,priority){if(!synth||!enabled.checked||mut)return;if(priority==='critical')stop();lines.forEach(x=>{const t=String(x.text||'').trim();if(t&&!spokenHistory.includes(t)){queue.push({...x,text:t});spokenHistory.unshift(t);if(spokenHistory.length>24)spokenHistory.pop()}});if(queue.length>10)queue.splice(0,queue.length-10);speakNext()}
- function recordEvent(raw,source,extra){const obj=typeof raw==='object'&&raw?raw:{text:raw,source};const t=String(obj.text||'').replace(/\s+/g,' ').trim();if(t.length<3||(!obj.type&&!important(t)))return null;const now=Date.now(),key=mode()+'|'+t;if(key===lastEventKey&&now-lastEventAt<850)return null;lastEventKey=key;lastEventAt=now;const e={id:now+'-'+Math.random().toString(36).slice(2,7),type:obj.type||classify(t),text:t,source:obj.source||source||'game-ui',importance:obj.importance||'high',timestamp:new Date().toISOString(),state:snapshot(),data:obj.data||extra||{}};eventLog.push(e);if(eventLog.length>100)eventLog.shift();window.dispatchEvent(new CustomEvent('thunder:game-event',{detail:e}));if(aiToggle&&aiToggle.checked)addSpeech(buildLocalCommentary(e),(e.type==='finish'||e.type==='elimination')?'critical':'normal');else addSpeech([{text:t,role:'caster'}],'normal');return e}
- ['ep','txe'].forEach(id=>{const el=$(id);if(!el)return;new MutationObserver(()=>{const t=(el.textContent||'').trim();if(t)recordEvent(t,id)}).observe(el,{childList:true,characterData:true,subtree:true})});
- ['ld','rm','aalive','aphase','nalive','nphase'].forEach(id=>{const el=$(id);if(!el)return;let previous='';new MutationObserver(()=>{const t=(el.textContent||'').trim();if(!t||t===previous)return;previous=t;if(/^(1위|생존|⚡|결승선)/.test(t)&&important(t))recordEvent(t,id)}).observe(el,{childList:true,characterData:true,subtree:true})});
- if(aiToggle){try{aiToggle.checked=localStorage.getItem('tm_local_ai')!=='off'}catch(e){aiToggle.checked=true}aiToggle.addEventListener('change',()=>{try{localStorage.setItem('tm_local_ai',aiToggle.checked?'on':'off')}catch(e){}setStatus(aiToggle.checked?'실시간 상황 분석 해설 켜짐 · 오프라인 작동':'스마트 해설 꺼짐 · 기본 중계 사용')})}
- enabled.addEventListener('change',()=>{if(!enabled.checked)stop();window.TM_saveSetting?.('voiceEnabled',enabled.checked)});
- volume.addEventListener('input',()=>{window.TM_saveSetting?.('voiceVolume',Number(volume.value));if(synth&&busy){const p=queue.slice();stop();queue=p;speakNext()}});
- rate.addEventListener('input',()=>{window.TM_saveSetting?.('voiceRate',Number(rate.value));if(synth&&busy){const p=queue.slice();stop();queue=p;speakNext()}});
- const test=$('voiceTest');if(test)test.addEventListener('click',()=>{stop();addSpeech([{text:'자아아! THUNDER MULTI 아레나, 오늘의 승부가 시작됩니다! 초반부터 엄청난 속도입니다!',role:'caster',critical:true},{text:'경기 초반에는 흐름을 읽는 게 중요합니다. 현재 순위뿐 아니라 남은 시간과 선수들의 위치까지 함께 살펴보겠습니다.',role:'analyst',critical:true}],'critical')});
- if(synth&&synth.onvoiceschanged!==undefined)synth.onvoiceschanged=()=>{selected=chooseVoices()};
- if(!synth){enabled.checked=false;enabled.disabled=true;if(test)test.disabled=true}
- window.THUNDER_AI={getEvents:()=>eventLog.slice(),getLatestEvent:()=>eventLog[eventLog.length-1]||null,generateCommentary:buildLocalCommentary,pushEvent:e=>recordEvent(e),getSnapshot:snapshot,clearEvents:()=>{eventLog.length=0}};
- setStatus('실시간 경기 분석 해설 준비 완료 · 외부 API 불필요');
-})();
+
 </script>
 </body></html>
