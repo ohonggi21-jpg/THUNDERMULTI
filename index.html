@@ -204,6 +204,16 @@ h1{font:900 clamp(38px,10vw,110px)/.95 Impact,"Arial Black",sans-serif;letter-sp
 #oC{z-index:30;background:#000c}
  
 /* THUNDER MULTI in-game guide */
+
+/* 가로 화면 설명서: 마지막 섹션도 전체 폭을 사용해 균형 있게 배치 */
+@media (orientation:landscape) and (min-width:700px){
+ .guide-wrap{box-sizing:border-box;width:100%;align-items:center!important;padding-left:max(22px,env(safe-area-inset-left))!important;padding-right:max(22px,env(safe-area-inset-right))!important}
+ .guide-head,.guide-content,.guide-footer{width:min(100%,1200px)!important;max-width:1200px!important;margin-left:auto!important;margin-right:auto!important}
+ .guide-content>section:last-child{grid-column:1/-1}
+ .guide-footer{justify-content:center!important;text-align:center!important}
+ .guide-footer p{text-align:center!important}
+}
+
 .guide-open{margin-top:clamp(2px,1vh,10px);min-height:42px;border-color:#8ad7ff;color:#eaf8ff;background:linear-gradient(135deg,#173b62,#10253f);font-size:clamp(13px,2.2vw,17px);box-shadow:0 4px 0 #071a30,0 8px 18px #0009}
 /* 타이틀 화면에서 설명 버튼은 항상 보이는 왼쪽 위에 고정 */
 .TITLE #bHelp{position:fixed;top:max(10px,env(safe-area-inset-top));left:max(10px,env(safe-area-inset-left));z-index:15;margin:0;min-height:42px;padding:.55em 1em;font-size:clamp(12px,2vw,15px);box-shadow:0 4px 0 #071a30,0 8px 18px #0009}
