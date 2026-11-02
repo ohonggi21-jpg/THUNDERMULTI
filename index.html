@@ -262,7 +262,9 @@ kbd{display:inline-block;padding:1px 6px;border:1px solid #8ab6d9;border-radius:
 
 /* 점수 버튼 두 종류 모두 하단 일시정지 버튼과 분리 */
 #tmHostFab,#tmFab{top:calc(62px + env(safe-area-inset-top))!important;bottom:auto!important;left:max(8px,env(safe-area-inset-left))!important;right:auto!important}
-\n#gameSpeed{position:fixed;right:max(12px,env(safe-area-inset-right));bottom:max(154px,calc(env(safe-area-inset-bottom) + 145px));z-index:13;display:none;padding:9px 12px;border:2px solid #ffd75e;border-radius:12px;background:#0b1a2ee6;color:#fff;font-weight:900;font-size:13px;box-shadow:0 3px 12px #0008;cursor:pointer}\n.RACING #gameSpeed,.FINISH #gameSpeed,.A_BATTLE #gameSpeed,.A_FINISH #gameSpeed,.N_BATTLE #gameSpeed,.N_FINISH #gameSpeed,.TN_M #gameSpeed{display:block}\n</style></head><body class="TITLE">
+
+#gameSpeed{position:fixed;right:max(12px,env(safe-area-inset-right));bottom:max(154px,calc(env(safe-area-inset-bottom) + 145px));z-index:13;display:none;padding:9px 12px;border:2px solid #ffd75e;border-radius:12px;background:#0b1a2ee6;color:#fff;font-weight:900;font-size:13px;box-shadow:0 3px 12px #0008;cursor:pointer}
+.RACING #gameSpeed,.FINISH #gameSpeed,.A_BATTLE #gameSpeed,.A_FINISH #gameSpeed,.N_BATTLE #gameSpeed,.N_FINISH #gameSpeed,.TN_M #gameSpeed{display:block}\n</style></head><body class="TITLE">
 <canvas id="cv"></canvas>
 <div id="hud"><div id="tb"><b id="tm">0.0초</b><b id="ld">-</b><b id="rm">-</b></div><div id="bar"></div><div id="rk"></div></div>
 <div id="ahud"><div id="atb"><b id="atm">0.0초</b><b id="aalive">생존 5/5</b><b id="aphase">탐색</b></div><div id="afighters"></div></div>
