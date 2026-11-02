@@ -262,7 +262,7 @@ kbd{display:inline-block;padding:1px 6px;border:1px solid #8ab6d9;border-radius:
 
 /* 점수 버튼 두 종류 모두 하단 일시정지 버튼과 분리 */
 #tmHostFab,#tmFab{top:calc(62px + env(safe-area-inset-top))!important;bottom:auto!important;left:max(8px,env(safe-area-inset-left))!important;right:auto!important}
-</style></head><body class="TITLE">
+\n#gameSpeed{position:fixed;right:max(12px,env(safe-area-inset-right));bottom:max(154px,calc(env(safe-area-inset-bottom) + 145px));z-index:13;display:none;padding:9px 12px;border:2px solid #ffd75e;border-radius:12px;background:#0b1a2ee6;color:#fff;font-weight:900;font-size:13px;box-shadow:0 3px 12px #0008;cursor:pointer}\n.RACING #gameSpeed,.FINISH #gameSpeed,.A_BATTLE #gameSpeed,.A_FINISH #gameSpeed,.N_BATTLE #gameSpeed,.N_FINISH #gameSpeed,.TN_M #gameSpeed{display:block}\n</style></head><body class="TITLE">
 <canvas id="cv"></canvas>
 <div id="hud"><div id="tb"><b id="tm">0.0초</b><b id="ld">-</b><b id="rm">-</b></div><div id="bar"></div><div id="rk"></div></div>
 <div id="ahud"><div id="atb"><b id="atm">0.0초</b><b id="aalive">생존 5/5</b><b id="aphase">탐색</b></div><div id="afighters"></div></div>
@@ -281,7 +281,7 @@ kbd{display:inline-block;padding:1px 6px;border:1px solid #8ab6d9;border-radius:
 <button class="mode-btn neon" id="bN" type="button"><div class="mi">🌀</div><div class="mt">네온 팽이</div><div class="md">30가지 이벤트! 링아웃 배틀!</div></button>
 <button class="mode-btn tennis" id="bT" type="button"><div class="mi">🎾</div><div class="mt">TENNIS</div><div class="md">3판 2선승제 · 테니스 스타 배틀!</div></button>
 <button class="mode-btn wc" id="bW" type="button"><div class="mi">🏆</div><div class="mt">월드 챔피언십</div><div class="md">네 가지 종목 중 하나를 선택하고 세계 챔피언에 도전하세요!</div></button>
-<button class="mode-btn random" id="bR" type="button"><div class="mi">🎲</div><div class="mt">랜덤 모드!</div><div class="md">네 게임 중 하나를 무작위로!</div></button>
+<button class="mode-btn random" id="bR" type="button"><div class="mi">🎲</div><div class="mt">랜덤 모드!</div><div class="md">다섯 모드 중 하나를 무작위로!</div></button>
 </div><button class="btn s guide-open" id="bHelp" type="button" aria-label="게임 설명 · 플레이 가이드" title="게임 설명 · 플레이 가이드">📘 게임 설명 · 플레이 가이드</button><button class="btn s" id="bHall" type="button">🏆 명예의 전당</button></div></div>
 <div class="ov guide-overlay" id="oHelp" aria-label="THUNDER MULTI 게임 설명">
  <div class="wrap guide-wrap">
@@ -341,7 +341,7 @@ kbd{display:inline-block;padding:1px 6px;border:1px solid #8ab6d9;border-radius:
 <div class="ov" id="oAX"><div class="wrap"><div class="card arena" id="axc"></div></div></div>
 <div class="ov" id="oNX"><div class="wrap"><div class="card neon" id="nxc"></div></div></div>
 <div id="errBox"></div>
-<button id="pz" type="button" aria-label="일시정지" aria-keyshortcuts="P Escape">⏸</button>
+<button id="pz" type="button" aria-label="일시정지" aria-keyshortcuts="P Escape">⏸</button><button id="gameSpeed" type="button" aria-label="관전 배속">▶ 1x</button>
 <div class="ov" id="oP" role="dialog" aria-modal="true" aria-labelledby="pauseTitle"><div class="wrap"><div class="card"><h2 id="pauseTitle">⏸ 일시정지</h2><p id="pauseMessage">게임 진행이 완전히 멈췄습니다.</p><p class="pause-keys">P / Esc: 계속·일시정지 · Space: 응원</p><div class="b2"><button class="btn" id="pR" type="button">▶ 계속하기</button><button class="btn s" id="pRe" type="button">🔄 다시 시작</button><button class="btn s" id="pT" type="button">🏠 타이틀로 돌아가기</button></div></div></div></div>
 <div id="mv"><div class="mq" id="mq0"><span></span><em></em></div><div class="mq" id="mq1"><span></span><em></em></div><div class="mq" id="mq2"><span></span><em></em></div><div class="mq" id="mq3"><span></span><em></em></div><div id="mcd"></div></div>
 <div class="ov" id="oC"><div class="wrap"><div class="card"><p id="cmsg" style="font-size:18px;margin-bottom:12px"></p><div style="display:flex;gap:10px;justify-content:center"><button class="btn" id="cy" type="button">확인</button><button class="btn s" id="cn" type="button">취소</button></div></div></div></div>
@@ -478,7 +478,7 @@ const A_s = (() => {
     {n:'궁극의 결전',w:5,c:()=>alive().length===2,r:()=>{alive().forEach(f=>{f.eff.haste=2;f.eff.defense=1});sfx('big');shk=8;return`궁극의 결전!`}}
   ];
   function tryEvent(){const A=alive();if(A.length<2)return;const valid=EVENTS.filter(e=>(st.t-(st.last[e.n]??-99)>=4)&&e.c());if(!valid.length)return;let r=R()*valid.reduce((a,e)=>a+e.w,0);for(const e of valid){r-=e.w;if(r<=0){const m=e.r();if(m){say(m,2);st.log.push({t:st.t,tx:m})}st.last[e.n]=st.t;st.evn++;return}}}
-  function endBattle(w){if(st.won)return;st.won=w;window.recordArenaHall(st,'pro');window.THUNDER_AI?.pushEvent({type:'finish',text:`${w.n} 최후의 챔피언으로 우승!`,source:'pro-finish',importance:'critical',data:{winner:w.n,remaining:1}});go('A_FINISH');st.finT=0;sfx('fin');setTimeout(()=>sfx('fan'),500);say(`🏆 GAME SET! 최후의 챔피언은 ${w.n}!`,3);flash=1;shk=10;st.cheerBoost=2;for(let i=0;i<90;i++)pT.push({x:w.x+rr(-220,220),y:w.y-rr(20,220),vx:rr(-140,140),vy:rr(-240,-40),l:2.8,m:2.8,c:['#ffd75e','#4a9eff','#fff','#7dff9b'][i%4],s:6,g:260})}
+  function endBattle(w){if(st.won)return;st.won=w;window.recordArenaHall(st,'pro');window.THUNDER_AI?.pushEvent({type:'finish',text:`${w.n} 최후의 챔피언으로 우승!`,source:'pro-finish',importance:'critical',data:{winner:w.n,remaining:1}});go('A_FINISH');st.finT=0;sfx('fin');after(500,()=>sfx('fan'));say(`🏆 GAME SET! 최후의 챔피언은 ${w.n}!`,3);flash=1;shk=10;st.cheerBoost=2;for(let i=0;i<90;i++)pT.push({x:w.x+rr(-220,220),y:w.y-rr(20,220),vx:rr(-140,140),vy:rr(-240,-40),l:2.8,m:2.8,c:['#ffd75e','#4a9eff','#fff','#7dff9b'][i%4],s:6,g:260})}
   function cheer(){if(!st.fighters.length)return;let f = (aCheerIdx>=0 && st.fighters[aCheerIdx]) ? st.fighters[aCheerIdx] : (alive()[0]||st.fighters[0]);if(!f)return;[523,659,784,1047].forEach((fq,i)=>tone(fq,.16,'triangle',.14,i*.05));shk=4;st.cheerBoost=1.5;const cols=['#ffd75e','#ff2a85','#00e5ff','#7dff9b','#fff'];for(let i=0;i<24;i++)pT.push({x:f.x+rr(-50,50),y:f.y-40+rr(-20,20),vx:rr(-180,180),vy:rr(-300,-80),l:1,m:1,c:cols[i%5],s:5.5,g:360});say(f.alive?`📣 ${f.n} 화이팅!`:`📣 ${f.n} 선수에게 응원!`,1)}
   function reset(){st.hallSaved=0;aCheerIdx=-1;st.sel=[];st.fighters=[];st.t=0;st.evT=1.4;st.won=null;st.overtime=0;st.isOT=false;st.finT=0;st.cmq=[];st.cmT=0;st.shown=[];st.log=[];st.last={};st.evn=0;st.lastChance=0;st.cheerBoost=0;pT=[];cam.x=600;cam.y=490;cam.z=.85;try{$('act').textContent=''}catch(e){}}
   function startRoulette(){reset();go('A_ROULETTE');st.sel=shuffle(CHARS).slice(0,5);$('art').textContent='전투원 추첨 중...';const cd=$('acd');cd.innerHTML=[0,1,2,3,4].map(i=>`<div class="rc sp" id="arc${i}"><i>?</i><div class="nm">???</div><small>&nbsp;</small></div>`).join('');const stop=[1000,1550,2100,2650,3200];const fill=(i,p,lk)=>{const e=$('arc'+i);e.className='rc'+(lk?' lk':' sp');e.innerHTML=`<i style="background:${p.c}">${lk?i+1:'?'}</i><div class="nm">${p.n}</div><small>${lk?`${p.w}<br>${p.ab}`:'&nbsp;'}</small>`};[0,1,2,3,4].forEach(i=>{let d=45,el=0,lp=-1;const step=()=>{if(el>=stop[i]){fill(i,st.sel[i],1);sfx(i===4?'big':'lock');if(i===4){flash=.8;shk=6;after(600,()=>{go('A_CONFIRM');$('art').textContent='전투원 결정 완료! (카드를 눌러 응원 선수 선택)'})}return}let k;do k=CHARS.length*R()|0;while(k===lp);lp=k;fill(i,CHARS[k]);sfx('tick');el+=d;d*=1.13;after(d,step)};after(i*140,step)})}
@@ -610,7 +610,7 @@ const N_s = (() => {
     {n:'분노 폭발',w:5,c:()=>alive().some(t=>t.rpm<150),r:()=>{const t=pick(alive().filter(x=>x.rpm<150))||pick(alive());if(!t)return null;t.eff.drainRed=2.5;t.eff.haste=2;return`${t.n}, 분노 폭발!`}},
     {n:'회전 가속',w:5,c:()=>alive().length>=2,r:()=>{alive().forEach(t=>{t.eff.haste=1.8;const a=Math.atan2(t.y-ACY,t.x-ACX);t.vx+=Math.cos(a+rr(-.5,.5))*200;t.vy+=Math.sin(a+rr(-.5,.5))*200});return`회전 가속!`}},
     {n:'잔상 공격',w:5,c:()=>alive().length>=2,r:()=>{const A=alive(),f=pick(A),t=pick(A.filter(x=>x!==f));if(!t)return null;t.rpm=Math.max(0,t.rpm-36);t.hitFlash=.4;t.lastHitBy=f;f.damageDealt+=12;for(let i=0;i<4;i++){const a=rr(0,Math.PI*2);pT.push({x:f.x+Math.cos(a)*60,y:f.y+Math.sin(a)*60,vx:Math.cos(a)*80,vy:Math.sin(a)*80,l:.5,m:.5,c:safeColor(f.col),s:5,g:0})}if(t.rpm<=0)killTop(t,f);return`${f.n}의 잔상 공격!`}},
-    {n:'철벽 방어',w:5,c:()=>alive().length>=2,r:()=>{const t=pick(alive());if(!t)return null;t.massBoost=2.5;setTimeout(()=>t.massBoost=null,3000);spawnRing(t.x,t.y,'#c4ced8',50);return`${t.n}, 철벽 방어!`}},
+    {n:'철벽 방어',w:5,c:()=>alive().length>=2,r:()=>{const t=pick(alive());if(!t)return null;t.massBoost=2.5;after(3000,()=>t.massBoost=null);spawnRing(t.x,t.y,'#c4ced8',50);return`${t.n}, 철벽 방어!`}},
     {n:'급강하',w:5,c:()=>alive().length>=2,r:()=>{const t=pick(alive());if(!t)return null;const a=rr(0,Math.PI*2);t.vx=Math.cos(a)*700;t.vy=Math.sin(a)*700;return`${t.n}, 급강하!`}},
     {n:'회오리',w:6,c:()=>alive().length>=2,r:()=>{alive().forEach(t=>{const ang=rr(0,Math.PI*2);t.vx+=Math.cos(ang)*180;t.vy+=Math.sin(ang)*180;t.rpm=Math.max(0,t.rpm-15)});shk=5;return`회오리!`}},
     {n:'스파크 폭발',w:5,c:()=>alive().length>=2,r:()=>{const t=pick(alive());if(!t)return null;for(let i=0;i<40;i++){const a=rr(0,Math.PI*2),sp=rr(100,400);pT.push({x:t.x,y:t.y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,l:.7,m:.7,c:safeColor(t.col),s:4,g:0})}spawnRing(t.x,t.y,t.col,80);return`스파크 폭발!`}},
@@ -770,10 +770,10 @@ function startRandom(){
 }
 
 /* ===== 메인 루프 & 입력 ===== */
-let last=performance.now(),lastCheer=0,loopReq=0;
+let gameSpd=1;let last=performance.now(),lastCheer=0,loopReq=0;
 const scheduleLoop=()=>{if(!loopReq)loopReq=requestAnimationFrame(n=>{loopReq=0;loop(n)})};
 function loop(n){if(paused){last=n;return}
-  const dt=Math.min(.05,(n-last)/1e3); last=n; tt+=dt;
+  let dt=Math.min(.05,(n-last)/1e3); last=n; dt*=gameSpd; tt+=dt;
   if(typeof TX!=='undefined'&&TX.on){TX.frame(dt);scheduleLoop();return}
   if(TN&&TN.multi){TN.mf(dt);scheduleLoop();return}
   if(MODE==='arena'){
@@ -841,13 +841,13 @@ function cheer(){
   const h=cheerIdx>=0&&HS[cheerIdx]?HS[cheerIdx]:HS[0]; if(!h||h.out||h.fin)return;
   sfx('up'); shk=5;
   for(let i=0;i<20;i++)PT.push({x:rr(0,W),y:rr(ty0,ty1),vx:rr(-140,140),vy:rr(-260,-60),l:.9,m:.9,c:['#ffd75e','#ff6b6b','#7dff9b'][i%3],s:5,g:400});
-  ad(h,.12,1.2); say(`${h.name}, 힘내세요! 관중의 응원이 쏟아집니다!`,1);
+  say(`${h.name}, 힘내세요! 관중의 응원이 쏟아집니다!`,1);
 }
-$('cb').onclick=()=>cheer();
+$('gameSpeed').onclick=()=>{const v=[0.5,1,1.5,2],i=v.indexOf(gameSpd);gameSpd=v[(i+1)%v.length];$('gameSpeed').textContent=(gameSpd===1?'▶ ':'⏩ ')+gameSpd+'x';sfx('click')};$('cb').onclick=()=>cheer();
 document.addEventListener('keydown',e=>{const control=e.target?.closest?.('button,a,input,textarea,select,[contenteditable="true"]');if(e.code==='Space'&&!control&&(S==='RACING'||S==='A_BATTLE'||S==='N_BATTLE')){e.preventDefault();cheer()}});
 document.getElementById('errBox').addEventListener('click',function(){this.style.display='none';this.textContent=''});window.addEventListener('error',e=>{if(!e.message&&e.target&&e.target!==window)return;const box=$('errBox');box.style.display='block';box.textContent+=`⚠️ ${e.message||e}\n @ ${(e.filename||'').split('/').pop()}:${e.lineno||''}:${e.colno||''} ${e.error&&e.error.stack?String(e.error.stack).replace(/\s+/g,' ').slice(0,260):''}\n`},true);
 window.addEventListener('unhandledrejection',e=>{const box=$('errBox');box.style.display='block';box.textContent+=`⚠️ ${e.reason&&e.reason.message||e.reason}\n`});
-const TG=["3가지 게임, 한 번에!","🎲 랜덤 모드로 무작위 도전!","경마·아레나·팽이, 최후의 승자는?","응원과 함께 승리를 기원하세요!"];let ti=0;$('tg').textContent=TG[0];setInterval(()=>{if(S==='TITLE')$('tg').textContent=TG[++ti%4]},3200);
+const TG=["4가지 게임, 한 번에!","🎲 랜덤 모드로 무작위 도전!","경마·아레나·팽이·테니스, 최후의 승자는?","응원과 함께 승리를 기원하세요!"];let ti=0;$('tg').textContent=TG[0];setInterval(()=>{if(S==='TITLE')$('tg').textContent=TG[++ti%4]},3200);
 rs(); setM('t',108); scheduleLoop();
 
 /* ===== WORLD CHAMPIONSHIP + PAUSE (추가 모듈) ===== */
@@ -1404,7 +1404,7 @@ $('bHall').onclick=()=>{if(S!=='TITLE')return;sfx('click');showHall()};
  function stop(){seq++;queue=[];busy=false;if(synth)try{synth.cancel()}catch(e){}}
  function speakNext(){if(!synth||busy||!queue.length||!enabled.checked||mut)return;const item=queue.shift(),token=seq;busy=true;const u=new SpeechSynthesisUtterance(item.text);u.lang='ko-KR';u.volume=Math.min(1,Number(volume.value)/100);u.rate=Number(rate.value)/100*(item.role==='analyst'?.96:1.13);u.pitch=item.role==='analyst'?.72:.94;selected=chooseVoices();const v=item.role==='analyst'?selected.analyst:selected.caster;if(v)u.voice=v;const done=()=>{if(token!==seq)return;busy=false;setTimeout(speakNext,130)};u.onend=done;u.onerror=done;try{synth.speak(u)}catch(e){done()}}
  function addSpeech(lines,priority){if(!synth||!enabled.checked||mut)return;if(priority==='critical')stop();lines.forEach(x=>{const t=String(x.text||'').trim();if(t&&!spokenHistory.includes(t)){queue.push({...x,text:t});spokenHistory.unshift(t);if(spokenHistory.length>24)spokenHistory.pop()}});if(queue.length>10)queue.splice(0,queue.length-10);speakNext()}
- function recordEvent(raw,source,extra){const obj=typeof raw==='object'&&raw?raw:{text:raw,source};const t=String(obj.text||'').replace(/\s+/g,' ').trim();if(t.length<3||(!obj.type&&!important(t)))return null;const now=Date.now(),key=mode()+'|'+t;if(key===lastEventKey&&now-lastEventAt<850)return null;lastEventKey=key;lastEventAt=now;const e={id:now+'-'+Math.random().toString(36).slice(2,7),type:obj.type||classify(t),text:t,source:obj.source||source||'game-ui',importance:obj.importance||'high',timestamp:new Date().toISOString(),state:snapshot(),data:obj.data||extra||{}};eventLog.push(e);if(eventLog.length>100)eventLog.shift();window.dispatchEvent(new CustomEvent('thunder:game-event',{detail:e}));if(aiToggle&&aiToggle.checked)addSpeech(buildLocalCommentary(e),e.importance==='critical'?'critical':'normal');else addSpeech([{text:t,role:'caster'}],'normal');return e}
+ function recordEvent(raw,source,extra){const obj=typeof raw==='object'&&raw?raw:{text:raw,source};const t=String(obj.text||'').replace(/\s+/g,' ').trim();if(t.length<3||(!obj.type&&!important(t)))return null;const now=Date.now(),key=mode()+'|'+t;if(key===lastEventKey&&now-lastEventAt<850)return null;lastEventKey=key;lastEventAt=now;const e={id:now+'-'+Math.random().toString(36).slice(2,7),type:obj.type||classify(t),text:t,source:obj.source||source||'game-ui',importance:obj.importance||'high',timestamp:new Date().toISOString(),state:snapshot(),data:obj.data||extra||{}};eventLog.push(e);if(eventLog.length>100)eventLog.shift();window.dispatchEvent(new CustomEvent('thunder:game-event',{detail:e}));if(aiToggle&&aiToggle.checked)addSpeech(buildLocalCommentary(e),(e.type==='finish'||e.type==='elimination')?'critical':'normal');else addSpeech([{text:t,role:'caster'}],'normal');return e}
  ['ep','txe'].forEach(id=>{const el=$(id);if(!el)return;new MutationObserver(()=>{const t=(el.textContent||'').trim();if(t)recordEvent(t,id)}).observe(el,{childList:true,characterData:true,subtree:true})});
  ['ld','rm','aalive','aphase','nalive','nphase'].forEach(id=>{const el=$(id);if(!el)return;let previous='';new MutationObserver(()=>{const t=(el.textContent||'').trim();if(!t||t===previous)return;previous=t;if(/^(1위|생존|⚡|결승선)/.test(t)&&important(t))recordEvent(t,id)}).observe(el,{childList:true,characterData:true,subtree:true})});
  if(aiToggle){try{aiToggle.checked=localStorage.getItem('tm_local_ai')!=='off'}catch(e){aiToggle.checked=true}aiToggle.addEventListener('change',()=>{try{localStorage.setItem('tm_local_ai',aiToggle.checked?'on':'off')}catch(e){}setStatus(aiToggle.checked?'실시간 상황 분석 해설 켜짐 · 오프라인 작동':'스마트 해설 꺼짐 · 기본 중계 사용')})}
