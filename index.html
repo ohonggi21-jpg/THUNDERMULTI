@@ -1830,6 +1830,7 @@ $('bHall').onclick=()=>{if(S!=='TITLE')return;sfx('click');showHall()};$('bNews'
    const p=d.players[entry.nick]||(d.players[entry.nick]={totalPoints:0,hits:0,games:0,best:0});
    const chosen=match.candidates[entry.pick];const hit=!!chosen&&chosen.name===winner;
    const pts=hit?(chosen.odds?Math.round(100*chosen.odds):Math.max(20,(match.candidates.length-chosen.rank)*20)):0;
+   if(hit){try{noise(.38,.12,1900);sfx('fan')}catch(e){}}else{try{noise(.32,.10,520);tone(185,.42,'sawtooth',.08,0,-55)}catch(e){}}
    p.games=(Number(p.games)||0)+1;if(hit)p.hits=(Number(p.hits)||0)+1;
    p.totalPoints=(Number(p.totalPoints)||0)+pts;p.best=Math.max(Number(p.best)||0,pts);p.lastPoints=pts;p.lastWinner=winner;p.lastPick=chosen?chosen.name:'';
   });
@@ -1866,6 +1867,7 @@ $('bHall').onclick=()=>{if(S!=='TITLE')return;sfx('click');showHall()};$('bNews'
   };
  }
  function onState(state){
+  if(state==='F_FINISH'||state==='T_FINISH'){const priorSpeed=gameSpd;gameSpd=.5;shk=Math.max(shk,9);try{sfx('fan')}catch(e){}setTimeout(()=>{if(gameSpd===.5)gameSpd=priorSpeed},1300)}
   if(['HORSE_CONFIRM','A_CONFIRM','N_CONFIRM','F_CONFIRM','T_CONFIRM'].includes(state)){
    match={id:++matchSeq,state:state,count:1,candidates:[],entries:[],locked:false,settled:false};
    setTimeout(makePanel,80);setTimeout(makePanel,360);
