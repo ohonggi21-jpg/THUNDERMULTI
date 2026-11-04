@@ -1451,7 +1451,7 @@ $('pT').onclick=()=>ask('타이틀로 돌아갈까요? 진행 중인 경기'+(TN
 })();
 </script>
 <script>
-/* ===== TENNIS (독립 모듈: 3판 2선승제 · 자동 진행 · 20종 이벤트) ===== */
+/* ===== TENNIS (독립 모듈: 단판 승부 · 자동 진행 · 20종 이벤트) ===== */
 var TX={on:0,spd:1};
 (function(){
 const FL={KR:'🇰🇷',US:'🇺🇸',ES:'🇪🇸',FR:'🇫🇷',DE:'🇩🇪',JP:'🇯🇵',AU:'🇦🇺',SE:'🇸🇪',IT:'🇮🇹',RS:'🇷🇸',AR:'🇦🇷',PL:'🇵🇱',GB:'🇬🇧',BR:'🇧🇷'};
@@ -1518,7 +1518,7 @@ const dr=(.4*n+.5)*(su=='clay'?1.15:1);[0,1].forEach(i=>{st.stam[i]=Math.max(5,s
 st.n++;st.pt[w]++;st.strk[w]++;st.strk[1-w]=0;st.fx.forEach(f=>f.left--);st.fx=st.fx.filter(f=>f.left>0);
 const info={w,s,type,n,text:tx,ev,big:prs||mp,mp,game:false,round:false,done:false};
 if(st.pt[w]>=4){info.game=true;st.g[w]++;st.srv=1-st.srv;st.pt=[0,0];st.strk=[0,0];st.stam=st.stam.map(x=>Math.min(100,x+2));
- if(st.g[w]>=3){info.round=true;st.rounds.push({g:st.g.slice(),w});st.rw[w]++;st.g=[0,0];st.stam=st.stam.map(x=>Math.min(100,x+12));st.side^=1;if(st.rw[w]>=2){st.done=true;st.win=w;info.done=true}}}
+ if(st.g[w]>=3){info.round=true;st.rounds.push({g:st.g.slice(),w});st.rw[w]++;st.g=[0,0];st.stam=st.stam.map(x=>Math.min(100,x+12));st.side^=1;if(st.rw[w]>=1){st.done=true;st.win=w;info.done=true}}}
 return info}
 function oddsP(A,B,su){let a=0;const N=240;for(let k=0;k<N;k++){const st=mk(A,B,su);st.noEv=true;st.srv=k&1;let g=0;while(!st.done&&g++<400)step(st);if(st.win===0)a++}const p=cl(a/N,.04,.96);return[p,1-p]}
 TX._t={mk,step,oddsP,PL,mkP,EVT};
@@ -1542,9 +1542,9 @@ return`<div class="tpc" style="--c:${i?C1:C0}"><div class="fl">${FL[p.cc]}</div>
 function start(){TX.on=1;aud();go('T_ROULETTE');MODE='tennis';setM('r',150);newMatch();ov(`<div class="tnh">🎾 TENNIS</div><div class="tag">선수 추첨 중…</div><div class="tcs">${pcard(0,1)}<div class="vsx">VS</div>${pcard(1,1)}</div>`);
 let k=0;const spin=()=>{if(k++<14){const ai=R()*PL.length|0,bi0=R()*PL.length|0,bi=bi0===ai?(bi0+1)%PL.length:bi0,a=PL[ai],b=PL[bi];document.querySelectorAll('#oTX .tpc h3').forEach((h,i)=>h.textContent=(i?b:a)[0]);sfx('tick');after(60+k*14,spin)}else{sfx('big');flash=.7;confirmUI()}};after(200,spin)}
 function confirmUI(){go('T_CONFIRM');MODE='tennis';const sx=TX.sex=='M'?'남자':'여자';if(!TX.prediction||TX.prediction.locked)TX.prediction={winner:null,score:null,locked:false};
-ov(`<div class="tnh">🎾 TENNIS</div><div class="tag">${sx} 단식 · ${SUN[TX.surf]} · 3판 2선승제 · 노애드</div><div class="tcs">${pcard(0)}<div class="vsx">VS</div>${pcard(1)}</div><div class="gc wide" style="margin:12px auto;max-width:900px"><h4>🎯 경기 결과 예측</h4><p class="sm">경기 시작 버튼을 누르면 예측이 마감돼요. 승자와 세트 스코어를 골라 보세요.</p><div class="vs">${[0,1].flatMap(i=>['2-0','2-1'].map(sc=>`<button class="pc ${TX.prediction.winner===i&&TX.prediction.score===sc?'sel':''}" type="button" data-tx="pred" data-v="${i}|${sc}">${TX.pl[i].name} ${sc}</button>`)).join('')}</div></div><div class="tbt"><button class="btn" type="button" data-tx="go">🎾 경기 시작! · 예측 마감</button><button class="btn s QRB" type="button" onclick="TM_openHost('single')">📱 친구 예측 QR</button><button class="btn s QRB" type="button" onclick="TM_openHost('live')">📺 실시간 관전·응원 QR</button><button class="btn s QRB" type="button" onclick="TM_openHost('both')">🔗 통합 QR (예측+관전+응원)</button><div class="tmFriends"></div><button class="btn s" type="button" data-tx="re">🔄 선수 다시 뽑기</button><button class="btn s" type="button" data-tx="home">타이틀로</button></div>`);if(window.TM_paint)window.TM_paint()}
+ov(`<div class="tnh">🎾 TENNIS</div><div class="tag">${sx} 단식 · ${SUN[TX.surf]} · 단판 승부 · 노애드</div><div class="tcs">${pcard(0)}<div class="vsx">VS</div>${pcard(1)}</div><div class="gc wide" style="margin:12px auto;max-width:900px"><h4>🎯 경기 결과 예측</h4><p class="sm">경기 시작 버튼을 누르면 예측이 마감돼요. 승리할 선수를 선택하세요.</p><div class="vs">${[0,1].map(i=>`<button class="pc ${TX.prediction.winner===i?'sel':''}" type="button" data-tx="pred" data-v="${i}|1-0">${TX.pl[i].name} 승리 · 단판</button>`).join('')}</div></div><div class="tbt"><button class="btn" type="button" data-tx="go">🎾 경기 시작! · 예측 마감</button><button class="btn s QRB" type="button" onclick="TM_openHost('single')">📱 친구 예측 QR</button><button class="btn s QRB" type="button" onclick="TM_openHost('live')">📺 실시간 관전·응원 QR</button><button class="btn s QRB" type="button" onclick="TM_openHost('both')">🔗 통합 QR (예측+관전+응원)</button><div class="tmFriends"></div><button class="btn s" type="button" data-tx="re">🔄 선수 다시 뽑기</button><button class="btn s" type="button" data-tx="home">타이틀로</button></div>`);if(window.TM_paint)window.TM_paint()}
 function ready(){if(TX.prediction)TX.prediction.locked=true;go('T_READY');MODE='tennis';setM('d',126,.3);TX.st=mk(TX.pl[0],TX.pl[1],TX.surf);resetView();hud();say('코트 위에 선수들이 입장합니다!');let t=0;[['READY...',800],['3',500],['2',500],['1',500]].forEach(([x,d],i)=>{after(t,()=>{ov(`<div class="cnt3">${x}</div>`);sfx(i?'beep':'lock')});t+=d});after(t,begin)}
-function begin(){go('T_MATCH');MODE='tennis';$('oTX').innerHTML='';setM('g',140,.55);sfx('gun');shk=6;say('경기 시작! 3판 2선승제');TX.gap=.4}
+function begin(){go('T_MATCH');MODE='tennis';$('oTX').innerHTML='';setM('g',140,.55);sfx('gun');shk=6;say('경기 시작! 단판 승부');TX.gap=.4}
 TX.restart=ready;TX.start=start;
 /* ===== THUNDER DAILY · 경기 기반 신문 시스템 ===== */
 const TM_NEWS_KEY='tmNewsArchiveV1';
@@ -1614,7 +1614,7 @@ function showHall(){
  <div class="gc wide"><h4>🎯 승부예측 누적 점수 TOP 10</h4><div id="hallPredTotal"><p class="sm">온라인 명예의 전당을 불러오는 중...</p></div><button class="btn s" type="button" data-hall-more="total">더 많은 순위 보기 · TOP 30</button></div>
  <div class="gc wide"><h4>🔥 한 경기 최고 예측 점수 TOP 10</h4><div id="hallPredBest"><p class="sm">온라인 명예의 전당을 불러오는 중...</p></div><button class="btn s" type="button" data-hall-more="best">더 많은 순위 보기 · TOP 30</button></div>
  <div class="gr">${gameHtml}</div>
- <div class="gc wide"><h4>🎾 테니스 추가 기록</h4><div class="gr"><div class="gc"><small>예측 승자 적중</small><b>${g.predHit||0} / ${g.predTotal||0}</b></div><div class="gc"><small>정확한 세트 스코어</small><b>${g.predExact||0}회</b></div><div class="gc"><small>최다 에이스</small><b>${g.aces||0}개</b></div><div class="gc"><small>최장 랠리</small><b>${g.rally||0}구</b></div><div class="gc"><small>최단 경기</small><b>${g.fast&&g.fast!==999?g.fast+'초':'기록 없음'}</b></div></div></div>
+ <div class="gc wide"><h4>🎾 테니스 추가 기록</h4><div class="gr"><div class="gc"><small>예측 승자 적중</small><b>${g.predHit||0} / ${g.predTotal||0}</b></div><div class="gc"><small>정확한 경기 결과</small><b>${g.predExact||0}회</b></div><div class="gc"><small>최다 에이스</small><b>${g.aces||0}개</b></div><div class="gc"><small>최장 랠리</small><b>${g.rally||0}구</b></div><div class="gc"><small>최단 경기</small><b>${g.fast&&g.fast!==999?g.fast+'초':'기록 없음'}</b></div></div></div>
  <button class="btn" type="button" data-archive-close>닫기</button>`);
  loadPredictionHall();
 }
@@ -1626,7 +1626,7 @@ document.addEventListener('click',e=>{if(e.target.closest('[data-archive-close]'
 /* ---------- 진행 ---------- */
 const say=t=>{const e=$('txc');if(e)e.textContent=t},pt4=['0','15','30','40'];
 function hud(){const st=TX.st,P=st.P,row=i=>`<div class="tr"><b>${FL[P[i].cc]} ${P[i].name}</b><span class="rw">${'●'.repeat(st.rw[i])}${'○'.repeat(2-st.rw[i])}</span><span class="gm">${st.g[i]}</span><span class="pt">${st.pt[i]>3?'게임':pt4[st.pt[i]]}</span><i>${st.srv===i?'🎾':''}</i><em style="width:${st.stam[i]}%;background:${i?C1:C0}"></em></div>`;
-$('txh').firstElementChild.innerHTML=row(0)+row(1)+`<div class="ts">${SUN[st.surf]} · ${st.rounds.length+1}판 · 3판 2선승제 · 체력바 표시${st.pt[0]==3&&st.pt[1]==3?' · 노애드 결승 포인트':''}</div>`}
+$('txh').firstElementChild.innerHTML=row(0)+row(1)+`<div class="ts">${SUN[st.surf]} · 단판 승부 · 체력바 표시${st.pt[0]==3&&st.pt[1]==3?' · 노애드 결승 포인트':''}</div>`}
 function showEv(ev){const P=TX.st.P,w=ev.who===2?'양 선수':P[ev.who].name,e=$('txe');window.THUNDER_AI?.pushEvent({type:ev.name==='ACE'?'score':ev.type==='df'?'mistake':'tennis_event',text:`${ev.name} · ${w} — ${ev.desc}`,source:'tennis-event',importance:ev.name==='ACE'?'high':'normal',data:{player:w,event:ev.name,description:ev.desc,good:!!ev.good}});e.innerHTML=`⚡ <b>${ev.name}</b> · ${w} — ${ev.desc}`;e.style.opacity=1;e.style.borderColor=ev.good?'#7dff9b':'#ff9d9d';TX.multiEv={text:`⚡ ${ev.name} · ${w} — ${ev.desc}`,good:!!ev.good};TX.evT=2.6;sfx(ev.good?'up':'down')}
 function build(info){const st=TX.st,nr=st.side?1:0,vB=i=>i===nr?.97:.03,s=info.s,sh=[];let t=0;
 if(info.type=='df'){for(let q=0;q<2;q++){sh.push({h:s,a:{u:TX.pu[s],v:vB(s)},b:{u:q?-1.25:1.25,v:s===nr?.22:.78},t0:t,t1:t+.28,arc:30,out:1,type:info.type});t+=.3}return{sh,dur:t+.22,info,t:0,q:-1}}
@@ -1657,7 +1657,7 @@ function tick(d,rd){const st=TX.st;TX.time+=rd;if(TX.evT>0){TX.evT-=d;if(TX.evT<
 if(TX.gap>0){TX.gap-=d;return}
 if(!TX.anim){const info=step(st);TX.last=info;TX.anim=build(info);if(info.ev)showEv(info.ev);if(info.mp)say('🔥 매치 포인트!');return}
 const a=TX.anim;a.t+=d;
-if(a.t>=a.dur){const i=a.info;TX.anim=null;hud();TX.pop={t:0,txt:i.type=='ace'?'ACE!':i.type=='df'?'DF':'+1',w:i.w};say(i.text+(i.game?' — '+(i.round?(st.rounds.length)+'세트 종료!':'게임 종료!'):''));window.THUNDER_AI?.pushEvent({type:i.done?'finish':'score',text:`${st.P[i.w].name} 득점! ${st.P[0].name} ${st.pt[0]} : ${st.P[1].name} ${st.pt[1]}${i.game?' · 게임 종료':''}`,source:'tennis-score',importance:i.done?'critical':'high',data:{scorer:st.P[i.w].name,score:[st.pt[0],st.pt[1]],games:[st.g[0],st.g[1]],sets:[st.rw[0],st.rw[1]],event:i.text}});
+if(a.t>=a.dur){const i=a.info;TX.anim=null;hud();TX.pop={t:0,txt:i.type=='ace'?'ACE!':i.type=='df'?'DF':'+1',w:i.w};say(i.text+(i.game?' — '+(i.round?'세트 종료!':'게임 종료!'):''));window.THUNDER_AI?.pushEvent({type:i.done?'finish':'score',text:`${st.P[i.w].name} 득점! ${st.P[0].name} ${st.pt[0]} : ${st.P[1].name} ${st.pt[1]}${i.game?' · 게임 종료':''}`,source:'tennis-score',importance:i.done?'critical':'high',data:{scorer:st.P[i.w].name,score:[st.pt[0],st.pt[1]],games:[st.g[0],st.g[1]],sets:[st.rw[0],st.rw[1]],event:i.text}});
  sfx(i.w===0?'lock':'beep');TX.gap=i.round?1.1:i.game?.45:.15;if(i.done)finish()}}
 function finish(){const st=TX.st;TX.win=st.win;window.TM_newsPublish?.('tennis',st.P[st.win].name,`${st.P[0].name} vs ${st.P[1].name} · ${st.P[st.win].name} 우승`,[TX.last?.text].filter(Boolean));if(TN&&TN.multi&&TN.sp==='tennis')return;go('T_FINISH');MODE='tennis';TX.fin=3.4;flash=1;shk=7;sfx('fan');after(500,()=>sfx('fin'));say('🏆 '+st.P[st.win].name+' 우승!');
 for(let i=0;i<90;i++)TX.cf.push({x:rr(0,W),y:rr(-CH*.5,0),vx:rr(-40,40),vy:rr(60,200),c:['#ffd75e','#e63946','#fff','#4fc3f7','#7dff9b'][i%5]})}
