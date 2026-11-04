@@ -1786,6 +1786,7 @@ $('bHall').onclick=()=>{if(S!=='TITLE')return;sfx('click');showHall()};$('bNews'
  function makePanel(){
   const wrap=activeWrap(),candidates=getCandidates();
   if(!wrap||candidates.length<2)return;
+  if(match&&!match.locked)match.candidates=candidates.slice();
   let panel=$id('tmPredPanel');
   if(panel&&panel.parentNode!==wrap){panel.remove();panel=null}
   if(!panel){panel=document.createElement('section');panel.id='tmPredPanel';panel.className='tm-pred-panel';wrap.appendChild(panel)}
