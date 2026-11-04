@@ -370,7 +370,7 @@ kbd{display:inline-block;padding:1px 6px;border:1px solid #8ab6d9;border-radius:
 <button class="mode-btn horse" id="bS" type="button"><div class="mi">🏇</div><div class="mt">경마 경기</div><div class="md">40가지 이벤트! 결승선 질주!</div></button>
 <button class="mode-btn arena" id="bA" type="button"><div class="mi">⚔️</div><div class="mt">프로게이머</div><div class="md">30가지 이벤트! 5인 배틀로얄!</div></button>
 <button class="mode-btn neon" id="bN" type="button"><div class="mi">🌀</div><div class="mt">네온 팽이</div><div class="md">30가지 이벤트! 링아웃 배틀!</div></button>
-<button class="mode-btn tennis" id="bT" type="button"><div class="mi">🎾</div><div class="mt">TENNIS</div><div class="md">단판 승부 · 빠른 테니스 스타 배틀!</div></button>
+<button class="mode-btn tennis" id="bT" type="button"><div class="mi">🎾</div><div class="mt">TENNIS</div><div class="md">1게임 승부 · 초단기 테니스 스타 배틀!</div></button>
 <button class="mode-btn football" id="bF" type="button"><div class="mi">⚽</div><div class="mt">축구 경기</div><div class="md">12명의 선수 · 40초 풀타임 · 역동적인 카메라!</div></button>
 <button class="mode-btn wc" id="bW" type="button"><div class="mi">🏆</div><div class="mt">월드 챔피언십</div><div class="md">다섯 종목 중 하나를 선택하고 세계 챔피언에 도전하세요!</div></button>
 <button class="mode-btn random" id="bR" type="button"><div class="mi">🎲</div><div class="mt">랜덤 모드!</div><div class="md">여섯 모드 중 하나를 무작위로!</div></button>
@@ -386,7 +386,7 @@ kbd{display:inline-block;padding:1px 6px;border:1px solid #8ab6d9;border-radius:
      <article class="guide-card horse"><div class="guide-icon">🏇</div><div><h4>경마 경기</h4><p>3마리의 경주마가 결승선을 향해 달립니다. 가속, 컨디션 변화, 실수, 날씨와 코스 상황 등 다양한 이벤트가 승부를 뒤흔들어요.</p><small>핵심: 결승선에 가장 먼저 도착한 경주마가 우승!</small></div></article>
      <article class="guide-card arena"><div class="guide-icon">⚔️</div><div><h4>프로게이머</h4><p>5명의 프로게이머 캐릭터가 각자의 무기와 전투 스타일로 맞붙는 배틀로얄입니다. 탐색부터 교전, 생존 경쟁, 최후의 결전까지 전투가 진행돼요.</p><small>핵심: 마지막까지 생존한 전투원이 우승!</small></div></article>
      <article class="guide-card neon"><div class="guide-icon">🌀</div><div><h4>네온 팽이</h4><p>5개의 개성 있는 팽이가 링 안에서 충돌합니다. 공격과 회전력 변화, 다양한 이벤트를 버티며 최후의 승자를 가려요.</p><small>핵심: 링아웃되지 않고 최후까지 남는 팽이가 우승!</small></div></article>
-     <article class="guide-card tennis"><div class="guide-icon">🎾</div><div><h4>테니스</h4><p>선수가 무작위로 매칭되는 단식 경기입니다. 한 세트로 승부를 내는 빠른 단판 경기예요.</p><small>핵심: 단판 승부 · 노애드 규칙</small></div></article>
+     <article class="guide-card tennis"><div class="guide-icon">🎾</div><div><h4>테니스</h4><p>선수가 무작위로 매칭되는 단식 경기입니다. 한 게임만 진행해 승자를 정하는 초단기 경기예요.</p><small>핵심: 1게임 승부 · 노애드 규칙</small></div></article>
      <article class="guide-card football"><div class="guide-icon">⚽</div><div><h4>축구</h4><p>두 팀이 6명씩, 총 12명의 선수로 40초 풀타임 경기를 펼칩니다. 선수 집중 화면과 전체 전술 화면을 오가는 역동적인 카메라로 관전해요.</p><small>핵심: 수비 2명 · 공격 3명 · 골키퍼 1명 · 경기 후 MVP 선정</small></div></article>
     </div>
     <div class="guide-mini"><b>🎲 랜덤 모드</b><span>경마, 프로게이머, 네온 팽이, 테니스, 축구 및 월드 챔피언십 중 하나가 무작위로 선택됩니다.</span></div>
@@ -1518,7 +1518,7 @@ const dr=(.4*n+.5)*(su=='clay'?1.15:1);[0,1].forEach(i=>{st.stam[i]=Math.max(5,s
 st.n++;st.pt[w]++;st.strk[w]++;st.strk[1-w]=0;st.fx.forEach(f=>f.left--);st.fx=st.fx.filter(f=>f.left>0);
 const info={w,s,type,n,text:tx,ev,big:prs||mp,mp,game:false,round:false,done:false};
 if(st.pt[w]>=4){info.game=true;st.g[w]++;st.srv=1-st.srv;st.pt=[0,0];st.strk=[0,0];st.stam=st.stam.map(x=>Math.min(100,x+2));
- if(st.g[w]>=3){info.round=true;st.rounds.push({g:st.g.slice(),w});st.rw[w]++;st.g=[0,0];st.stam=st.stam.map(x=>Math.min(100,x+12));st.side^=1;if(st.rw[w]>=1){st.done=true;st.win=w;info.done=true}}}
+ if(st.g[w]>=1){info.round=true;st.rounds.push({g:st.g.slice(),w});st.rw[w]++;st.done=true;st.win=w;info.done=true}}
 return info}
 function oddsP(A,B,su){let a=0;const N=240;for(let k=0;k<N;k++){const st=mk(A,B,su);st.noEv=true;st.srv=k&1;let g=0;while(!st.done&&g++<400)step(st);if(st.win===0)a++}const p=cl(a/N,.04,.96);return[p,1-p]}
 TX._t={mk,step,oddsP,PL,mkP,EVT};
@@ -1542,9 +1542,9 @@ return`<div class="tpc" style="--c:${i?C1:C0}"><div class="fl">${FL[p.cc]}</div>
 function start(){TX.on=1;aud();go('T_ROULETTE');MODE='tennis';setM('r',150);newMatch();ov(`<div class="tnh">🎾 TENNIS</div><div class="tag">선수 추첨 중…</div><div class="tcs">${pcard(0,1)}<div class="vsx">VS</div>${pcard(1,1)}</div>`);
 let k=0;const spin=()=>{if(k++<14){const ai=R()*PL.length|0,bi0=R()*PL.length|0,bi=bi0===ai?(bi0+1)%PL.length:bi0,a=PL[ai],b=PL[bi];document.querySelectorAll('#oTX .tpc h3').forEach((h,i)=>h.textContent=(i?b:a)[0]);sfx('tick');after(60+k*14,spin)}else{sfx('big');flash=.7;confirmUI()}};after(200,spin)}
 function confirmUI(){go('T_CONFIRM');MODE='tennis';const sx=TX.sex=='M'?'남자':'여자';if(!TX.prediction||TX.prediction.locked)TX.prediction={winner:null,score:null,locked:false};
-ov(`<div class="tnh">🎾 TENNIS</div><div class="tag">${sx} 단식 · ${SUN[TX.surf]} · 단판 승부 · 노애드</div><div class="tcs">${pcard(0)}<div class="vsx">VS</div>${pcard(1)}</div><div class="gc wide" style="margin:12px auto;max-width:900px"><h4>🎯 경기 결과 예측</h4><p class="sm">경기 시작 버튼을 누르면 예측이 마감돼요. 승리할 선수를 선택하세요.</p><div class="vs">${[0,1].map(i=>`<button class="pc ${TX.prediction.winner===i?'sel':''}" type="button" data-tx="pred" data-v="${i}|1-0">${TX.pl[i].name} 승리 · 단판</button>`).join('')}</div></div><div class="tbt"><button class="btn" type="button" data-tx="go">🎾 경기 시작! · 예측 마감</button><button class="btn s QRB" type="button" onclick="TM_openHost('single')">📱 친구 예측 QR</button><button class="btn s QRB" type="button" onclick="TM_openHost('live')">📺 실시간 관전·응원 QR</button><button class="btn s QRB" type="button" onclick="TM_openHost('both')">🔗 통합 QR (예측+관전+응원)</button><div class="tmFriends"></div><button class="btn s" type="button" data-tx="re">🔄 선수 다시 뽑기</button><button class="btn s" type="button" data-tx="home">타이틀로</button></div>`);if(window.TM_paint)window.TM_paint()}
+ov(`<div class="tnh">🎾 TENNIS</div><div class="tag">${sx} 단식 · ${SUN[TX.surf]} · 1게임 승부 · 노애드</div><div class="tcs">${pcard(0)}<div class="vsx">VS</div>${pcard(1)}</div><div class="gc wide" style="margin:12px auto;max-width:900px"><h4>🎯 경기 결과 예측</h4><p class="sm">경기 시작 버튼을 누르면 예측이 마감돼요. 승리할 선수를 선택하세요.</p><div class="vs">${[0,1].map(i=>`<button class="pc ${TX.prediction.winner===i?'sel':''}" type="button" data-tx="pred" data-v="${i}|1-0">${TX.pl[i].name} 승리 · 단판</button>`).join('')}</div></div><div class="tbt"><button class="btn" type="button" data-tx="go">🎾 경기 시작! · 예측 마감</button><button class="btn s QRB" type="button" onclick="TM_openHost('single')">📱 친구 예측 QR</button><button class="btn s QRB" type="button" onclick="TM_openHost('live')">📺 실시간 관전·응원 QR</button><button class="btn s QRB" type="button" onclick="TM_openHost('both')">🔗 통합 QR (예측+관전+응원)</button><div class="tmFriends"></div><button class="btn s" type="button" data-tx="re">🔄 선수 다시 뽑기</button><button class="btn s" type="button" data-tx="home">타이틀로</button></div>`);if(window.TM_paint)window.TM_paint()}
 function ready(){if(TX.prediction)TX.prediction.locked=true;go('T_READY');MODE='tennis';setM('d',126,.3);TX.st=mk(TX.pl[0],TX.pl[1],TX.surf);resetView();hud();say('코트 위에 선수들이 입장합니다!');let t=0;[['READY...',800],['3',500],['2',500],['1',500]].forEach(([x,d],i)=>{after(t,()=>{ov(`<div class="cnt3">${x}</div>`);sfx(i?'beep':'lock')});t+=d});after(t,begin)}
-function begin(){go('T_MATCH');MODE='tennis';$('oTX').innerHTML='';setM('g',140,.55);sfx('gun');shk=6;say('경기 시작! 단판 승부');TX.gap=.4}
+function begin(){go('T_MATCH');MODE='tennis';$('oTX').innerHTML='';setM('g',140,.55);sfx('gun');shk=6;say('경기 시작! 1게임 승부');TX.gap=.4}
 TX.restart=ready;TX.start=start;
 /* ===== THUNDER DAILY · 경기 기반 신문 시스템 ===== */
 const TM_NEWS_KEY='tmNewsArchiveV1';
@@ -1626,7 +1626,7 @@ document.addEventListener('click',e=>{if(e.target.closest('[data-archive-close]'
 /* ---------- 진행 ---------- */
 const say=t=>{const e=$('txc');if(e)e.textContent=t},pt4=['0','15','30','40'];
 function hud(){const st=TX.st,P=st.P,row=i=>`<div class="tr"><b>${FL[P[i].cc]} ${P[i].name}</b><span class="rw">${'●'.repeat(st.rw[i])}${'○'.repeat(2-st.rw[i])}</span><span class="gm">${st.g[i]}</span><span class="pt">${st.pt[i]>3?'게임':pt4[st.pt[i]]}</span><i>${st.srv===i?'🎾':''}</i><em style="width:${st.stam[i]}%;background:${i?C1:C0}"></em></div>`;
-$('txh').firstElementChild.innerHTML=row(0)+row(1)+`<div class="ts">${SUN[st.surf]} · 단판 승부 · 체력바 표시${st.pt[0]==3&&st.pt[1]==3?' · 노애드 결승 포인트':''}</div>`}
+$('txh').firstElementChild.innerHTML=row(0)+row(1)+`<div class="ts">${SUN[st.surf]} · 1게임 승부 · 체력바 표시${st.pt[0]==3&&st.pt[1]==3?' · 노애드 결승 포인트':''}</div>`}
 function showEv(ev){const P=TX.st.P,w=ev.who===2?'양 선수':P[ev.who].name,e=$('txe');window.THUNDER_AI?.pushEvent({type:ev.name==='ACE'?'score':ev.type==='df'?'mistake':'tennis_event',text:`${ev.name} · ${w} — ${ev.desc}`,source:'tennis-event',importance:ev.name==='ACE'?'high':'normal',data:{player:w,event:ev.name,description:ev.desc,good:!!ev.good}});e.innerHTML=`⚡ <b>${ev.name}</b> · ${w} — ${ev.desc}`;e.style.opacity=1;e.style.borderColor=ev.good?'#7dff9b':'#ff9d9d';TX.multiEv={text:`⚡ ${ev.name} · ${w} — ${ev.desc}`,good:!!ev.good};TX.evT=2.6;sfx(ev.good?'up':'down')}
 function build(info){const st=TX.st,nr=st.side?1:0,vB=i=>i===nr?.97:.03,s=info.s,sh=[];let t=0;
 if(info.type=='df'){for(let q=0;q<2;q++){sh.push({h:s,a:{u:TX.pu[s],v:vB(s)},b:{u:q?-1.25:1.25,v:s===nr?.22:.78},t0:t,t1:t+.28,arc:30,out:1,type:info.type});t+=.3}return{sh,dur:t+.22,info,t:0,q:-1}}
