@@ -1022,9 +1022,9 @@ const Football=(()=>{
     const isCross=goalDistance<370&&Math.abs(receiver.y-300)>90;passTo(owner,receiver,isCross?'cross':'pass');return;
    }
    owner.ratings+=.65;owner.runPhase+=.8;
-   const advance=attack*(pressure<65?32:19);
-   ball.x=clamp(ball.x+advance,35,965);ball.y=clamp(ball.y+(300-ball.y)*.12+(R()-.5)*18,55,545);
-   ball.owner=owner.id;st.possession=team;
+   const advance=attack*(pressure<65?112:76);
+   owner.tx=clamp(owner.x+advance,55,945);owner.ty=clamp(owner.y+(300-owner.y)*.10,58,542);
+   st.possession=team;
    logEvent(pressure<65?['환상적인 드리블!','dribble']:['침착한 볼 컨트롤!','control'],owner,'압박을 피해 전진합니다');
    if(!st.done&&st.cam.hold<=0){st.cam.mode='carrier';st.cam.focus=owner.id;st.cam.tz=1.35;}
   }
@@ -1097,9 +1097,9 @@ function beginPenalty(){
      ty=clamp(homeY+(ball.y-300)*.28,88,512);
      if(Math.hypot(dx,dy)<112){tx=clamp(ball.x-attack*34,55,945);ty=clamp(ball.y+dy*.08,60,540);}
     }else{
-     const lane=p.number===7?-82:p.number===11?82:0;
-     tx=clamp(ball.x-attack*(attacking?48:78),150,850);
-     ty=clamp(ball.y+lane+(homeY-300)*.12,65,535);
+     const lane=p.number===7?-105:p.number===11?105:0,lead=p.number===10?78:48;
+     tx=clamp(ball.x+attack*(attacking?lead:-76),105,895);
+     ty=clamp((attacking?ball.y:ball.y*.68+homeY*.32)+lane,55,545);
     }
     if(owner===p){tx=clamp(p.x+attack*92,55,945);ty=clamp(p.y+(300-p.y)*.08,60,540);}
     p.tx=tx;p.ty=ty;const oldX=p.x,oldY=p.y,dist=Math.max(1,Math.hypot(tx-p.x,ty-p.y)),v=(p.role==='공격수'?118:94)*(owner===p?1.08:1);
@@ -1113,9 +1113,9 @@ function beginPenalty(){
   else if(c.hold<=0&&owner&&owner.active&&!st.shot){
    // 공 소유 선수를 화면의 중심보다 약간 앞에 두고, 주변 수비수까지 보이는 중계 클로즈업
    c.mode='carrier';c.focus=owner.id;const attack=owner.team===0?1:-1;
-   c.tx=clamp(owner.x+attack*24,250,750);c.ty=clamp(owner.y-10,170,430);c.tz=1.48;
+   c.tx=clamp(owner.x+attack*24,250,750);c.ty=clamp(owner.y-10,170,430);c.tz=1.12;
   }
-  else if(c.mode==='carrier'&&focus&&focus.active&&!st.shot){c.tx=clamp(focus.x+(focus.team===0?24:-24),250,750);c.ty=clamp(focus.y-10,170,430);c.tz=1.48}
+  else if(c.mode==='carrier'&&focus&&focus.active&&!st.shot){c.tx=clamp(focus.x+(focus.team===0?24:-24),250,750);c.ty=clamp(focus.y-10,170,430);c.tz=1.12}
   else if(c.mode==='ball'||c.mode==='wide'||!owner){const tactical=st.players.filter(p=>p.active);const minX=Math.min(...tactical.map(p=>p.x)),maxX=Math.max(...tactical.map(p=>p.x));c.tx=clamp(ball.x*.68+500*.32,260,740);c.ty=ball.y*.62+300*.38;if(c.hold<=0){c.mode='ball';c.focus=null;c.tz=clamp(1.10-(maxX-minX)/1900,.94,1.08)}}
   if(c.hold<=0&&c.mode==='celebrate'){c.mode='wide';c.focus=null;c.tz=1.02;c.tx=500;c.ty=300}
   else if(c.hold<=0&&c.mode==='player'&&(!focus||!focus.active)){c.mode='ball';c.focus=null;c.tz=1.08}
