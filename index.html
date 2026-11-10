@@ -1183,7 +1183,7 @@ function render(){if(!st)return;cx.save();if(shk>0)cx.translate(rr(-shk,shk),rr(
   st.players.forEach(p=>drawPlayer(p,project));
   const b=st.ball;
    if(st.ballTrail&&st.ballTrail.length){st.ballTrail.forEach(q=>{const tp=project(q.x,q.y,q.z||0);cx.globalAlpha=Math.max(0,q.life/.24)*.28;cx.fillStyle='#fff7c5';cx.beginPath();cx.arc(tp.x,tp.y,3.6,0,Math.PI*2);cx.fill()});cx.globalAlpha=1}
-   const b=st.ball,bp=project(b.x,b.y,b.z||0),ground=project(b.x,b.y),ballDepth=.78+b.y/600*.31;cx.save();cx.fillStyle='#00100866';cx.beginPath();cx.ellipse(ground.x,ground.y+2,10*ballDepth,4*ballDepth,0,0,Math.PI*2);cx.fill();
+   const bp=project(b.x,b.y,b.z||0),ground=project(b.x,b.y),ballDepth=.78+b.y/600*.31;cx.save();cx.fillStyle='#00100866';cx.beginPath();cx.ellipse(ground.x,ground.y+2,10*ballDepth,4*ballDepth,0,0,Math.PI*2);cx.fill();
    cx.shadowColor='#000';cx.shadowBlur=12;cx.fillStyle='#fff';cx.strokeStyle='#18202b';cx.lineWidth=2.5;cx.beginPath();cx.arc(bp.x,bp.y,8.5*ballDepth,0,Math.PI*2);cx.fill();cx.stroke();
    cx.shadowBlur=0;cx.fillStyle='#17202b';cx.beginPath();cx.arc(bp.x-2,bp.y-2,2.6*ballDepth,0,Math.PI*2);cx.fill();
    cx.strokeStyle='#17202b';cx.lineWidth=1;cx.beginPath();cx.arc(bp.x,bp.y,5.5*ballDepth,.4,2.7);cx.stroke();cx.restore();
