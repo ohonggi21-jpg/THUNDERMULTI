@@ -1103,7 +1103,7 @@ function beginPenalty(){
     }
     if(owner===p){tx=clamp(p.x+attack*92,55,945);ty=clamp(p.y+(300-p.y)*.08,60,540);}
     p.tx=tx;p.ty=ty;const oldX=p.x,oldY=p.y,dist=Math.max(1,Math.hypot(tx-p.x,ty-p.y)),v=(p.role==='공격수'?118:94)*(owner===p?1.08:1);
-    const step=Math.min(1,dt*v/dist);p.x+=(tx-p.x)*step;p.y+=(ty-p.y)*step;p.vx=(p.x-oldX)/Math.max(dt,.001);p.vy=(p.y-oldY)/Math.max(dt,.001);p.kickT=Math.max(0,(p.kickT||0)-dt);p.tackleT=Math.max(0,(p.tackleT||0)-dt);p.celebrateT=Math.max(0,(p.celebrateT||0)-dt);p.runPhase+=dt*(owner===p?15:10);
+    const step=Math.min(1,dt*v/dist);p.x+=(tx-p.x)*step;p.y+=(ty-p.y)*step;p.vx=(p.x-oldX)/Math.max(dt,.001);p.vy=(p.y-oldY)/Math.max(dt,.001);p.kickT=Math.max(0,(p.kickT||0)-dt);p.tackleT=Math.max(0,(p.tackleT||0)-dt);p.celebrateT=Math.max(0,(p.celebrateT||0)-dt);const movement=Math.hypot(p.x-oldX,p.y-oldY)/Math.max(dt,.001);p.runPhase+=dt*(2.5+Math.min(1,movement/180)*14);
    });
    if(st.nextEvent<=0&&!st.shot&&!st.pass){st.nextEvent=rr(.72,1.18);act()}
    const c=st.cam;if(c.hold>0)c.hold-=dt;let focus=playerById(c.focus);
@@ -1630,7 +1630,7 @@ TX._multi={
 };
 /* ---------- 매치 준비 ---------- */
 function newMatch(){const sex=R()<.5?'M':'F',pool=shuffle(PL.filter(b=>b[4]===sex)).slice(0,2),su=['hard','clay','grass'][R()*3|0];TX.sex=sex;TX.surf=su;TX.pl=pool.map(mkP);TX.prob=oddsP(TX.pl[0],TX.pl[1],su);TX.odds=TX.prob.map(p=>cl(.94/p,1.05,9.9));TX.st=mk(TX.pl[0],TX.pl[1],su);resetView()}
-function resetView(){TX.resultSaved=0;TX.anim=null;TX.gap=0;TX.time=0;TX.win=null;TX.saved=0;TX.pu=[0,0];TX.py=TX.st?(TX.st.side===0?[.97,.03]:[.03,.97]):[.97,.03];TX.z=1;TX.cf=[];TX.pop=null;TX.fin=0;TX.evT=0;TX.last=null;TX.hl=[0,0]}
+function resetView(){TX.resultSaved=0;TX.anim=null;TX.gap=0;TX.time=0;TX.win=null;TX.saved=0;TX.pu=[0,0];TX.py=TX.st?(TX.st.side===0?[.97,.03]:[.03,.97]):[.97,.03];TX.vel=[0,0];TX.z=1;TX.cf=[];TX.pop=null;TX.fin=0;TX.evT=0;TX.last=null;TX.hl=[0,0]}
 TX.qr=()=>TX.pl.map((p,i)=>({name:p.name,col:i?C1:C0,desc:FL[p.cc]+' 세계 '+p.rank+'위 · '+STL[p.sty]+' · 배당 '+TX.odds[i].toFixed(2)+'배'}));
 const ov=h=>{$('oTX').innerHTML=h;$('oTX').scrollTop=0};
 const bar=(l,v)=>`<div class="sbar"><span>${l}</span><i><u style="width:${v}%"></u></i><b>${v}</b></div>`;
@@ -1747,11 +1747,13 @@ function build(info){
 }
 function movePlayers(dt){
  const st=TX.st;if(!st)return;
+ if(!TX.vel)TX.vel=[0,0];const oldPu=TX.pu.slice(),oldPy=TX.py.slice();
+ const stampVelocity=()=>{for(let i=0;i<2;i++)TX.vel[i]=Math.min(1,Math.hypot(TX.pu[i]-oldPu[i],TX.py[i]-oldPy[i])/Math.max(dt,.001)*.28)};
  const a=TX.anim,follow=1-Math.exp(-dt*12),recover=1-Math.exp(-dt*4),near=st.side?1:0,baseY=i=>i===near?.97:.03;
  if(!TX.py)TX.py=st.side===0?[.97,.03]:[.03,.97];
- if(!a){for(let i=0;i<2;i++){TX.pu[i]+=(0-TX.pu[i])*recover;TX.py[i]+=(baseY(i)-TX.py[i])*recover}return}
+ if(!a){for(let i=0;i<2;i++){TX.pu[i]+=(0-TX.pu[i])*recover;TX.py[i]+=(baseY(i)-TX.py[i])*recover}stampVelocity();return}
  let q=a.sh.findIndex(sh=>a.t>=sh.t0&&a.t<sh.t1);
- if(q<0){for(let i=0;i<2;i++){TX.pu[i]+=(0-TX.pu[i])*recover;TX.py[i]+=(baseY(i)-TX.py[i])*recover}return}
+ if(q<0){for(let i=0;i<2;i++){TX.pu[i]+=(0-TX.pu[i])*recover;TX.py[i]+=(baseY(i)-TX.py[i])*recover}stampVelocity();return}
  const sh=a.sh[q],f=cl((a.t-sh.t0)/(sh.t1-sh.t0),0,1),ease=x=>x*x*(3-2*x);
  const hitter=sh.h,receiver=1-hitter;
  const hitterGoal=cl(sh.a.u*(1-.28*ease(f)),-.92,.92);
@@ -1763,6 +1765,7 @@ function movePlayers(dt){
  TX.py[hitter]+=(hitterYGoal-TX.py[hitter])*follow;
  TX.pu[receiver]+=(receiverGoal-TX.pu[receiver])*follow;
  TX.py[receiver]+=(receiverYGoal-TX.py[receiver])*follow;
+ stampVelocity();
 }
 function tick(d,rd){const st=TX.st;TX.time+=rd;if(TX.evT>0){TX.evT-=d;if(TX.evT<=0)$('txe').style.opacity=0}
 if(TX.gap>0){TX.gap-=d;return}
@@ -1842,7 +1845,7 @@ function draw(dt){
  const per=i=>{
   const v=pv(i),fin=S==='T_FINISH'||S==='T_RESULT',cheer=fin&&st.win===i;let sw=0;
   if(a&&a.q>=0&&a.sh[a.q]&&a.sh[a.q].h===i){const sh=a.sh[a.q],f=cl((a.t-sh.t0)/(sh.t1-sh.t0),0,1);sw=Math.sin(Math.PI*cl(f/.34,0,1))}
-  const x=X(TX.pu[i],v),y=Y(v);person(x,y,SC(v)*1.14,i?C1:C0,sw,cheer,i===nr?1:-1);
+  const x=X(TX.pu[i],v),y=Y(v);person(x,y,SC(v)*1.14,i?C1:C0,sw,cheer,i===nr?1:-1,TX.vel?.[i]||0);
  };
  // 탑스핀·슬라이스로 휘는 공과 짧은 잔상
  if(a){
@@ -1867,9 +1870,9 @@ function draw(dt){
  TX.cf.forEach(c=>{c.x+=c.vx*dt;c.y+=c.vy*dt;if(c.y>CH)c.y=-10;cx.fillStyle=c.c;cx.fillRect(c.x,c.y,6,4)});
  cx.restore();if(flash>0){cx.fillStyle='rgba(255,245,200,'+flash*.3+')';cx.fillRect(0,0,W,CH)}
 }
-function person(x,y,sc,col,sw,cheer,dir){
+function person(x,y,sc,col,sw,cheer,dir,runAmount=0){
  cx.save();cx.translate(x,y);cx.scale(sc*dir,sc);cx.rotate((cheer?-.07:Math.sin(TX.t0*7+(dir>0?0:1.7))*.025)-cl(sw||0,0,1)*.12);
- const run=Math.sin(TX.t0*10+(dir>0?0:1.4)),stride=run*6,swing=cl(sw||0,0,1);
+ const run=Math.sin(TX.t0*10+(dir>0?0:1.4)),stride=run*6*(.12+cl(runAmount,0,1)*1.1),swing=cl(sw||0,0,1);
  cx.fillStyle='#0006';cx.beginPath();cx.ellipse(0,2,15,5,0,0,Math.PI*2);cx.fill();
  cx.strokeStyle='#202b37';cx.lineWidth=6;cx.lineCap='round';cx.beginPath();
  cx.moveTo(-5,-2);cx.lineTo(-8+stride,-25);cx.lineTo(-9+stride,-31);cx.moveTo(5,-2);cx.lineTo(8-stride,-25);cx.lineTo(9-stride,-31);cx.stroke();
