@@ -1007,7 +1007,7 @@ const Football=(()=>{
     if(outlet){logEvent(['골키퍼의 롱킥!','counter'],owner,outlet.name+'에게 전개합니다');passTo(owner,outlet,'pass')}
     return;
    }
-   if(goalDistance<310&&(goalDistance<175||R()<.42)){launchShot(team,owner,goalDistance<175?'clutch':'shot');return;}
+   if(goalDistance<310&&(goalDistance<190||R()<.18)){launchShot(team,owner,goalDistance<190?'clutch':'shot');return;}
    if(pressure<43&&R()<.22){
     const tackler=defenders.slice().sort((a,b)=>Math.hypot(a.x-ball.x,a.y-ball.y)-Math.hypot(b.x-ball.x,b.y-ball.y))[0];
     if(tackler){tackler.tackleT=.52;tackler.tackles++;tackler.ratings+=1.25;owner.ratings=Math.max(0,owner.ratings-.25);ball.owner=tackler.id;st.possession=opp;st.lastPasser=null;logEvent(['태클 성공!','tackle'],tackler,owner.name+'의 볼을 빼앗습니다');return;}
@@ -1018,7 +1018,7 @@ const Football=(()=>{
     const travel=Math.hypot(p.x-ball.x,p.y-ball.y),laneBonus=Math.abs(p.y-ball.y)>55?12:0;
     return{p,score:forward*.32+Math.min(space,180)*.38-travel*.22+laneBonus+(p.role==='공격수'?10:0)};
    }).sort((a,b)=>b.score-a.score)[0]?.p;
-   if(receiver&&(pressure>=58||R()<.62)){
+   if(receiver&&((pressure>=72&&R()<.78)||(pressure>=42&&goalDistance>260&&R()<.18))){
     const isCross=goalDistance<370&&Math.abs(receiver.y-300)>90;passTo(owner,receiver,isCross?'cross':'pass');return;
    }
    owner.ratings+=.65;owner.runPhase+=.8;
@@ -1088,14 +1088,14 @@ function beginPenalty(){
    st.players.forEach((p,i)=>{
     if(!p.active)return;
     const side=p.team,attack=side===0?1:-1,home=positions[i%6],homeX=side?1000-home.x:home.x,homeY=home.y;
-    const dx=ball.x-p.x,dy=ball.y-p.y,attacking=st.possession===side;
+    const dx=ball.x-p.x,dy=ball.y-p.y,attacking=st.possession===side,pressing=st.players.filter(q=>q.team===side&&q.active&&q.role!=='골키퍼').sort((a,b)=>Math.hypot(a.x-ball.x,a.y-ball.y)-Math.hypot(b.x-ball.x,b.y-ball.y))[0]?.id===p.id;
     let tx=homeX,ty=homeY;
     if(p.role==='골키퍼'){tx=side===0?62:938;ty=clamp(300+(ball.y-300)*.42,248,352);}
     else if(p.role==='수비수'){
      const line=attacking?ball.x-attack*150:ball.x-attack*108;
      tx=clamp(homeX*.34+line*.66,side===0?112:588,side===0?455:888);
      ty=clamp(homeY+(ball.y-300)*.28,88,512);
-     if(Math.hypot(dx,dy)<112){tx=clamp(ball.x-attack*34,55,945);ty=clamp(ball.y+dy*.08,60,540);}
+     if(!attacking&&pressing){tx=clamp(ball.x-attack*25,55,945);ty=clamp(ball.y,58,542);}
     }else{
      const lane=p.number===7?-105:p.number===11?105:0,lead=p.number===10?78:48;
      tx=clamp(ball.x+attack*(attacking?lead:-76),105,895);
